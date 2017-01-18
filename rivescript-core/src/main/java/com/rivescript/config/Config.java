@@ -25,6 +25,7 @@ package com.rivescript.config;
 import com.rivescript.RiveScript;
 import com.rivescript.session.SessionManager;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,26 +50,56 @@ public class Config {
 	private Config() {
 	}
 
+	/**
+	 * Returns whether strict syntax checking is enabled.
+	 *
+	 * @return whether strict syntax checking is enabled
+	 */
 	public boolean isStrict() {
 		return strict;
 	}
 
+	/**
+	 * Returns whether UTF-8 mode is enabled for user messages and triggers.
+	 *
+	 * @return whether UTF-8 mode is enabled for user messages and triggers
+	 */
 	public boolean isUtf8() {
 		return utf8;
 	}
 
+	/**
+	 * Returns whether forcing triggers to lowercase is enabled.
+	 *
+	 * @return whether forcing triggers to lowercase is enabled
+	 */
 	public boolean isForceCase() {
 		return forceCase;
 	}
 
+	/**
+	 * Returns the recursion depth limit.
+	 *
+	 * @return the recursion depth limit
+	 */
 	public int getDepth() {
 		return depth;
 	}
 
+	/**
+	 * Returns the {@link SessionManager} for user variables.
+	 *
+	 * @return the session manager for user variables
+	 */
 	public SessionManager getSessionManager() {
 		return sessionManager;
 	}
 
+	/**
+	 * Returns the custom error message overrides.
+	 *
+	 * @return the custom error message overrides
+	 */
 	public Map<String, String> getErrors() {
 		return errors;
 	}
@@ -100,7 +131,8 @@ public class Config {
 		return errors != null ? errors.equals(config.errors) : config.errors == null;
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		int result = (strict ? 1 : 0);
 		result = 31 * result + (utf8 ? 1 : 0);
 		result = 31 * result + (forceCase ? 1 : 0);
@@ -122,7 +154,12 @@ public class Config {
 				'}';
 	}
 
-	public ConfigBuilder toBuilder() {
+	/**
+	 * Converts this {@link Config} instance to a {@link Builder}.
+	 *
+	 * @return the config builder
+	 */
+	public Builder toBuilder() {
 		return newBuilder()
 				.strict(this.strict)
 				.utf8(this.utf8)
@@ -132,19 +169,37 @@ public class Config {
 				.errors(this.errors);
 	}
 
+	/**
+	 * Creates a basic config.
+	 *
+	 * @return the config
+	 */
 	public static Config basic() {
-		return ConfigBuilder.basic().build();
+		return Builder.basic().build();
 	}
 
+	/**
+	 * Creates a basic config with UTF-8 mode enabled.
+	 *
+	 * @return the config
+	 */
 	public static Config utf8() {
-		return ConfigBuilder.utf8().build();
+		return Builder.utf8().build();
 	}
 
-	public static ConfigBuilder newBuilder() {
-		return new ConfigBuilder();
+	/**
+	 * Creates a new {@link Builder}.
+	 *
+	 * @return the config builder
+	 */
+	public static Builder newBuilder() {
+		return new Builder();
 	}
 
-	public static final class ConfigBuilder {
+	/**
+	 * Builder for {@link Config}.
+	 */
+	public static final class Builder {
 
 		private boolean strict;
 		private boolean utf8;
@@ -153,39 +208,95 @@ public class Config {
 		private SessionManager sessionManager;
 		private Map<String, String> errors;
 
-		private ConfigBuilder() {
+		private Builder() {
 		}
 
-		public ConfigBuilder strict(boolean strict) {
+		/**
+		 * Sets whether strict syntax checking is enabled.
+		 *
+		 * @param strict whether strict syntax checking is enabled
+		 * @return this config builder
+		 */
+		public Builder strict(boolean strict) {
 			this.strict = strict;
 			return this;
 		}
 
-		public ConfigBuilder utf8(boolean utf8) {
+		/**
+		 * Sets whether UTF-8 mode is enabled.
+		 *
+		 * @param utf8 whether UTF-8 is enabled
+		 * @return this config builder
+		 */
+		public Builder utf8(boolean utf8) {
 			this.utf8 = utf8;
 			return this;
 		}
 
-		public ConfigBuilder forceCase(boolean forceCase) {
+		/**
+		 * Sets whether forcing triggers to lowercase is enabled.
+		 *
+		 * @param forceCase whether forcing triggers to lowercase is enabled
+		 * @return this config builder
+		 */
+		public Builder forceCase(boolean forceCase) {
 			this.forceCase = forceCase;
 			return this;
 		}
 
-		public ConfigBuilder depth(int depth) {
+		/**
+		 * Sets the recursion depth limit.
+		 *
+		 * @param depth the recursion depth limit
+		 * @return this config builder
+		 */
+		public Builder depth(int depth) {
 			this.depth = depth;
 			return this;
 		}
 
-		public ConfigBuilder sessionManager(SessionManager sessionManager) {
+		/**
+		 * Sets the {@link SessionManager} for user variables.
+		 *
+		 * @param sessionManager the session manager
+		 * @return this config builder
+		 */
+		public Builder sessionManager(SessionManager sessionManager) {
 			this.sessionManager = sessionManager;
 			return this;
 		}
 
-		public ConfigBuilder errors(Map<String, String> errors) {
+		/**
+		 * Sets the custom error message overrides.
+		 *
+		 * @param errors the custom error message overrides
+		 * @return this config builder
+		 */
+		public Builder errors(Map<String, String> errors) {
 			this.errors = errors;
 			return this;
 		}
 
+		/**
+		 * Adds a custom error message override.
+		 *
+		 * @param key the key of the error message
+		 * @param value the custom error message
+		 * @return this config builder
+		 */
+		public Builder addError(String key, String value) {
+			if (this.errors == null) {
+				this.errors = new HashMap<>();
+			}
+			this.errors.put(key, value);
+			return this;
+		}
+
+		/**
+		 * Builds the config.
+		 *
+		 * @return the config
+		 */
 		public Config build() {
 			Config config = new Config();
 			config.utf8 = this.utf8;
@@ -197,11 +308,21 @@ public class Config {
 			return config;
 		}
 
-		public static ConfigBuilder basic() {
-			return new ConfigBuilder().strict(true);
+		/**
+		 * Creates a basic config builder.
+		 *
+		 * @return the config builder
+		 */
+		public static Builder basic() {
+			return new Builder().strict(true);
 		}
 
-		public static ConfigBuilder utf8() {
+		/**
+		 * Creates a basic config builder with UTF-8 mode enabled.
+		 *
+		 * @return the config builder
+		 */
+		public static Builder utf8() {
 			return basic().utf8(true);
 		}
 	}
