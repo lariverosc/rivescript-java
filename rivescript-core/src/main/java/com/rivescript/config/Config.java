@@ -48,7 +48,7 @@ public class Config {
 	private SessionManager sessionManager;
 	private Map<String, String> errors;
 
-	private Config() {
+	protected Config() {
 	}
 
 	/**
@@ -113,23 +113,23 @@ public class Config {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Config config = (Config) o;
-		if (strict != config.strict) {
+		Config that = (Config) o;
+		if (strict != that.strict) {
 			return false;
 		}
-		if (utf8 != config.utf8) {
+		if (utf8 != that.utf8) {
 			return false;
 		}
-		if (forceCase != config.forceCase) {
+		if (forceCase != that.forceCase) {
 			return false;
 		}
-		if (depth != config.depth) {
+		if (depth != that.depth) {
 			return false;
 		}
-		if (sessionManager != null ? !sessionManager.equals(config.sessionManager) : config.sessionManager != null) {
+		if (sessionManager != null ? !sessionManager.equals(that.sessionManager) : that.sessionManager != null) {
 			return false;
 		}
-		return errors != null ? errors.equals(config.errors) : config.errors == null;
+		return errors != null ? errors.equals(that.errors) : that.errors == null;
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class Config {
 	/**
 	 * Converts this {@link Config} instance to a {@link Builder}.
 	 *
-	 * @return the config builder
+	 * @return the builder
 	 */
 	public Builder toBuilder() {
 		return newBuilder()
@@ -171,7 +171,7 @@ public class Config {
 	}
 
 	/**
-	 * Creates a basic config.
+	 * Creates a basic {@link Config}. A basic config has all the defaults, plus {@code strict = true}.
 	 *
 	 * @return the config
 	 */
@@ -180,7 +180,7 @@ public class Config {
 	}
 
 	/**
-	 * Creates a basic config with UTF-8 mode enabled.
+	 * Creates a basic {@link Config} with UTF-8 mode enabled.
 	 *
 	 * @return the config
 	 */
@@ -191,7 +191,7 @@ public class Config {
 	/**
 	 * Creates a new {@link Builder}.
 	 *
-	 * @return the config builder
+	 * @return the builder
 	 */
 	public static Builder newBuilder() {
 		return new Builder();
@@ -216,7 +216,7 @@ public class Config {
 		 * Sets whether strict syntax checking is enabled.
 		 *
 		 * @param strict whether strict syntax checking is enabled
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder strict(boolean strict) {
 			this.strict = strict;
@@ -227,7 +227,7 @@ public class Config {
 		 * Sets whether UTF-8 mode is enabled.
 		 *
 		 * @param utf8 whether UTF-8 is enabled
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder utf8(boolean utf8) {
 			this.utf8 = utf8;
@@ -238,7 +238,7 @@ public class Config {
 		 * Sets whether forcing triggers to lowercase is enabled.
 		 *
 		 * @param forceCase whether forcing triggers to lowercase is enabled
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder forceCase(boolean forceCase) {
 			this.forceCase = forceCase;
@@ -249,7 +249,7 @@ public class Config {
 		 * Sets the recursion depth limit.
 		 *
 		 * @param depth the recursion depth limit
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder depth(int depth) {
 			this.depth = depth;
@@ -260,7 +260,7 @@ public class Config {
 		 * Sets the {@link SessionManager} for user variables.
 		 *
 		 * @param sessionManager the session manager
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder sessionManager(SessionManager sessionManager) {
 			this.sessionManager = sessionManager;
@@ -271,7 +271,7 @@ public class Config {
 		 * Sets the custom error message overrides.
 		 *
 		 * @param errors the custom error message overrides
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder errors(Map<String, String> errors) {
 			this.errors = errors;
@@ -283,7 +283,7 @@ public class Config {
 		 *
 		 * @param key   the key of the error message
 		 * @param value the custom error message
-		 * @return this config builder
+		 * @return this builder
 		 */
 		public Builder addError(String key, String value) {
 			if (this.errors == null) {
@@ -310,18 +310,18 @@ public class Config {
 		}
 
 		/**
-		 * Creates a basic config builder.
+		 * Creates a basic {@link Config.Builder}. A basic builder has all the defaults, plus {@code strict = true}.
 		 *
-		 * @return the config builder
+		 * @return the builder
 		 */
 		public static Builder basic() {
 			return new Builder().strict(true);
 		}
 
 		/**
-		 * Creates a basic config builder with UTF-8 mode enabled.
+		 * Creates a basic {@link Config.Builder} with UTF-8 mode enabled.
 		 *
-		 * @return the config builder
+		 * @return the builder
 		 */
 		public static Builder utf8() {
 			return basic().utf8(true);
