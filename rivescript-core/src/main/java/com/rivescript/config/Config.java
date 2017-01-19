@@ -32,6 +32,7 @@ import java.util.Map;
  * User-configurable properties of the {@link RiveScript} interpreter.
  *
  * @author Marcel Overdijk
+ * @since 0.8
  */
 public class Config {
 
@@ -299,12 +300,12 @@ public class Config {
 		 */
 		public Config build() {
 			Config config = new Config();
-			config.utf8 = this.utf8;
 			config.strict = this.strict;
+			config.utf8 = this.utf8;
+			config.forceCase = this.forceCase;
 			config.depth = this.depth;
 			config.sessionManager = this.sessionManager;
 			config.errors = this.errors;
-			config.forceCase = this.forceCase;
 			return config;
 		}
 
