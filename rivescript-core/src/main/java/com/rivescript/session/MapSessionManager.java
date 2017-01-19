@@ -28,6 +28,6 @@ package com.rivescript.session;
  * @author Marcel Overdijk
  * @since 0.8
  */
-public interface SessionManager {
+public class MapSessionManager implements SessionManager {
 
 }
