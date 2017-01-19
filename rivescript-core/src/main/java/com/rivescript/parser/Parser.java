@@ -23,7 +23,10 @@
 package com.rivescript.parser;
 
 import com.rivescript.ast.Root;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,6 +39,8 @@ import java.util.List;
 public class Parser {
 
 	public static final double RS_VERSION = 2.0;
+
+	private static Logger logger = LoggerFactory.getLogger(Parser.class);
 
 	private ParserConfig config;
 
@@ -61,11 +66,18 @@ public class Parser {
 	 * In case of errors (e.g. a syntax error while strict mode is enabled) a {@link ParserException} will be thrown.
 	 *
 	 * @param filename the arbitrary name for the source code being parsed
-	 * @param code the list of lines of RiveScript source code
+	 * @param code     the list of lines of RiveScript source code
 	 * @return the AST root object
 	 * @throws ParserException if the parsing fails
 	 */
 	public Root parse(String filename, List<String> code) throws ParserException {
+
+		logger.info("Started parsing {}", filename);
+		if (logger.isTraceEnabled()) {
+			for (String line : code) {
+				logger.trace("{}", line);
+			}
+		}
 
 		// TODO
 
