@@ -281,7 +281,7 @@ public class Config {
 		/**
 		 * Adds a custom error message override.
 		 *
-		 * @param key the key of the error message
+		 * @param key   the key of the error message
 		 * @param value the custom error message
 		 * @return this config builder
 		 */
