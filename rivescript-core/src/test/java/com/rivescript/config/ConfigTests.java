@@ -59,14 +59,14 @@ public class ConfigTests {
 
 	@Test
 	public void testEquals() {
-		Config config1 = Config.basic();
-		Config config2 = Config.basic();
+		Config config1 = new Config();
+		Config config2 = new Config();
 		assertThat(config1, is(equalTo(config2)));
 	}
 
 	@Test
 	public void testToBuilder() {
-		Config config1 = Config.basic();
+		Config config1 = new Config();
 		Config.Builder builder = config1.toBuilder();
 		Config config2 = builder.build();
 		assertThat(config1, is(equalTo(config2)));
