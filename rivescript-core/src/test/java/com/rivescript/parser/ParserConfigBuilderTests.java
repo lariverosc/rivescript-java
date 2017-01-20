@@ -58,4 +58,16 @@ public class ParserConfigBuilderTests {
 		ParserConfig config = ParserConfig.newBuilder().utf8(true).build();
 		assertThat(config.isUtf8(), is(equalTo(true)));
 	}
+
+	@Test
+	public void testBuildWithForceCaseIsFalse() {
+		ParserConfig config = ParserConfig.newBuilder().forceCase(false).build();
+		assertThat(config.isForceCase(), is(equalTo(false)));
+	}
+
+	@Test
+	public void testBuildWithForceCaseIstrue() {
+		ParserConfig config = ParserConfig.newBuilder().forceCase(true).build();
+		assertThat(config.isForceCase(), is(equalTo(true)));
+	}
 }

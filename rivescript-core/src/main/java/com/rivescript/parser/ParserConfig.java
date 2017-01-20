@@ -32,6 +32,7 @@ public class ParserConfig {
 
 	private boolean strict;
 	private boolean utf8;
+	private boolean forceCase;
 
 	protected ParserConfig() {
 	}
@@ -54,6 +55,15 @@ public class ParserConfig {
 		return utf8;
 	}
 
+	/**
+	 * Returns whether forcing triggers to lowercase is enabled.
+	 *
+	 * @return whether forcing triggers to lowercase is enabled
+	 */
+	public boolean isForceCase() {
+		return forceCase;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -66,13 +76,17 @@ public class ParserConfig {
 		if (strict != that.strict) {
 			return false;
 		}
-		return utf8 == that.utf8;
+		if (utf8 != that.utf8) {
+			return false;
+		}
+		return forceCase == that.forceCase;
 	}
 
 	@Override
 	public int hashCode() {
 		int result = (strict ? 1 : 0);
 		result = 31 * result + (utf8 ? 1 : 0);
+		result = 31 * result + (forceCase ? 1 : 0);
 		return result;
 	}
 
@@ -81,6 +95,7 @@ public class ParserConfig {
 		return "ParserConfig{" +
 				"strict=" + strict +
 				", utf8=" + utf8 +
+				", forceCase=" + forceCase +
 				'}';
 	}
 
@@ -92,7 +107,8 @@ public class ParserConfig {
 	public Builder toBuilder() {
 		return newBuilder()
 				.strict(this.strict)
-				.utf8(this.utf8);
+				.utf8(this.utf8)
+				.forceCase(this.forceCase);
 	}
 
 	/**
@@ -111,6 +127,7 @@ public class ParserConfig {
 
 		private boolean strict;
 		private boolean utf8;
+		private boolean forceCase;
 
 		private Builder() {
 		}
@@ -138,6 +155,17 @@ public class ParserConfig {
 		}
 
 		/**
+		 * Sets whether forcing triggers to lowercase is enabled.
+		 *
+		 * @param forceCase whether forcing triggers to lowercase is enabled
+		 * @return this builder
+		 */
+		public Builder forceCase(boolean forceCase) {
+			this.forceCase = forceCase;
+			return this;
+		}
+
+		/**
 		 * Builds the parser config.
 		 *
 		 * @return the parser config
@@ -146,6 +174,7 @@ public class ParserConfig {
 			ParserConfig config = new ParserConfig();
 			config.strict = this.strict;
 			config.utf8 = this.utf8;
+			config.forceCase = this.forceCase;
 			return config;
 		}
 	}
