@@ -169,7 +169,7 @@ public class Parser {
 
 			// Separate the command from its data.
 			if (line.length() < 2) {
-				logger.warn("Weird single-character line '{}' found at {} line {}", line, filename, lineno);
+				logger.warn("Weird single-character line '{}' at {} line {}", line, filename, lineno);
 				continue;
 			}
 			String cmd = line.substring(0, 1);
@@ -182,20 +182,28 @@ public class Parser {
 
 			line = line.trim();
 
-			// In the event of a +Trigger, if we are force-lowercasing it, then do so
-			// now before the syntax check.
+			// In the event of a +Trigger, if we are force-lowercasing it, then do so now before the syntax check.
 			if (config.isForceCase() && cmd.equals("+")) {
 				line = line.toLowerCase();
 			}
 
-			// TODO: check syntax
+			logger.debug("Cmd: {}; line: {}", cmd, line);
+
+			// Run a syntax check on this line.
+			try {
+				checkSyntax(cmd, line);
+			} catch (ParserException e) {
+				if (config.isStrict()) {
+					throw e; // Simply rethrow the parser exception.
+				} else {
+					logger.warn("Syntax error '{}' at {} line {}", e.getMessage(), filename, lineno);
+				}
+			}
 
 			// Reset the %Previous state if this is a new +Trigger.
 			if (cmd.equals("+")) {
 				previous = null;
 			}
-
-			logger.debug("Cmd: {}; line: {}", cmd, line);
 
 			// Do a look-ahead for ^Continue and %Previous commands.
 			if (!cmd.equals("^")) {
@@ -230,8 +238,7 @@ public class Parser {
 					}
 
 					// If the current command is a ! and the next command(s) are ^,
-					// we'll tack each extension on as a line break (which is useful
-					// information for arrays).
+					// we'll tack each extension on as a line break (which is useful information for arrays).
 					if (cmd.equals("!")) {
 						if (lookCmd.equals("^")) {
 							line += "<crlf>" + lookahead;
@@ -240,8 +247,7 @@ public class Parser {
 					}
 
 					// If the current command is not a ^, and the line after is not a %,
-					// but the line after IS a ^, then tack it on to the end of the
-					// current line.
+					// but the line after IS a ^, then tack it on to the end of the current line.
 					if (!cmd.equals("^") && !lookCmd.equals("%")) {
 						if (lookCmd.equals("^")) {
 							// Which character to concatenate with?
@@ -513,5 +519,123 @@ public class Parser {
 		}
 
 		return ast;
+	}
+
+	private void checkSyntax(String cmd, String line) throws ParserException {
+		// Run syntax tests based on the command used.
+		if (cmd.equals("!")) {
+			// ! Definition
+			// - Must be formatted like this:
+			//   ! type name = value
+			//   OR
+			//   ! type = value
+			if (!line.matches("^(version|local|global|var|array|sub|person)(?:\\s+.+|)\\s*=\\s*.+?$")) {
+				throw new ParserException("Invalid format for !Definition line: must be '! type name = value' OR '! type = value'");
+			} else if (line.matches("^array")) {
+				if (line.matches("\\=\\s?\\||\\|\\s?$")) {
+					throw new ParserException("Piped arrays can't begin or end with a |");
+				} else if (line.matches("\\|\\|")) {
+					throw new ParserException("Piped arrays can't include blank entries");
+				}
+			}
+		} else if (cmd.equals(">")) {
+			// > Label
+			// - The "begin" label must have only one argument ("begin").
+			// - The "topic" label must be lowercased but can inherit other topics.
+			// - The "object" label must follow the same rules as "topic", but don't need to be lowercased.
+			String[] parts = line.split("\\s+");
+			if (parts[0].equals("begin") && parts.length > 1) {
+				throw new ParserException("The 'begin' label takes no additional arguments");
+			} else if (parts[0].equals("topic")) {
+				if (!config.isForceCase() && line.matches("[^a-z0-9_\\-\\s]")) {
+					throw new ParserException("Topics should be lowercased and contain only letters and numbers");
+				} else if (line.matches("[^A-Za-z0-9_\\-\\s]")) {
+					throw new ParserException("Topics should contain only letters and numbers in forceCase mode");
+				}
+			} else if (parts[0].equals("object")) {
+				if (line.matches("[^A-Za-z0-9\\_\\-\\s]")) {
+					throw new ParserException("Objects can only contain numbers and letters");
+				}
+			}
+		} else if (cmd.equals("+") || cmd.equals("%") || cmd.equals("@")) {
+			// + Trigger, % Previous, @ Redirect
+			// This one is strict. The triggers are to be run through the regexp engine,
+			// therefore it should be acceptable for the regexp engine.
+			// - Entirely lowercase.
+			// - No symbols except: ( | ) [ ] * _ # { } < > =
+			// - All brackets should be matched.
+			int parens = 0, square = 0, curly = 0, angle = 0; // Count the brackets
+
+			// Look for obvious errors first.
+			if (config.isUtf8()) {
+				// In UTF-8 mode, most symbols are allowed.
+				if (line.matches("[A-Z\\\\.]")) {
+					throw new ParserException("Triggers can't contain uppercase letters, backslashes or dots in UTF-8 mode");
+				}
+			} else if (line.matches("[^a-z0-9(|)\\[\\]*_#@{}<>=\\/\\s]")) {
+				throw new ParserException(
+						"Triggers may only contain lowercase letters, numbers, and these symbols: ( | ) [ ] * _ # { } < > = /");
+			} else if (line.matches("\\(\\||\\|\\)")) {
+				throw new ParserException("Piped alternations can't begin or end with a |");
+			} else if (line.matches("\\([^\\)].+\\|\\|.+\\)")) {
+				throw new ParserException("Piped alternations can't include blank entries");
+			} else if (line.matches("\\[\\||\\|\\]")) {
+				throw new ParserException("Piped optionals can't begin or end with a |");
+			} else if (line.matches("\\[[^\\]].+\\|\\|.+\\]")) {
+				throw new ParserException("Piped optionals can't include blank entries");
+			}
+
+			// Count the brackets.
+			String[] chars = line.split("");
+			for (String c : chars) {
+				switch (c) {
+					case "(":
+						parens++;
+						break;
+					case ")":
+						parens--;
+						break;
+					case "[":
+						square++;
+						break;
+					case "]":
+						square--;
+						break;
+					case "{":
+						curly++;
+						break;
+					case "}":
+						curly--;
+						break;
+					case "<":
+						angle++;
+						break;
+					case ">":
+						angle--;
+						break;
+				}
+			}
+
+			// Any mismatches?
+			if (parens != 0) {
+				throw new ParserException("Unmatched parenthesis brackets");
+			}
+			if (square != 0) {
+				throw new ParserException("Unmatched square brackets");
+			}
+			if (curly != 0) {
+				throw new ParserException("Unmatched curly brackets");
+			}
+			if (angle != 0) {
+				throw new ParserException("Unmatched angle brackets");
+			}
+		} else if (cmd.equals("*")) {
+			// * Condition
+			// Syntax for a conditional is as follows:
+			// * value symbol value => response
+			if (!line.matches("^.+?\\s*(?:==|eq|!=|ne|<>|<|<=|>|>=)\\s*.+?=>.+?$")) {
+				throw new ParserException("Invalid format for !Condition: should be like '* value symbol value => response'");
+			}
+		}
 	}
 }
