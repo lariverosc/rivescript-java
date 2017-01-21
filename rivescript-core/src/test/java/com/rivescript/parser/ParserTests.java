@@ -22,13 +22,15 @@
 
 package com.rivescript.parser;
 
+import com.rivescript.ast.Root;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Test;
 
-import java.util.Arrays;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Tests for {@link Parser}.
@@ -38,8 +40,57 @@ import static org.junit.Assert.assertThat;
 public class ParserTests {
 
 	@Test
-	public void testParse() {
-		Parser parser = new Parser();
-		parser.parse("test", Arrays.asList("1", "2", "3"));
+	public void testParseTestSuite() throws Exception {
+		URI file = getClass().getClassLoader().getResource("testsuite.rive").toURI();
+		List<String> code = Files.readAllLines(Paths.get(file));
+		Parser parser = new Parser(ParserConfig.newBuilder().strict(true).build());
+		Root ast = parser.parse("testsuite.rive", code.toArray(new String[0]));
+		System.out.println(ToStringBuilder.reflectionToString(ast, ToStringStyle.MULTI_LINE_STYLE));
+	}
+
+	@Test
+	public void testParseCustom() {
+		Parser parser = new Parser(ParserConfig.newBuilder().strict(true).build());
+		Root ast = parser.parse("test.rive", new String[] {
+				"! version = 2.00",
+				"! global debug = 1",
+				// "+ (foo|bar))",
+				// "! mars name     = value",
+				"! var name      = RiveScript Bot",
+				"! var age       = 0",
+				"! var gender    = androgynous",
+				"! var location  = Cyberspace",
+				"! var generator = RiveScript",
+				"! array be      = is are was were",
+				"! array whatis  = what is|what are|what was|what were,",
+				"! array blues   = azure blue aqua cyan baby\\sblue sky\\sblue",
+				"! array colors  = red green blue cyan magenta yellow",
+				"^ light red|light green|light blue|light cyan|light magenta|light yellow",
+				"^ dark red|dark green|dark blue|dark cyan|dark magenta|dark yellow",
+				"^ white orange teal brown pink",
+				"^ dark white|dark orange|dark teal|dark brown|dark pink",
+				"! sub what's  = what is",
+				"! sub what're = what are",
+				"! sub what'd  = what did",
+				"! sub a/s/l   = age sex location",
+				"! sub brb     = be right back",
+				"! sub afk     = away from keyboard",
+				"! sub l o l   = lol",
+				"! person you are = I am",
+				"! person i am    = you are",
+				"! person you     = I",
+				"! person i       = you",
+				"t",
+				"t test",
+				"+ hi bot",
+				"- hi human",
+				"- hi there",
+				"+ how are you doing?",
+				"* <get mood> eq great => I'm great",
+				"* <get mood> eq bad   => I'm not feeling so well",
+				"- I'm fine",
+		});
+
+		System.out.println(ToStringBuilder.reflectionToString(ast, ToStringStyle.MULTI_LINE_STYLE));
 	}
 }
