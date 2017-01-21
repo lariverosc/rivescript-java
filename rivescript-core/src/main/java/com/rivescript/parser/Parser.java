@@ -81,9 +81,9 @@ public class Parser {
 	/**
 	 * Parses the RiveScript source code.
 	 * <p>
-	 * This will return an AST {@link Root} object containing all of the relevant information parsed from the source code.
+	 * This will return an Abstract Syntax Tree {@link Root} object containing all of the relevant information parsed from the source code.
 	 * <p>
-	 * In case of errors (e.g. a syntax error while strict mode is enabled) a {@link ParserException} will be thrown.
+	 * In case of errors (e.g. a syntax error when strict mode is enabled) a {@link ParserException} will be thrown.
 	 *
 	 * @param filename the arbitrary name for the source code being parsed
 	 * @param code     the list of lines of RiveScript source code
