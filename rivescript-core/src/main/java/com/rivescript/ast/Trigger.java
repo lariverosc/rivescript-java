@@ -22,6 +22,7 @@
 
 package com.rivescript.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,8 +34,8 @@ import java.util.List;
 public class Trigger {
 
 	private String trigger;
-	private List<String> reply;
-	private List<String> condition;
+	private List<String> reply = new ArrayList<>();
+	private List<String> condition = new ArrayList<>();
 	private String redirect;
 	private String previous;
 
@@ -76,5 +77,58 @@ public class Trigger {
 
 	public void setPrevious(String previous) {
 		this.previous = previous;
+	}
+
+	public void addReply(String reply) {
+		this.reply.add(reply);
+	}
+
+	public void addCondition(String condition) {
+		this.condition.add(condition);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Trigger that = (Trigger) o;
+		if (trigger != null ? !trigger.equals(that.trigger) : that.trigger != null) {
+			return false;
+		}
+		if (reply != null ? !reply.equals(that.reply) : that.reply != null) {
+			return false;
+		}
+		if (condition != null ? !condition.equals(that.condition) : that.condition != null) {
+			return false;
+		}
+		if (redirect != null ? !redirect.equals(that.redirect) : that.redirect != null) {
+			return false;
+		}
+		return previous != null ? previous.equals(that.previous) : that.previous == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = trigger != null ? trigger.hashCode() : 0;
+		result = 31 * result + (reply != null ? reply.hashCode() : 0);
+		result = 31 * result + (condition != null ? condition.hashCode() : 0);
+		result = 31 * result + (redirect != null ? redirect.hashCode() : 0);
+		result = 31 * result + (previous != null ? previous.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Trigger{" +
+				"trigger='" + trigger + '\'' +
+				", reply=" + reply +
+				", condition=" + condition +
+				", redirect='" + redirect + '\'' +
+				", previous='" + previous + '\'' +
+				'}';
 	}
 }

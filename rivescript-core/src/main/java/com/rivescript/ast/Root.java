@@ -22,6 +22,8 @@
 
 package com.rivescript.ast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +35,13 @@ import java.util.Map;
  */
 public class Root {
 
-	private Begin begin;
-	private Map<String, Topic> topics;
-	private List<Object> objects;
+	private Begin begin = new Begin();
+	private Map<String, Topic> topics = new HashMap<>();
+	private List<ObjectMacro> objects = new ArrayList<>();
+
+	public Root() {
+		addTopic("random");
+	}
 
 	public Begin getBegin() {
 		return begin;
@@ -43,6 +49,10 @@ public class Root {
 
 	public void setBegin(Begin begin) {
 		this.begin = begin;
+	}
+
+	public Topic getTopic(String name) {
+		return topics.get(name);
 	}
 
 	public Map<String, Topic> getTopics() {
@@ -53,11 +63,54 @@ public class Root {
 		this.topics = topics;
 	}
 
-	public List<Object> getObjects() {
+	public List<ObjectMacro> getObjects() {
 		return objects;
 	}
 
-	public void setObjects(List<Object> objects) {
+	public void setObjects(List<ObjectMacro> objects) {
 		this.objects = objects;
+	}
+
+	public void addTopic(String name) {
+		topics.put(name, new Topic());
+	}
+
+	public void addObject(ObjectMacro object) {
+		objects.add(object);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Root that = (Root) o;
+		if (begin != null ? !begin.equals(that.begin) : that.begin != null) {
+			return false;
+		}
+		if (topics != null ? !topics.equals(that.topics) : that.topics != null) {
+			return false;
+		}
+		return objects != null ? objects.equals(that.objects) : that.objects == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = begin != null ? begin.hashCode() : 0;
+		result = 31 * result + (topics != null ? topics.hashCode() : 0);
+		result = 31 * result + (objects != null ? objects.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Root{" +
+				"begin=" + begin +
+				", topics=" + topics +
+				", objects=" + objects +
+				'}';
 	}
 }

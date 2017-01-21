@@ -22,6 +22,7 @@
 
 package com.rivescript.ast;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +34,11 @@ import java.util.Map;
  */
 public class Begin {
 
-	private Map<String, String> global;
-	private Map<String, String> var;
-	private Map<String, String> sub;
-	private Map<String, String> person;
-	private Map<String, List<String>> array;
+	private Map<String, String> global = new HashMap<>();
+	private Map<String, String> var = new HashMap<>();
+	private Map<String, String> sub = new HashMap<>();
+	private Map<String, String> person = new HashMap<>();
+	private Map<String, List<String>> array = new HashMap<>();
 
 	public Map<String, String> getGlobal() {
 		return global;
@@ -77,5 +78,70 @@ public class Begin {
 
 	public void setArray(Map<String, List<String>> array) {
 		this.array = array;
+	}
+
+	public void addGlobal(String name, String value) {
+		global.put(name, value);
+	}
+
+	public void addVar(String name, String value) {
+		var.put(name, value);
+	}
+
+	public void addSub(String name, String value) {
+		sub.put(name, value);
+	}
+
+	public void addPerson(String name, String value) {
+		person.put(name, value);
+	}
+
+	public void addArray(String name, List<String> value) {
+		array.put(name, value);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Begin that = (Begin) o;
+		if (global != null ? !global.equals(that.global) : that.global != null) {
+			return false;
+		}
+		if (var != null ? !var.equals(that.var) : that.var != null) {
+			return false;
+		}
+		if (sub != null ? !sub.equals(that.sub) : that.sub != null) {
+			return false;
+		}
+		if (person != null ? !person.equals(that.person) : that.person != null) {
+			return false;
+		}
+		return array != null ? array.equals(that.array) : that.array == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = global != null ? global.hashCode() : 0;
+		result = 31 * result + (var != null ? var.hashCode() : 0);
+		result = 31 * result + (sub != null ? sub.hashCode() : 0);
+		result = 31 * result + (person != null ? person.hashCode() : 0);
+		result = 31 * result + (array != null ? array.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Begin{" +
+				"global=" + global +
+				", var=" + var +
+				", sub=" + sub +
+				", person=" + person +
+				", array=" + array +
+				'}';
 	}
 }

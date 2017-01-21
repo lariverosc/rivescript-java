@@ -30,7 +30,7 @@ import java.util.List;
  * @author Marcel Overdijk
  * @since 0.8
  */
-public class Object {
+public class ObjectMacro {
 
 	private String name;
 	private String language;
@@ -58,5 +58,40 @@ public class Object {
 
 	public void setCode(List<String> code) {
 		this.code = code;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		ObjectMacro that = (ObjectMacro) o;
+		if (name != null ? !name.equals(that.name) : that.name != null) {
+			return false;
+		}
+		if (language != null ? !language.equals(that.language) : that.language != null) {
+			return false;
+		}
+		return code != null ? code.equals(that.code) : that.code == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = name != null ? name.hashCode() : 0;
+		result = 31 * result + (language != null ? language.hashCode() : 0);
+		result = 31 * result + (code != null ? code.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "ObjectMacro{" +
+				"name='" + name + '\'' +
+				", language='" + language + '\'' +
+				", code=" + code +
+				'}';
 	}
 }

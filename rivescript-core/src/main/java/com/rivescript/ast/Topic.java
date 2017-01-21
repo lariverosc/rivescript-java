@@ -22,6 +22,8 @@
 
 package com.rivescript.ast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +35,9 @@ import java.util.Map;
  */
 public class Topic {
 
-	private List<Trigger> triggers;
-	private Map<String, Boolean> includes;
-	private Map<String, Boolean> inherits;
+	private List<Trigger> triggers = new ArrayList<>();
+	private Map<String, Boolean> includes = new HashMap<>();
+	private Map<String, Boolean> inherits = new HashMap<>();
 
 	public List<Trigger> getTriggers() {
 		return triggers;
@@ -59,5 +61,52 @@ public class Topic {
 
 	public void setInherits(Map<String, Boolean> inherits) {
 		this.inherits = inherits;
+	}
+
+	public void addTrigger(Trigger trigger) {
+		triggers.add(trigger);
+	}
+
+	public void addInclude(String name, boolean value) {
+		includes.put(name, value);
+	}
+
+	public void addInherit(String name, boolean value) {
+		inherits.put(name, value);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Topic that = (Topic) o;
+		if (triggers != null ? !triggers.equals(that.triggers) : that.triggers != null) {
+			return false;
+		}
+		if (includes != null ? !includes.equals(that.includes) : that.includes != null) {
+			return false;
+		}
+		return inherits != null ? inherits.equals(that.inherits) : that.inherits == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = triggers != null ? triggers.hashCode() : 0;
+		result = 31 * result + (includes != null ? includes.hashCode() : 0);
+		result = 31 * result + (inherits != null ? inherits.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Topic{" +
+				"triggers=" + triggers +
+				", includes=" + includes +
+				", inherits=" + inherits +
+				'}';
 	}
 }
