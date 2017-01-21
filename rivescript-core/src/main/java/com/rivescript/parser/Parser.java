@@ -46,6 +46,9 @@ import java.util.Map;
  */
 public class Parser {
 
+	/**
+	 * The supported version of the RiveScript language.
+	 */
 	public static final double RS_VERSION = 2.0;
 
 	private static Logger logger = LoggerFactory.getLogger(Parser.class);
@@ -85,7 +88,7 @@ public class Parser {
 	 * @param filename the arbitrary name for the source code being parsed
 	 * @param code     the list of lines of RiveScript source code
 	 * @return the AST root object
-	 * @throws ParserException if the parsing fails
+	 * @throws ParserException in case of parsing error
 	 */
 	public Root parse(String filename, String[] code) throws ParserException {
 
@@ -521,6 +524,13 @@ public class Parser {
 		return ast;
 	}
 
+	/**
+	 * Checks the syntax of a RiveScript command.
+	 *
+	 * @param cmd  the single character command symbol
+	 * @param line the rest of the line after the command
+	 * @throws ParserException in case of syntax error
+	 */
 	private void checkSyntax(String cmd, String line) throws ParserException {
 		// Run syntax tests based on the command used.
 		if (cmd.equals("!")) {
