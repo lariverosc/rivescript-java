@@ -30,6 +30,7 @@ import java.util.Map;
 /**
  * Represents a RiveScript Topic.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
  * @since 0.8
  */

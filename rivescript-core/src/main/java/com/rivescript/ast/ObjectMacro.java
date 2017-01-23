@@ -27,6 +27,7 @@ import java.util.List;
 /**
  * Represents a RiveScript Object Macro.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
  * @since 0.8
  */

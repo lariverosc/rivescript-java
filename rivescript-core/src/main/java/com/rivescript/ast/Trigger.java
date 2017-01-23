@@ -28,6 +28,7 @@ import java.util.List;
 /**
  * Represents a RiveScript Trigger.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
  * @since 0.8
  */

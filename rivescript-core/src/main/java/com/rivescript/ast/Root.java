@@ -30,6 +30,7 @@ import java.util.Map;
 /**
  * Represents the root of the Abstract Syntax Tree (AST).
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
  * @since 0.8
  */

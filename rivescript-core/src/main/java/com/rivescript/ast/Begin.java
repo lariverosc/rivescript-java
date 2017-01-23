@@ -29,6 +29,7 @@ import java.util.Map;
 /**
  * Represents the "begin block" (configuration) data.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
  * @since 0.8
  */
