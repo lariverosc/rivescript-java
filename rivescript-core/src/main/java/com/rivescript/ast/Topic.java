@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Represents a RiveScript Topic.
  *
  * @author Marcel Overdijk
  * @since 0.8
@@ -39,38 +39,85 @@ public class Topic {
 	private Map<String, Boolean> includes = new HashMap<>();
 	private Map<String, Boolean> inherits = new HashMap<>();
 
+	/**
+	 * Returns the triggers of this topic.
+	 *
+	 * @return the triggers
+	 */
 	public List<Trigger> getTriggers() {
 		return triggers;
 	}
 
+	/**
+	 * Sets the triggers of this topic.
+	 *
+	 * @param triggers the triggers
+	 */
 	public void setTriggers(List<Trigger> triggers) {
 		this.triggers = triggers;
 	}
 
+	/**
+	 * Returns the includes of this topic.
+	 *
+	 * @return the includes
+	 */
 	public Map<String, Boolean> getIncludes() {
 		return includes;
 	}
 
+	/**
+	 * Sets the includes of this topic.
+	 *
+	 * @param includes the includes
+	 */
 	public void setIncludes(Map<String, Boolean> includes) {
 		this.includes = includes;
 	}
 
+	/**
+	 * Returns the inherits of this topic.
+	 *
+	 * @return the inherits
+	 */
 	public Map<String, Boolean> getInherits() {
 		return inherits;
 	}
 
+	/**
+	 * Sets the inherits of this topic.
+	 *
+	 * @param inherits the inherits
+	 */
 	public void setInherits(Map<String, Boolean> inherits) {
 		this.inherits = inherits;
 	}
 
+	/**
+	 * Adds the given trigger to this topic.
+	 *
+	 * @param trigger the trigger
+	 */
 	public void addTrigger(Trigger trigger) {
 		triggers.add(trigger);
 	}
 
+	/**
+	 * Adds the given include to this topic.
+	 *
+	 * @param name  the include
+	 * @param value the value
+	 */
 	public void addInclude(String name, boolean value) {
 		includes.put(name, value);
 	}
 
+	/**
+	 * Adds the given inherit to this topic.
+	 *
+	 * @param name  the inherit
+	 * @param value the value
+	 */
 	public void addInherit(String name, boolean value) {
 		inherits.put(name, value);
 	}

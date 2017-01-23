@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Represents the root of the Abstract Syntax Tree (AST).
  *
  * @author Marcel Overdijk
  * @since 0.8
@@ -39,42 +39,91 @@ public class Root {
 	private Map<String, Topic> topics = new HashMap<>();
 	private List<ObjectMacro> objects = new ArrayList<>();
 
+	/**
+	 * Creates a new Abstract Syntax Tree (AST) containing an empty "random" topic.
+	 */
 	public Root() {
 		addTopic("random");
 	}
 
+	/**
+	 * Returns the "begin block" (configuration) data.
+	 *
+	 * @return the "begin block" (configuration) data
+	 */
 	public Begin getBegin() {
 		return begin;
 	}
 
+	/**
+	 * Sets the "begin block" (configuration) data.
+	 *
+	 * @param begin the "begin block" (configuration) data
+	 */
 	public void setBegin(Begin begin) {
 		this.begin = begin;
 	}
 
+	/**
+	 * Returns the topic with the given name.
+	 *
+	 * @param name the name of the topic
+	 * @return the topic or {@code null} if not found
+	 */
 	public Topic getTopic(String name) {
 		return topics.get(name);
 	}
 
+	/**
+	 * Returns the topics.
+	 *
+	 * @return the topics
+	 */
 	public Map<String, Topic> getTopics() {
 		return topics;
 	}
 
+	/**
+	 * Sets the topics.
+	 *
+	 * @param topics the topics
+	 */
 	public void setTopics(Map<String, Topic> topics) {
 		this.topics = topics;
 	}
 
+	/**
+	 * Returns the objects.
+	 *
+	 * @return the objects
+	 */
 	public List<ObjectMacro> getObjects() {
 		return objects;
 	}
 
+	/**
+	 * Sets the objects.
+	 *
+	 * @param objects the objects
+	 */
 	public void setObjects(List<ObjectMacro> objects) {
 		this.objects = objects;
 	}
 
+	/**
+	 * Adds a new topic with the given name.
+	 *
+	 * @param name the name of the topic
+	 */
 	public void addTopic(String name) {
 		topics.put(name, new Topic());
 	}
 
+	/**
+	 * Adds the given object.
+	 *
+	 * @param object the object
+	 */
 	public void addObject(ObjectMacro object) {
 		objects.add(object);
 	}

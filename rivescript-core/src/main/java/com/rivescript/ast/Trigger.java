@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO
+ * Represents a RiveScript Trigger.
  *
  * @author Marcel Overdijk
  * @since 0.8
@@ -39,50 +39,110 @@ public class Trigger {
 	private String redirect;
 	private String previous;
 
+	/**
+	 * Returns the trigger pattern of this trigger.
+	 *
+	 * @return the trigger pattern
+	 */
 	public String getTrigger() {
 		return trigger;
 	}
 
+	/**
+	 * Sets the trigger pattern of this trigger.
+	 *
+	 * @param trigger the trigger pattern
+	 */
 	public void setTrigger(String trigger) {
 		this.trigger = trigger;
 	}
 
+	/**
+	 * Returns the replies of this trigger.
+	 *
+	 * @return the replies
+	 */
 	public List<String> getReply() {
 		return reply;
 	}
 
+	/**
+	 * Sets the replies of this trigger.
+	 *
+	 * @param reply the replies
+	 */
 	public void setReply(List<String> reply) {
 		this.reply = reply;
 	}
 
+	/**
+	 * Returns the conditions of this trigger.
+	 *
+	 * @return the conditions
+	 */
 	public List<String> getCondition() {
 		return condition;
 	}
 
+	/**
+	 * Sets the conditions of this trigger.
+	 *
+	 * @param condition the conditions
+	 */
 	public void setCondition(List<String> condition) {
 		this.condition = condition;
 	}
 
+	/**
+	 * Returns the redirect of this trigger.
+	 *
+	 * @return the redirect
+	 */
 	public String getRedirect() {
 		return redirect;
 	}
 
+	/**
+	 * Sets the redirect of this trigger.
+	 *
+	 * @param redirect the redirect
+	 */
 	public void setRedirect(String redirect) {
 		this.redirect = redirect;
 	}
 
+	/**
+	 * Returns the previous of this trigger.
+	 *
+	 * @return the previous
+	 */
 	public String getPrevious() {
 		return previous;
 	}
 
+	/**
+	 * Sets the previous of this trigger.
+	 *
+	 * @param previous the previous
+	 */
 	public void setPrevious(String previous) {
 		this.previous = previous;
 	}
 
+	/**
+	 * Adds the given reply to this trigger.
+	 *
+	 * @param reply the reply
+	 */
 	public void addReply(String reply) {
 		this.reply.add(reply);
 	}
 
+	/**
+	 * Adds the given condition to this trigger.
+	 *
+	 * @param condition the condition
+	 */
 	public void addCondition(String condition) {
 		this.condition.add(condition);
 	}

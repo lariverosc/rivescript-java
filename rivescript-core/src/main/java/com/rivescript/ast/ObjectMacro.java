@@ -25,7 +25,7 @@ package com.rivescript.ast;
 import java.util.List;
 
 /**
- * TODO
+ * Represents a RiveScript Object Macro.
  *
  * @author Marcel Overdijk
  * @since 0.8
@@ -36,26 +36,56 @@ public class ObjectMacro {
 	private String language;
 	private List<String> code;
 
+	/**
+	 * Returns the name of this object.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the name of this object.
+	 *
+	 * @param name the name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Returns the programming language of this object.
+	 *
+	 * @return the programming language
+	 */
 	public String getLanguage() {
 		return language;
 	}
 
+	/**
+	 * Sets the programming language of this object.
+	 *
+	 * @param language the programming language
+	 */
 	public void setLanguage(String language) {
 		this.language = language;
 	}
 
+	/**
+	 * Returns the source code of this object.
+	 *
+	 * @return the source code
+	 */
 	public List<String> getCode() {
 		return code;
 	}
 
+	/**
+	 * Sets the source code of this object.
+	 *
+	 * @param code the source code
+	 */
 	public void setCode(List<String> code) {
 		this.code = code;
 	}

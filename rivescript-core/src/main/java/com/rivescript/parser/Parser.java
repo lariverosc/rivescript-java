@@ -62,7 +62,9 @@ public class Parser {
 		concatModes.put("space", " ");
 	}
 
-	private ParserConfig config;
+	private boolean strict;
+	private boolean utf8;
+	private boolean forceCase;
 
 	/**
 	 * Creates a new {@link Parser} with a default {@link ParserConfig}.
@@ -75,7 +77,12 @@ public class Parser {
 	 * Creates a new {@link Parser} with the given {@link ParserConfig}.
 	 */
 	public Parser(ParserConfig config) {
-		this.config = config != null ? config : new ParserConfig();
+		if (config == null) {
+			config = new ParserConfig();
+		}
+		this.strict = config.isStrict();
+		this.utf8 = config.isUtf8();
+		this.forceCase = config.isForceCase();
 	}
 
 	/**
@@ -186,7 +193,7 @@ public class Parser {
 			line = line.trim();
 
 			// In the event of a +Trigger, if we are force-lowercasing it, then do so now before the syntax check.
-			if (config.isForceCase() && cmd.equals("+")) {
+			if (forceCase && cmd.equals("+")) {
 				line = line.toLowerCase();
 			}
 
@@ -196,7 +203,7 @@ public class Parser {
 			try {
 				checkSyntax(cmd, line);
 			} catch (ParserException e) {
-				if (config.isStrict()) {
+				if (strict) {
 					throw e; // Simply rethrow the parser exception.
 				} else {
 					logger.warn("Syntax error '{}' at {} line {}", e.getMessage(), filename, lineno);
@@ -398,7 +405,7 @@ public class Parser {
 					}
 					if (type.equals("topic")) {
 						// Force case on topics.
-						if (config.isForceCase()) {
+						if (forceCase) {
 							name = name.toLowerCase();
 						}
 
@@ -557,7 +564,7 @@ public class Parser {
 			if (parts[0].equals("begin") && parts.length > 1) {
 				throw new ParserException("The 'begin' label takes no additional arguments");
 			} else if (parts[0].equals("topic")) {
-				if (!config.isForceCase() && line.matches("[^a-z0-9_\\-\\s]")) {
+				if (!forceCase && line.matches("[^a-z0-9_\\-\\s]")) {
 					throw new ParserException("Topics should be lowercased and contain only letters and numbers");
 				} else if (line.matches("[^A-Za-z0-9_\\-\\s]")) {
 					throw new ParserException("Topics should contain only letters and numbers in forceCase mode");
@@ -577,7 +584,7 @@ public class Parser {
 			int parens = 0, square = 0, curly = 0, angle = 0; // Count the brackets
 
 			// Look for obvious errors first.
-			if (config.isUtf8()) {
+			if (utf8) {
 				// In UTF-8 mode, most symbols are allowed.
 				if (line.matches("[A-Z\\\\.]")) {
 					throw new ParserException("Triggers can't contain uppercase letters, backslashes or dots in UTF-8 mode");

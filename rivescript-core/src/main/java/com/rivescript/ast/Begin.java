@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Represents the "begin block" (configuration) data.
  *
  * @author Marcel Overdijk
  * @since 0.8
@@ -40,62 +40,142 @@ public class Begin {
 	private Map<String, String> person = new HashMap<>();
 	private Map<String, List<String>> array = new HashMap<>();
 
+	/**
+	 * Returns the global variables.
+	 *
+	 * @return the global variables
+	 */
 	public Map<String, String> getGlobal() {
 		return global;
 	}
 
+	/**
+	 * Sets the global variables.
+	 *
+	 * @param global the global variables
+	 */
 	public void setGlobal(Map<String, String> global) {
 		this.global = global;
 	}
 
+	/**
+	 * Returns the bot variables.
+	 *
+	 * @return the bot variables
+	 */
 	public Map<String, String> getVar() {
 		return var;
 	}
 
+	/**
+	 * Sets the bot variables.
+	 *
+	 * @param var the bot variables
+	 */
 	public void setVar(Map<String, String> var) {
 		this.var = var;
 	}
 
+	/**
+	 * Returns the substitution variables.
+	 *
+	 * @return the substitution variables
+	 */
 	public Map<String, String> getSub() {
 		return sub;
 	}
 
+	/**
+	 * Sets the substitution variables.
+	 *
+	 * @param sub the substitution variables
+	 */
 	public void setSub(Map<String, String> sub) {
 		this.sub = sub;
 	}
 
+	/**
+	 * Retuns the person variables.
+	 *
+	 * @return the person variables
+	 */
 	public Map<String, String> getPerson() {
 		return person;
 	}
 
+	/**
+	 * Sets the person variables.
+	 *
+	 * @param person the person variables
+	 */
 	public void setPerson(Map<String, String> person) {
 		this.person = person;
 	}
 
+	/**
+	 * Returns the arrays.
+	 *
+	 * @return the arrays
+	 */
 	public Map<String, List<String>> getArray() {
 		return array;
 	}
 
+	/**
+	 * Sets the arrays.
+	 *
+	 * @param array the arrays
+	 */
 	public void setArray(Map<String, List<String>> array) {
 		this.array = array;
 	}
 
+	/**
+	 * Adds a global variable.
+	 *
+	 * @param name  the name of the variable
+	 * @param value the value
+	 */
 	public void addGlobal(String name, String value) {
 		global.put(name, value);
 	}
 
+	/**
+	 * Adds a bot variable.
+	 *
+	 * @param name  the name of the variable
+	 * @param value the value
+	 */
 	public void addVar(String name, String value) {
 		var.put(name, value);
 	}
 
+	/**
+	 * Adds a substitution variable.
+	 *
+	 * @param name  the name of the variable
+	 * @param value the value
+	 */
 	public void addSub(String name, String value) {
 		sub.put(name, value);
 	}
 
+	/**
+	 * Adds a person variable
+	 *
+	 * @param name  the name of the variable
+	 * @param value the value
+	 */
 	public void addPerson(String name, String value) {
 		person.put(name, value);
 	}
 
+	/**
+	 * Adds an array.
+	 *
+	 * @param name  the name of the array
+	 * @param value the array
+	 */
 	public void addArray(String name, List<String> value) {
 		array.put(name, value);
 	}
