@@ -649,26 +649,53 @@ public class RiveScript {
 		for (String topic : topics.keySet()) {
 			logger.debug("Analyzing topic {}", topic);
 
-			// TODO
+			// Collect a list of all the triggers we're going to worry about.
+			// If this topic inherits another topic, we need to recursively add those to the list as well.
+			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic);
 
-			//			// Collect a list of all the triggers we're going to worry about. If this
-			//			// topic inherits another topic, we need to recursively add those to the
-			//			// list as well.
-			//			allTriggers := rs.getTopicTriggers(topic, rs.topics, nil)
-			//
-			//			// Sort these triggers.
-			//			rs.sorted.topics[topic] = rs.sortTriggerSet(allTriggers, true)
-			//
-			//			// Get all of the %Previous triggers for this topic.
-			//			thatTriggers := rs.getTopicTriggers(topic, nil, rs.thats)
-			//
-			//			// And sort them, too.
-			//			rs.sorted.thats[topic] = rs.sortTriggerSet(thatTriggers, false)
+			// Sort these triggers.
+			sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
+
+			// Get all of the %Previous triggers for this topic.
+			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true);
+
+			// And sort them, too.
+			sorted.getThats().put(topic, sortTriggerSet(thatTriggers, false));
 		}
 
 		// Sort the substitution lists.
 		sorted.setSub(sortList(sub.keySet()));
 		sorted.setPerson(sortList(person.keySet()));
+	}
+
+	private List<SortedTriggerEntry> getTopicTriggers(String topic) {
+		return getTopicTriggers(topic, false, 0, 0, false);
+	}
+
+	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats) {
+		return getTopicTriggers(topic, thats, 0, 0, false);
+	}
+
+	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats, int depth, int inheritance, boolean inherited) {
+
+		// TODO
+
+		List<SortedTriggerEntry> triggers = new ArrayList<>();
+
+		// TODO
+
+		return null;
+	}
+
+	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers, boolean excludePrevious) {
+
+		// TODO
+
+		List<SortedTriggerEntry> running = new ArrayList<>();
+
+		// TODO
+
+		return running;
 	}
 
 	/**
@@ -708,7 +735,11 @@ public class RiveScript {
 
 				@Override
 				public int compare(String o1, String o2) {
-					return Integer.compare(o2.length(), o1.length());
+					int result = Integer.compare(o2.length(), o1.length());
+					if (result == 0) {
+						result = o1.compareTo(o2);
+					}
+					return result;
 				}
 			});
 			// Collections.reverse(sortedLengths);
