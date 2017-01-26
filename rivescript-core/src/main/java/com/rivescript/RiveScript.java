@@ -684,7 +684,7 @@ public class RiveScript {
 
 		// TODO
 
-		return null;
+		return triggers;
 	}
 
 	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers, boolean excludePrevious) {
