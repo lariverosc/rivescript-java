@@ -654,7 +654,7 @@ public class RiveScript {
 			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic);
 
 			// Sort these triggers.
-			sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
+			sorted.getTopics().put(topic, sortTriggerSet(allTriggers));
 
 			// Get all of the %Previous triggers for this topic.
 			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true);
@@ -676,15 +676,81 @@ public class RiveScript {
 		return getTopicTriggers(topic, thats, 0, 0, false);
 	}
 
+	/**
+	 * TODO
+	 *
+	 *  Keep in mind here that there is a difference between 'includes' and
+	 * 'inherits' -- topics that inherit other topics are able to OVERRIDE
+	 * triggers that appear in the inherited topic. This means that if the top
+	 * topic has a trigger of simply '*', then NO triggers are capable of
+	 * matching in ANY inherited topic, because even though * has the lowest
+	 * priority, it has an automatic priority over all inherited topics.
+	 *
+	 * The getTopicTriggers method takes this into account. All topics that
+	 * inherit other topics will have their triggers prefixed with a fictional
+	 * {inherits} tag, which would start at {inherits=0} and increment if this
+	 * topic has other inheriting topics. So we can use this tag to make sure
+	 * topics that inherit things will have their triggers always be on top of
+	 * the stack, from inherits=0 to inherits=n.
+	 *
+	 * Important info about the depth vs. inheritance params to this function:
+	 * depth increments by 1 each time this function recursively calls itself.
+	 * inheritance increments by 1 only when this topic inherits another topic.
+	 *
+	 * This way, '> topic alpha includes beta inherits gamma' will have this
+	 * effect:
+	 *  alpha and beta's triggers are combined together into one matching pool,
+	 *  and then those triggers have higher priority than gamma's.
+	 *
+	 * The inherited option is true if this is a recursive call, from a topic
+	 * that inherits other topics. This forces the {inherits} tag to be added to
+	 * the triggers. This only applies when the top topic 'includes' another
+	 * topic.
+	 *
+	 * @param topic
+	 * @param thats
+	 * @param depth
+	 * @param inheritance
+	 * @param inherited
+	 * @return
+	 */
 	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats, int depth, int inheritance, boolean inherited) {
+		// Break if we're in too deep.
+		if (depth > this.depth) {
+			logger.warn("Deep recursion while scanning topic inheritance!");
+			return new ArrayList<>();
+		}
 
-		// TODO
+		logger.debug("Collecting trigger list for topic {} (depth={}; inheritance={}; inherited={})", topic, depth, inheritance, inherited);
 
+		// Collect an array of triggers to return.
 		List<SortedTriggerEntry> triggers = new ArrayList<>();
 
+		// Get those that exist in this topic directly.
+		List<SortedTriggerEntry> inThisTopic = new ArrayList<>();
+		if (!thats) {
+			// The non-thats structure is: {topics}->[ array of triggers ]
+			// TODO
+		} else {
+			// The 'that' structure is: {topic}->{cur trig}->{prev trig}->{trigger info}
+			// TODO
+		}
+
+		// Does this topic include others?
+		// TODO
+
+		// Does this topic inherit others?
+		// TODO
+
+		// Collect the triggers for *this* topic. If this topic inherits any othertopics, it means that this topic's triggers have higher
+		// priority than those in any inherited topics. Enforce this with an {inherits} tag.
 		// TODO
 
 		return triggers;
+	}
+
+	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers) {
+		return sortTriggerSet(triggers, true);
 	}
 
 	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers, boolean excludePrevious) {
