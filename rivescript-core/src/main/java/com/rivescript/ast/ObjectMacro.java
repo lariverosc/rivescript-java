@@ -29,7 +29,6 @@ import java.util.List;
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class ObjectMacro {
 
@@ -119,7 +118,7 @@ public class ObjectMacro {
 
 	@Override
 	public String toString() {
-		return "ObjectMacro{" +
+		return "ZzObjectMacro{" +
 				"name='" + name + '\'' +
 				", language='" + language + '\'' +
 				", code=" + code +

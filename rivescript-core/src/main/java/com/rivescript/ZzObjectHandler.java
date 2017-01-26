@@ -20,38 +20,41 @@
  * SOFTWARE.
  */
 
-import com.rivescript.ZzObjectMacro;
-import com.rivescript.macro.Subroutine;
-
-import java.lang.String;
-import java.lang.StringBuilder;
+package com.rivescript;
 
 /**
- * An example object macro written in Java.
- *
- * To define a Java object macro, you must implement the interface
- * com.rivescript.ZzObjectMacro and register it using setSubroutine().
- *
- * This macro does two things: returns their message reversed, and sets
- * a user variable named `java`.
- *
- * This implements the `reverse` object macro used in Aiden/obj-java.rive
- *
- * See RSBot.java for more details.
+ * Interface for RiveScript object handlers.
  *
  * @author Noah Petherbridge
  */
-public class ExampleMacro implements Subroutine {
-	public String call (com.rivescript.RiveScript rs, String[] args) {
-		String message = String.join(" ", args);
+public interface ZzObjectHandler {
 
-		// To get/set user variables for the user, you can use currentUser
-		// to find their ID and then use the usual methods.
-		String user = rs.currentUser();
-		rs.setUservar(user, "java", "This variable was set by Java "
-			+ "when you said 'reverse " + message + "'");
+	/**
+	 * Handler for when object code is read (loaded) by RiveScript. Should return {@code true} for
+	 * success or {@code false} to indicate error.
+	 *
+	 * @param name The name of the object.
+	 * @param code The source code inside the object.
+	 */
+	boolean onLoad(String name, String[] code);
 
-		// Reverse their message and return it.
-		return new StringBuilder(message).reverse().toString();
-	}
+	/**
+	 * Handler for when a user invokes the object. Should return the text reply from the object.
+	 *
+	 * @param name The name of the object being called.
+	 * @param user The user's id.
+	 * @param args The argument list from the call tag.
+	 */
+	String onCall(String name, String user, String[] args);
+
+	/**
+	 * Sets a Java class to handle the {@link ZzObjectMacro} directly.
+	 * <p>
+	 * This is only useful to the built-in Java handler; other handlers do not need to implement
+	 * this function.
+	 *
+	 * @param name The name of the object macro.
+	 * @param impl The {@link ZzObjectMacro} implementation.
+	 */
+	void setClass(String name, ZzObjectMacro impl);
 }

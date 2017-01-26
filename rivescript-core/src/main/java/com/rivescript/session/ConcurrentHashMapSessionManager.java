@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Noah Petherbridge
  * @author Marcel Overdijk
  */
-public class MapSessionManager implements SessionManager {
+public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	@Override
 	public UserData init(String username) {

@@ -54,7 +54,7 @@ public class RSBot {
 
 		// Create a new RiveScript interpreter.
 		System.out.println(":: Creating RS Object");
-		RiveScript rs = new RiveScript(debug);
+		RiveScript rs = new RiveScript();
 
 		// Create a handler for Perl as an object macro language.
 		File rsp4jFile = new File(RSBot.class.getClassLoader().getResource("lang/rsp4j.pl").getFile());

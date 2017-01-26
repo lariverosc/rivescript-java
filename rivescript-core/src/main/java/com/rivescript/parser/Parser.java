@@ -25,9 +25,7 @@ package com.rivescript.parser;
 import com.rivescript.ast.ObjectMacro;
 import com.rivescript.ast.Root;
 import com.rivescript.ast.Trigger;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.rivescript.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,6 @@ import java.util.Map;
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class Parser {
 
@@ -75,6 +72,8 @@ public class Parser {
 
 	/**
 	 * Creates a new {@link Parser} with the given {@link ParserConfig}.
+	 *
+	 * @param config the config
 	 */
 	public Parser(ParserConfig config) {
 		if (config == null) {
@@ -93,9 +92,9 @@ public class Parser {
 	 * In case of errors (e.g. a syntax error when strict mode is enabled) a {@link ParserException} will be thrown.
 	 *
 	 * @param filename the arbitrary name for the source code being parsed
-	 * @param code     the list of lines of RiveScript source code
+	 * @param code     the lines of RiveScript source code
 	 * @return the AST root object
-	 * @throws ParserException in case of parsing error
+	 * @throws ParserException in case of a parsing error
 	 */
 	public Root parse(String filename, String[] code) throws ParserException {
 
@@ -118,7 +117,7 @@ public class Parser {
 		boolean inComment = false;         // In a multi-line comment
 		boolean inObject = false;          // In an object macro
 		String objectName = null;          // The name of the current object
-		String objectLang = null;          // The programming language of the current object
+		String objectLanguage = null;      // The programming language of the current object
 		List<String> objectBuffer = null;  // The source code buffer of the current object
 		Trigger currentTrigger = null;     // The current trigger
 		String previous = null;            // The a %Previous trigger
@@ -132,7 +131,7 @@ public class Parser {
 			lineno = lp + 1;
 
 			// Strip the line.
-			String line = StringUtils.trimToEmpty(code[lp]);
+			String line = code[lp].trim();
 			if (line.length() == 0) {
 				continue; // Skip blank lines!
 			}
@@ -141,16 +140,16 @@ public class Parser {
 			if (inObject) {
 				// End of the object?
 				if (line.contains("< object") || line.contains("<object")) {
-					if (StringUtils.isNotBlank(objectName)) {
+					if (objectName != null && objectName.length() > 0) {
 						ObjectMacro object = new ObjectMacro();
 						object.setName(objectName);
-						object.setLanguage(objectLang);
+						object.setLanguage(objectLanguage);
 						object.setCode(objectBuffer);
 						ast.addObject(object);
 					}
 					inObject = false;
 					objectName = null;
-					objectLang = null;
+					objectLanguage = null;
 					objectBuffer = null;
 				} else {
 					objectBuffer.add(line);
@@ -218,7 +217,7 @@ public class Parser {
 			// Do a look-ahead for ^Continue and %Previous commands.
 			if (!cmd.equals("^")) {
 				for (int li = (lp + 1); li < code.length; li++) {
-					String lookahead = StringUtils.trimToEmpty(code[li]);
+					String lookahead = code[li].trim();
 					if (lookahead.length() < 2) {
 						continue;
 					}
@@ -289,7 +288,7 @@ public class Parser {
 					if (left.length >= 1) {
 						type = left[0].trim();
 						if (left.length >= 2) {
-							left = ArrayUtils.remove(left, 0);
+							left = Arrays.copyOfRange(left, 1, left.length);
 							name = StringUtils.join(left, " ").trim();
 						}
 					}
@@ -301,7 +300,12 @@ public class Parser {
 
 					// Handle version numbers.
 					if (type.equals("version")) {
-						double parsedVersion = NumberUtils.toDouble(value);
+						double parsedVersion = 0;
+						try {
+							parsedVersion = Double.parseDouble(value);
+						} catch (NumberFormatException e) {
+							logger.warn("RiveScript version '{}' at {} line {} is not a valid floating number", value, filename, lineno);
+						}
 						if (parsedVersion > RS_VERSION) {
 							throw new ParserException(
 									String.format("Unsupported RiveScript version at %s line %d. We only support %s", filename, lineno,
@@ -386,12 +390,12 @@ public class Parser {
 				case ">": { // > Label
 					String[] temp = line.trim().split(" ");
 					String type = temp[0];
-					temp = ArrayUtils.remove(temp, 0);
+					temp = Arrays.copyOfRange(temp, 1, temp.length);
 					String name = "";
 					String[] fields = new String[0];
 					if (temp.length > 0) {
 						name = temp[0];
-						temp = ArrayUtils.remove(temp, 0);
+						temp = Arrays.copyOfRange(temp, 1, temp.length);
 					}
 					if (temp.length > 0) {
 						fields = temp;
@@ -431,20 +435,20 @@ public class Parser {
 						}
 					} else if (type.equals("object")) {
 						// If a field was provided, it should be the programming language.
-						String lang = "";
+						String language = "";
 						if (fields.length > 0) {
-							lang = fields[0].toLowerCase();
+							language = fields[0].toLowerCase();
 						}
 
 						// Missing language?
-						if (lang.equals("")) {
+						if (language.equals("")) {
 							logger.warn("No programming language specified for object '{}' at {} line", name, filename, lineno);
 							continue;
 						}
 
 						// Start reading the object code.
 						objectName = name;
-						objectLang = lang;
+						objectLanguage = language;
 						objectBuffer = new ArrayList<>();
 						inObject = true;
 					} else {

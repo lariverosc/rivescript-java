@@ -7,13 +7,12 @@ buildscript {
 }
 
 ext {
-	commonsLang3Version = "3.4"
-	hamcrestVersion     = "1.3"
-	junitVersion        = "4.12"
-	jsonVersion         = "20160810"
-	mockitoVersion      = "1.10.19"
-	slf4jVersion        = "1.7.22"
-	ext.javadocLinks    = [
+	hamcrestVersion  = "1.3"
+	junitVersion     = "4.12"
+	jsonVersion      = "20160810"
+	mockitoVersion   = "1.10.19"
+	slf4jVersion     = "1.7.22"
+	ext.javadocLinks = [
 			"http://docs.oracle.com/javase/7/docs/api/",
 			"http://docs.oracle.com/javaee/7/api/"
 	] as String[]
@@ -52,7 +51,6 @@ configure(allprojects) { project ->
 	}
 
 	dependencies {
-		compile "org.apache.commons:commons-lang3:${commonsLang3Version}"
 		compile "org.slf4j:slf4j-api:${slf4jVersion}"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-core:${hamcrestVersion}"

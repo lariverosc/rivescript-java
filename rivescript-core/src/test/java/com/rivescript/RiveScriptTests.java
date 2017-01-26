@@ -20,39 +20,47 @@
  * SOFTWARE.
  */
 
-package com.rivescript.parser;
+package com.rivescript;
 
-import com.rivescript.ast.Root;
+import com.rivescript.config.Config;
 import org.junit.Test;
 
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 /**
- * Tests for {@link Parser}.
+ * Tests for {@link RiveScript}.
  *
  * @author Marcel Overdijk
  */
-public class ParserTests {
+public class RiveScriptTests {
 
 	@Test
-	public void testParseTestSuite() throws Exception {
-		URI file = getClass().getClassLoader().getResource("testsuite.rive").toURI();
-		List<String> code = Files.readAllLines(Paths.get(file));
-		Parser parser = new Parser(ParserConfig.newBuilder().strict(true).build());
-		Root ast = parser.parse("testsuite.rive", code.toArray(new String[0]));
+	public void testLoadFileTestSuite() throws Exception {
+		String path = getClass().getClassLoader().getResource("testsuite.rive").getFile();
+		RiveScript rs = new RiveScript(Config.basic());
+		rs.loadFile(path);
+		rs.sortReplies();
+
+		System.out.println("**** START DUMP TOPICS ****");
+		rs.dumpTopics();
+		System.out.println("**** DONE DUMP TOPICS ****");
+
+		System.out.println("**** START DUMP SORTED ****");
+		rs.dumpSorted();
+		System.out.println("**** START DUMP SORTED ****");
 	}
 
 	@Test
-	public void testParseCustom() {
-		Parser parser = new Parser(ParserConfig.newBuilder().strict(true).build());
-		Root ast = parser.parse("test.rive", new String[] {
+	public void testLoadDirectory() throws Exception {
+		String path = getClass().getClassLoader().getResource("fixtures/begin").getFile();
+		RiveScript rs = new RiveScript(Config.basic());
+		rs.loadDirectory(path);
+	}
+
+	@Test
+	public void testStreamCustom() {
+		RiveScript rs = new RiveScript(Config.basic());
+		rs.stream(new String[] {
 				"! version = 2.00",
 				"! global debug = 1",
-				// "+ (foo|bar))",
-				// "! mars name     = value",
 				"! var name      = RiveScript Bot",
 				"! var age       = 0",
 				"! var gender    = androgynous",

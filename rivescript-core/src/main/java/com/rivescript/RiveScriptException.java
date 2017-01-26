@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 the original author or authors.
+ * Copyright (c) 2016-2017 the original author or authors.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +23,45 @@
 package com.rivescript;
 
 /**
- * Interface for RiveScript object macros written in Java.
+ * Thrown to indicate a RiveScript error.
  *
  * @author Noah Petherbridge
+ * @author Marcel Overdijk
  */
-public interface ObjectMacro {
+public class RiveScriptException extends RuntimeException {
 
 	/**
-	 * The implementation of your object macro function.
-	 * <p>
-	 * This code is executed when a {@code <call>} tag in a RiveScript reply wants to call your object macro.
-	 *
-	 * @param rivescript A reference to the parent RiveScript instance.
-	 * @param args       An array of the word-arguments from the call tag.
-	 * @return A string result of the macro.
+	 * Creates a new {@code RiveScriptException}.
 	 */
-	String call(RiveScript rivescript, String[] args);
+	public RiveScriptException() {
+		super();
+	}
+
+	/**
+	 * Creates a new {@code RiveScriptException} with the given message.
+	 *
+	 * @param message the message
+	 */
+	public RiveScriptException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Creates a new {@code RiveScriptException} with the given message and cause.
+	 *
+	 * @param message the message
+	 * @param cause   the cause
+	 */
+	public RiveScriptException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * Creates a new {@code RiveScriptException} with the given cause.
+	 *
+	 * @param cause the cause
+	 */
+	public RiveScriptException(Throwable cause) {
+		super(cause);
+	}
 }

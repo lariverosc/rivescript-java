@@ -26,11 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a RiveScript Trigger.
+ * Represents a RiveScript ZzTrigger.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class Trigger {
 
@@ -184,7 +183,7 @@ public class Trigger {
 
 	@Override
 	public String toString() {
-		return "Trigger{" +
+		return "ZzTrigger{" +
 				"trigger='" + trigger + '\'' +
 				", reply=" + reply +
 				", condition=" + condition +

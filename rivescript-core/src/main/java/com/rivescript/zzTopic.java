@@ -34,11 +34,11 @@ import java.util.regex.Pattern;
  *
  * @author Noah Petherbridge
  */
-public class Topic {
+public class zzTopic {
 
 	// Private variables.
 	private static boolean debug = false;
-	private HashMap<String, Trigger> triggers = new HashMap<>();        // Topics contain triggers
+	private HashMap<String, ZzTrigger> triggers = new HashMap<>();        // Topics contain triggers
 	private boolean hasPrevious = false;                                // Has at least one %Previous
 	private HashMap<String, Vector<String>> previous = new HashMap<>(); // Mapping of %Previous's to their triggers
 	private Vector<String> includes = new Vector<>();                   // Included topics
@@ -53,7 +53,7 @@ public class Topic {
 	 *
 	 * @param name The name of the topic.
 	 */
-	public Topic(String name) {
+	public zzTopic(String name) {
 		this.name = name;
 	}
 
@@ -64,21 +64,21 @@ public class Topic {
 	 * @param debug The new debug mode to set.
 	 */
 	public static boolean setDebug(boolean debug) {
-		Topic.debug = debug;
+		zzTopic.debug = debug;
 		return debug;
 	}
 
 	/**
-	 * Returns a {@link Trigger} object from the topic. If the trigger doesn't exist, it
+	 * Returns a {@link ZzTrigger} object from the topic. If the trigger doesn't exist, it
 	 * is created on the fly.
 	 *
 	 * @param pattern The pattern for the trigger.
 	 */
-	public Trigger trigger(String pattern) {
+	public ZzTrigger trigger(String pattern) {
 		// Is this a new trigger?
 		if (!triggers.containsKey(pattern)) {
-			// Create a new Trigger object.
-			Trigger newTrigger = new Trigger(this.name, pattern);
+			// Create a new ZzTrigger object.
+			ZzTrigger newTrigger = new ZzTrigger(this.name, pattern);
 			triggers.put(pattern, newTrigger);
 		}
 
@@ -95,9 +95,9 @@ public class Topic {
 	}
 
 	/**
-	 * Returns a sorted list of all {@link Trigger}s. Note that the results are only accurate if
-	 * you called {@link Topic#sortTriggers(String[])} for this topic after loading new replies into it (the
-	 * {@link RiveScript#sortReplies()} automagically calls {@link Topic#sortTriggers(String[])} for all topics,
+	 * Returns a sorted list of all {@link ZzTrigger}s. Note that the results are only accurate if
+	 * you called {@link zzTopic#sortTriggers(String[])} for this topic after loading new replies into it (the
+	 * {@link RiveScript#sortReplies()} automagically calls {@link zzTopic#sortTriggers(String[])} for all topics,
 	 * so just make sure you call {@link RiveScript#sortReplies()} after loading new replies).
 	 */
 	public String[] listTriggers() {
@@ -105,7 +105,7 @@ public class Topic {
 	}
 
 	/**
-	 * Returns a list of all {@link Trigger}s. If you provide a {@code true} value to this method, it will
+	 * Returns a list of all {@link ZzTrigger}s. If you provide a {@code true} value to this method, it will
 	 * return the unsorted list (getting the keys of the trigger hash directly). If you
 	 * want a sorted list (which you probably do), use {@link #listTriggers()} instead, or explicitly
 	 * provide a {@code false} value to this method.
@@ -146,7 +146,7 @@ public class Topic {
 	}
 
 	/**
-	 * (Re)creates the internal sort cache for this topic's {@link Trigger}s.
+	 * (Re)creates the internal sort cache for this topic's {@link ZzTrigger}s.
 	 */
 	public void sortTriggers(String[] alltrigs) {
 		// Get our list of triggers.
@@ -195,7 +195,7 @@ public class Topic {
 
 			int inherits = h;
 			say("Sorting triggers by heritage level " + inherits);
-			String[] triggers = Util.Sv2s(heritage.get(inherits));
+			String[] triggers = ZzUtil.Sv2s(heritage.get(inherits));
 
 			// Sort-priority maps.
 			HashMap<Integer, Vector<String>> prior = new HashMap<>();
@@ -234,7 +234,7 @@ public class Topic {
 				sorting priority, it has an automatic priority over all inherited
 				topics.
 
-				The topicTriggers in TopicManager takes this into account. All topics
+				The topicTriggers in ZzTopicManager takes this into account. All topics
 				that inherit other topics will have their local triggers prefixed
 				with a fictional {inherits} tag, which will start at {inherits=0}
 				and increment if the topic tree has other inheriting topics. So
@@ -244,7 +244,7 @@ public class Topic {
 			*/
 
 			// Sort the priority lists numerically from highest to lowest.
-			int[] prior_sorted = Util.sortKeysDesc(prior);
+			int[] prior_sorted = ZzUtil.sortKeysDesc(prior);
 			for (int p = 0; p < prior_sorted.length; p++) {
 				say("Sorting triggers w/ priority " + prior_sorted[p]);
 				Vector<String> p_list = prior.get(prior_sorted[p]);
@@ -260,7 +260,7 @@ public class Topic {
 
 				// Initialize a sort bucket that will keep inheritance levels'
 				// triggers in separate places.
-				Inheritance bucket = new Inheritance();
+				ZzInheritance bucket = new ZzInheritance();
 
 				// Loop through the triggers and sort them into their buckets.
 				for (Enumeration e = p_list.elements(); e.hasMoreElements(); ) {
@@ -320,11 +320,11 @@ public class Topic {
 		}
 
 		// Turn the running sort buffer into a string array and store it.
-		this.sorted = Util.Sv2s(sorted);
+		this.sorted = ZzUtil.Sv2s(sorted);
 	}
 
 	/**
-	 * Adds a mapping between a {@link Trigger} and a {@code %Previous} that follows it.
+	 * Adds a mapping between a {@link ZzTrigger} and a {@code %Previous} that follows it.
 	 *
 	 * @param pattern  The trigger pattern.
 	 * @param previous The pattern in the {@code %Previous}.
@@ -338,7 +338,7 @@ public class Topic {
 	}
 
 	/**
-	 * Returns whether any {@link Trigger} in the topic has a {@code %Previous} (only good after
+	 * Returns whether any {@link ZzTrigger} in the topic has a {@code %Previous} (only good after
 	 * {@link RiveScript#sortReplies()} is called.
 	 */
 	public boolean hasPrevious() {
@@ -354,18 +354,18 @@ public class Topic {
 		while (sit.hasNext()) {
 			vector.add((String) sit.next());
 		}
-		return Util.Sv2s(vector);
+		return ZzUtil.Sv2s(vector);
 	}
 
 	/**
-	 * Returns the {@link Trigger}s associated with a {@code %Previous}.
+	 * Returns the {@link ZzTrigger}s associated with a {@code %Previous}.
 	 *
 	 * @param previous The {@code %Previous} pattern.
 	 */
 	public String[] listPreviousTriggers(String previous) {
 		// TODO return sorted list
 		if (this.previous.containsKey(previous)) {
-			return Util.Sv2s(this.previous.get(previous));
+			return ZzUtil.Sv2s(this.previous.get(previous));
 		}
 		return new String[0];
 	}
@@ -419,7 +419,7 @@ public class Topic {
 	 */
 	public String[] listPrevious(String previous) {
 		if (this.previous.containsKey(previous)) {
-			return Util.Sv2s(this.previous.get(previous));
+			return ZzUtil.Sv2s(this.previous.get(previous));
 		} else {
 			return new String[0];
 		}
@@ -447,14 +447,14 @@ public class Topic {
 	 * Returns a list of included topics.
 	 */
 	public String[] includes() {
-		return Util.Sv2s(this.includes);
+		return ZzUtil.Sv2s(this.includes);
 	}
 
 	/**
 	 * Returns a list of inherited topics.
 	 */
 	public String[] inherits() {
-		return Util.Sv2s(this.inherits);
+		return ZzUtil.Sv2s(this.inherits);
 	}
 
 	/**
@@ -464,7 +464,7 @@ public class Topic {
 	 */
 	private void say(String line) {
 		if (debug) { // doesn't work?
-			System.out.println("[RS::Topic] " + line);
+			System.out.println("[RS::zzTopic] " + line);
 		}
 	}
 }

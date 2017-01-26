@@ -25,8 +25,8 @@ package com.rivescript.parser;
 /**
  * User-configurable properties of the RiveScript {@link Parser}.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class ParserConfig {
 

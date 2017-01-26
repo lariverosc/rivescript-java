@@ -22,12 +22,114 @@
 
 package com.rivescript.session;
 
+import java.util.Map;
+
 /**
  * TODO
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public interface SessionManager {
 
+	/**
+	 * Makes sure a username has a session (creates one if not).
+	 *
+	 * @param username the username
+	 * @return the user data
+	 */
+	UserData init(String username);
+
+	/**
+	 * Sets a user's variables.
+	 *
+	 * @param username the username
+	 * @param vars the user variables
+	 */
+	void set(String username, Map<String, String> vars);
+
+	/**
+	 * Adds input and reply to a user's history.
+	 *
+	 * @param username the username
+	 * @param input the input
+	 * @param reply the reply
+	 */
+	void addHistory(String username, String input, String reply);
+
+	/**
+	 * Sets a user's the last matched trigger.
+	 *
+	 * @param username the username
+	 * @param trigger the trigger
+	 */
+	void setLastMatch(String username, String trigger);
+
+	/**
+	 * Returns a user variable.
+	 *
+	 * @param username the username
+	 * @param name the variable name
+	 * @return the variable value
+	 */
+	String get(String username, String name);
+
+	/**
+	 * Returns all variables for a user.
+	 *
+	 * @param username the username
+	 * @return the user data
+	 */
+	UserData getAny(String username);
+
+	/**
+	 * Returns all variables about all users.
+	 *
+	 * @return the users and their user data
+	 */
+	Map<String, UserData> getAll();
+
+	/**
+	 * Returns a user's last matched trigger.
+	 *
+	 * @param username the username
+	 * @return the last matched trigger
+	 */
+	String getLastMatch(String username);
+
+	/**
+	 * Returns a user's history.
+	 *
+	 * @param username the username
+	 * @return the history
+	 */
+	History getHistory(String username);
+
+	/**
+	 * Clears a user's variables.
+	 *
+	 * @param username the username
+	 */
+	void clear(String username);
+
+	/**
+	 * Clear all variables of all users.
+	 */
+	void clearAll();
+
+	/**
+	 * Makes a snapshot of a user's variables.
+	 *
+	 * @param username the username
+	 */
+	void freeze(String username);
+
+	/**
+	 * Unfreezes a user's variables.
+	 *
+	 * @param username the username
+	 * @param action the thaw action
+	 * @see ThawAction
+	 */
+	void thaw(String username, ThawAction action);
 }

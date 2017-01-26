@@ -20,48 +20,7 @@
  * SOFTWARE.
  */
 
-package com.rivescript.parser;
-
 /**
- * Thrown to indicate an error during parsing.
- *
- * @author Noah Petherbridge
- * @author Marcel Overdijk
+ * Provides sorting classes.
  */
-public class ParserException extends RuntimeException {
-
-	/**
-	 * Creates a new {@code ParserException}.
-	 */
-	public ParserException() {
-		super();
-	}
-
-	/**
-	 * Creates a new {@code ParserException} with the given message.
-	 *
-	 * @param message the message
-	 */
-	public ParserException(String message) {
-		super(message);
-	}
-
-	/**
-	 * Creates a new {@code ParserException} with the given message and cause.
-	 *
-	 * @param message the message
-	 * @param cause   the cause
-	 */
-	public ParserException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * Creates a new {@code ParserException} with the given cause.
-	 *
-	 * @param cause the cause
-	 */
-	public ParserException(Throwable cause) {
-		super(cause);
-	}
-}
+package com.rivescript.sorting;

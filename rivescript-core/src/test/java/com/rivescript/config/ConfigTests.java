@@ -22,8 +22,10 @@
 
 package com.rivescript.config;
 
+import com.rivescript.RiveScript;
 import org.junit.Test;
 
+import static com.rivescript.config.Config.DEFAULT_DEPTH;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -40,8 +42,9 @@ public class ConfigTests {
 		Config config = Config.basic();
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(false)));
+		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
 		assertThat(config.isForceCase(), is(equalTo(false)));
-		assertThat(config.getDepth(), is(equalTo(Config.DEFAULT_DEPTH)));
+		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
 		assertThat(config.getErrors(), is(equalTo(null)));
 	}
@@ -51,8 +54,9 @@ public class ConfigTests {
 		Config config = Config.utf8();
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(true)));
+		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
 		assertThat(config.isForceCase(), is(equalTo(false)));
-		assertThat(config.getDepth(), is(equalTo(Config.DEFAULT_DEPTH)));
+		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
 		assertThat(config.getErrors(), is(equalTo(null)));
 	}

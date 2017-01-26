@@ -31,18 +31,24 @@ import java.util.Map;
 /**
  * User-configurable properties of the {@link RiveScript} interpreter.
  *
+ * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class Config {
 
 	/**
 	 * The default recursion depth limit.
 	 */
-	public static int DEFAULT_DEPTH = 50;
+	public static final int DEFAULT_DEPTH = 50;
+
+	/**
+	 * The default unicode punctuation pattern.
+	 */
+	public static final String DEFAULT_UNICODE_PUNCTUATION_PATTERN = "[.,!?;:]";
 
 	private boolean strict;
 	private boolean utf8;
+	private String unicodePunctuation = DEFAULT_UNICODE_PUNCTUATION_PATTERN;
 	private boolean forceCase;
 	private int depth = DEFAULT_DEPTH;
 	private SessionManager sessionManager;
@@ -67,6 +73,15 @@ public class Config {
 	 */
 	public boolean isUtf8() {
 		return utf8;
+	}
+
+	/**
+	 * Returns the unicode punctuation pattern.
+	 *
+	 * @return the unicode punctuation pattern
+	 */
+	public String getUnicodePunctuation() {
+		return unicodePunctuation;
 	}
 
 	/**
@@ -126,16 +141,21 @@ public class Config {
 		if (depth != that.depth) {
 			return false;
 		}
+		if (unicodePunctuation != null ? !unicodePunctuation.equals(that.unicodePunctuation) : that.unicodePunctuation != null) {
+			return false;
+		}
 		if (sessionManager != null ? !sessionManager.equals(that.sessionManager) : that.sessionManager != null) {
 			return false;
 		}
 		return errors != null ? errors.equals(that.errors) : that.errors == null;
+
 	}
 
 	@Override
 	public int hashCode() {
 		int result = (strict ? 1 : 0);
 		result = 31 * result + (utf8 ? 1 : 0);
+		result = 31 * result + (unicodePunctuation != null ? unicodePunctuation.hashCode() : 0);
 		result = 31 * result + (forceCase ? 1 : 0);
 		result = 31 * result + depth;
 		result = 31 * result + (sessionManager != null ? sessionManager.hashCode() : 0);
@@ -148,6 +168,7 @@ public class Config {
 		return "Config{" +
 				"strict=" + strict +
 				", utf8=" + utf8 +
+				", unicodePunctuation='" + unicodePunctuation + '\'' +
 				", forceCase=" + forceCase +
 				", depth=" + depth +
 				", sessionManager=" + sessionManager +
@@ -164,6 +185,7 @@ public class Config {
 		return newBuilder()
 				.strict(this.strict)
 				.utf8(this.utf8)
+				.unicodePunctuation(this.unicodePunctuation)
 				.forceCase(this.forceCase)
 				.depth(this.depth)
 				.sessionManager(this.sessionManager)
@@ -204,6 +226,7 @@ public class Config {
 
 		private boolean strict;
 		private boolean utf8;
+		private String unicodePunctuation = DEFAULT_UNICODE_PUNCTUATION_PATTERN;
 		private boolean forceCase;
 		private int depth = DEFAULT_DEPTH;
 		private SessionManager sessionManager;
@@ -231,6 +254,17 @@ public class Config {
 		 */
 		public Builder utf8(boolean utf8) {
 			this.utf8 = utf8;
+			return this;
+		}
+
+		/**
+		 * Sets the unicode punctuation pattern (only used when UTF-8 mode is enabled).
+		 *
+		 * @param unicodePunctuation the unicode punctuation pattern
+		 * @return this builder
+		 */
+		public Builder unicodePunctuation(String unicodePunctuation) {
+			this.unicodePunctuation = unicodePunctuation;
 			return this;
 		}
 
@@ -302,6 +336,7 @@ public class Config {
 			Config config = new Config();
 			config.strict = this.strict;
 			config.utf8 = this.utf8;
+			config.unicodePunctuation = this.unicodePunctuation;
 			config.forceCase = this.forceCase;
 			config.depth = this.depth;
 			config.sessionManager = this.sessionManager;

@@ -20,38 +20,55 @@
  * SOFTWARE.
  */
 
-import com.rivescript.ZzObjectMacro;
-import com.rivescript.macro.Subroutine;
+package com.rivescript.sorting;
 
-import java.lang.String;
-import java.lang.StringBuilder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * An example object macro written in Java.
- *
- * To define a Java object macro, you must implement the interface
- * com.rivescript.ZzObjectMacro and register it using setSubroutine().
- *
- * This macro does two things: returns their message reversed, and sets
- * a user variable named `java`.
- *
- * This implements the `reverse` object macro used in Aiden/obj-java.rive
- *
- * See RSBot.java for more details.
+ * TODO
  *
  * @author Noah Petherbridge
+ * @author Marcel Overdijk
  */
-public class ExampleMacro implements Subroutine {
-	public String call (com.rivescript.RiveScript rs, String[] args) {
-		String message = String.join(" ", args);
+public class SortBuffer {
 
-		// To get/set user variables for the user, you can use currentUser
-		// to find their ID and then use the usual methods.
-		String user = rs.currentUser();
-		rs.setUservar(user, "java", "This variable was set by Java "
-			+ "when you said 'reverse " + message + "'");
+	private Map<String, List<SortedTriggerEntry>> topics = new HashMap<>();
+	private Map<String, List<SortedTriggerEntry>> thats = new HashMap<>();
+	private List<String> sub = new ArrayList<>();
+	private List<String> person = new ArrayList<>();
 
-		// Reverse their message and return it.
-		return new StringBuilder(message).reverse().toString();
+	public Map<String, List<SortedTriggerEntry>> getTopics() {
+		return topics;
+	}
+
+	public void setTopics(Map<String, List<SortedTriggerEntry>> topics) {
+		this.topics = topics;
+	}
+
+	public Map<String, List<SortedTriggerEntry>> getThats() {
+		return thats;
+	}
+
+	public void setThats(Map<String, List<SortedTriggerEntry>> thats) {
+		this.thats = thats;
+	}
+
+	public List<String> getSub() {
+		return sub;
+	}
+
+	public void setSub(List<String> sub) {
+		this.sub = sub;
+	}
+
+	public List<String> getPerson() {
+		return person;
+	}
+
+	public void setPerson(List<String> person) {
+		this.person = person;
 	}
 }

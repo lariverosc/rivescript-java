@@ -31,16 +31,16 @@ import java.util.Vector;
  *
  * @author Noah Petherbridge
  */
-public class TopicManager {
+public class ZzTopicManager {
 
 	// Private variables.
-	private HashMap<String, Topic> topics = new HashMap<>(); // List of managed topics
+	private HashMap<String, zzTopic> topics = new HashMap<>(); // List of managed topics
 	private Vector<String> vTopics = new Vector<>(); // A vector of topics
 
 	/**
 	 * Creates a topic manager. Only one per RiveScript interpreter needed.
 	 */
-	public TopicManager() {
+	public ZzTopicManager() {
 		// Nothing to construct.
 	}
 
@@ -49,11 +49,11 @@ public class TopicManager {
 	 *
 	 * @param topic The name of the topic (will be constructed if it doesn't exist).
 	 */
-	public Topic topic(String topic) {
+	public zzTopic topic(String topic) {
 		// Is this a new topic?
 		if (!topics.containsKey(topic)) {
 			// Create it.
-			Topic newTopic = new Topic(topic);
+			zzTopic newTopic = new zzTopic(topic);
 			topics.put(topic, newTopic);
 			vTopics.add(topic);
 		}
@@ -88,7 +88,7 @@ public class TopicManager {
 	/**
 	 * Sorts the replies in all the topics. This will build trigger lists of
 	 * the topics (taking into account topic inheritance/includes) and sending
-	 * the final trigger list into each {@link Topic}'s individual {@link Topic#sortTriggers(String[])}
+	 * the final trigger list into each {@link zzTopic}'s individual {@link zzTopic#sortTriggers(String[])}
 	 * method.
 	 */
 	public void sortReplies() {
@@ -193,7 +193,7 @@ public class TopicManager {
 		}
 
 		// Return it as an array.
-		return Util.Sv2s(triggers);
+		return ZzUtil.Sv2s(triggers);
 	}
 
 	/**
@@ -201,20 +201,20 @@ public class TopicManager {
 	 * object that corresponds to the search trigger. Or rather, if you have a trigger
 	 * that was part of a topic's sort list, but that topic itself doesn't manage
 	 * that trigger, this function will search the tree to find the topic that does,
-	 * and return its {@link Trigger} object.
+	 * and return its {@link ZzTrigger} object.
 	 *
 	 * @param topic   The name of the topic to start at.
 	 * @param pattern The trigger pattern text.
 	 * @param depth   The current depth limit (should start at 0), for recursion.
 	 */
-	public Trigger findTriggerByInheritance(String topic, String pattern, int depth) {
+	public ZzTrigger findTriggerByInheritance(String topic, String pattern, int depth) {
 		// Break if we're too deep.
 		if (depth > 50) {
 			System.err.println("Deep recursion while scanning topic inheritance (topic " + topic + " was involved)");
 			return null;
 		}
 
-		// Inheritance is more important than inclusion.
+		// ZzInheritance is more important than inclusion.
 		String[] inherits = this.topic(topic).inherits();
 		for (int i = 0; i < inherits.length; i++) {
 			// Does this topic have our trigger?
@@ -223,7 +223,7 @@ public class TopicManager {
 				return this.topic(inherits[i]).trigger(pattern);
 			} else {
 				// Recurse.
-				Trigger match = this.findTriggerByInheritance(inherits[i], pattern, (depth + 1));
+				ZzTrigger match = this.findTriggerByInheritance(inherits[i], pattern, (depth + 1));
 				if (match != null) {
 					// Found it!
 					return match;
@@ -240,7 +240,7 @@ public class TopicManager {
 				return this.topic(includes[i]).trigger(pattern);
 			} else {
 				// Recurse.
-				Trigger match = this.findTriggerByInheritance(includes[i], pattern, (depth + 1));
+				ZzTrigger match = this.findTriggerByInheritance(includes[i], pattern, (depth + 1));
 				if (match != null) {
 					// Found it!
 					return match;
@@ -288,6 +288,6 @@ public class TopicManager {
 		}
 
 		// Return.
-		return Util.Sv2s(result);
+		return ZzUtil.Sv2s(result);
 	}
 }

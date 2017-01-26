@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Noah Petherbridge
  */
-public class Client {
+public class ZzClient {
 
 	private String id;
 	private HashMap<String, String> data = new HashMap<>(); // User data
@@ -43,7 +43,7 @@ public class Client {
 	 *
 	 * @param id The unique ID for this client, not null.
 	 */
-	public Client(String id) {
+	public ZzClient(String id) {
 		this.id = requireNonNull(id, "'id' must not be null");
 
 		// Set default vars.

@@ -20,38 +20,46 @@
  * SOFTWARE.
  */
 
-import com.rivescript.ZzObjectMacro;
-import com.rivescript.macro.Subroutine;
+package com.rivescript.session;
 
-import java.lang.String;
-import java.lang.StringBuilder;
+import java.util.Map;
 
 /**
- * An example object macro written in Java.
- *
- * To define a Java object macro, you must implement the interface
- * com.rivescript.ZzObjectMacro and register it using setSubroutine().
- *
- * This macro does two things: returns their message reversed, and sets
- * a user variable named `java`.
- *
- * This implements the `reverse` object macro used in Aiden/obj-java.rive
- *
- * See RSBot.java for more details.
+ * TODO
  *
  * @author Noah Petherbridge
+ * @author Marcel Overdijk
  */
-public class ExampleMacro implements Subroutine {
-	public String call (com.rivescript.RiveScript rs, String[] args) {
-		String message = String.join(" ", args);
+public class UserData {
 
-		// To get/set user variables for the user, you can use currentUser
-		// to find their ID and then use the usual methods.
-		String user = rs.currentUser();
-		rs.setUservar(user, "java", "This variable was set by Java "
-			+ "when you said 'reverse " + message + "'");
+	private Map<String, String> variables;
+	private String lastMatch;
+	private History history;
 
-		// Reverse their message and return it.
-		return new StringBuilder(message).reverse().toString();
+	// TODO
+
+
+	public Map<String, String> getVariables() {
+		return variables;
+	}
+
+	public void setVariables(Map<String, String> variables) {
+		this.variables = variables;
+	}
+
+	public String getLastMatch() {
+		return lastMatch;
+	}
+
+	public void setLastMatch(String lastMatch) {
+		this.lastMatch = lastMatch;
+	}
+
+	public History getHistory() {
+		return history;
+	}
+
+	public void setHistory(History history) {
+		this.history = history;
 	}
 }

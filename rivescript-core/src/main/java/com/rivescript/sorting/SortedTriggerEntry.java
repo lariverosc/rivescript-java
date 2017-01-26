@@ -20,24 +20,34 @@
  * SOFTWARE.
  */
 
-package com.rivescript;
+package com.rivescript.sorting;
 
-import java.util.Comparator;
+import com.rivescript.ast.Trigger;
 
 /**
- * A comparator class to sort {@link String}s by length, longest to shortest.
+ * TODO
  *
  * @author Noah Petherbridge
+ * @author Marcel Overdijk
  */
-public class StringCompare implements Comparator<String> {
+public class SortedTriggerEntry {
 
-	@Override
-	public int compare(String o1, String o2) {
-		if (o1.length() < o2.length()) {
-			return 1;
-		} else if (o1.length() > o2.length()) {
-			return -1;
-		}
-		return 0;
+	String trigger;
+	Trigger pointer;
+
+	public String getTrigger() {
+		return trigger;
+	}
+
+	public void setTrigger(String trigger) {
+		this.trigger = trigger;
+	}
+
+	public Trigger getPointer() {
+		return pointer;
+	}
+
+	public void setPointer(Trigger pointer) {
+		this.pointer = pointer;
 	}
 }

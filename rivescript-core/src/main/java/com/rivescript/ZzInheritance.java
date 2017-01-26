@@ -30,7 +30,7 @@ import java.util.Vector;
  *
  * @author Noah Petherbridge
  */
-public class Inheritance {
+public class ZzInheritance {
 
 	// Private variables.
 	private HashMap<Integer, Vector<String>> atomic = new HashMap<>(); // Whole words, no wildcards
@@ -43,7 +43,7 @@ public class Inheritance {
 	private Vector<String> star = new Vector<>(); // With only * in them
 
 	// Constructor
-	public Inheritance() {
+	public ZzInheritance() {
 		// Nothing to do.
 	}
 
@@ -79,11 +79,11 @@ public class Inheritance {
 		// words are things that aren't wildcards).
 
 		// Sort the hash by its number of words, descending.
-		int[] sorted = Util.sortKeysDesc(hash);
+		int[] sorted = ZzUtil.sortKeysDesc(hash);
 
 		// Go through the results and add them to the vector.
 		for (int i = 0; i < sorted.length; i++) {
-			String[] items = Util.Sv2s(hash.get(sorted[i]));
+			String[] items = ZzUtil.Sv2s(hash.get(sorted[i]));
 			for (int j = 0; j < items.length; j++) {
 				vector.add(items[j]);
 			}
@@ -100,7 +100,7 @@ public class Inheritance {
 	 * @param wc     The vector of wildcard triggers
 	 */
 	private Vector<String> addSortedList(Vector<String> vector, Vector<String> wc) {
-		String[] items = Util.sortByLength(com.rivescript.Util.Sv2s(wc));
+		String[] items = ZzUtil.sortByLength(ZzUtil.Sv2s(wc));
 		for (int i = 0; i < items.length; i++) {
 			vector.add(items[i]);
 		}

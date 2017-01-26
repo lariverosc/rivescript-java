@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @author Noah Petherbridge
  */
-public class Util {
+public class ZzUtil {
 
 	/**
 	 * Converts a {@link String} {@link Vector} to a {@link String} array.
@@ -72,7 +73,7 @@ public class Util {
 	 *
 	 * @param hash The hash to get the keys from.
 	 */
-	public static String[] SSh2s(HashMap<String, String> hash) {
+	public static String[] SSh2s(Map<String, String> hash) {
 		Vector<String> vector = new Vector<>();
 		Iterator sit = hash.keySet().iterator();
 		while (sit.hasNext()) {
@@ -86,7 +87,7 @@ public class Util {
 	 *
 	 * @param hash The hash to get the keys from.
 	 */
-	public static int[] IIh2s(HashMap<Integer, Inheritance> hash) {
+	public static int[] IIh2s(HashMap<Integer, ZzInheritance> hash) {
 		Vector<Integer> vector = new Vector<>();
 		Iterator sit = hash.keySet().iterator();
 		while (sit.hasNext()) {
@@ -151,7 +152,7 @@ public class Util {
 	 * @param list The list to sort.
 	 */
 	public static String[] sortByLength(String[] list) {
-		Arrays.sort(list, new StringCompare());
+		// Arrays.sort(list, new ZzStringCompare());
 		return list;
 	}
 
@@ -162,7 +163,7 @@ public class Util {
 	 * @param hash   A hash that pairs the sorted list with the replacement texts.
 	 * @param text   The text to apply the substitutions to.
 	 */
-	public static String substitute(String[] sorted, HashMap<String, String> hash, String text) {
+	public static String substitute(String[] sorted, Map<String, String> hash, String text) {
 		for (int i = 0; i < sorted.length; i++) {
 			String pattern = sorted[i];
 			String result = hash.get(sorted[i]);

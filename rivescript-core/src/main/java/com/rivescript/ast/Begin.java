@@ -31,7 +31,6 @@ import java.util.Map;
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class Begin {
 

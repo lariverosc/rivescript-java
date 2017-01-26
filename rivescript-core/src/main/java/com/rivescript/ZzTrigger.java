@@ -30,7 +30,7 @@ import java.util.Vector;
  *
  * @author Noah Petherbridge
  */
-public class Trigger {
+public class ZzTrigger {
 
 	// A trigger is a parent of everything that comes after it (redirect, reply and conditions).
 
@@ -47,7 +47,7 @@ public class Trigger {
 	 * @param topic   The topic of the trigger.
 	 * @param pattern The match pattern for the trigger.
 	 */
-	public Trigger(String topic, String pattern) {
+	public ZzTrigger(String topic, String pattern) {
 		this.inTopic = topic; // And then it's read-only! Triggers can't be moved to other topics
 		this.pattern = pattern;
 	}

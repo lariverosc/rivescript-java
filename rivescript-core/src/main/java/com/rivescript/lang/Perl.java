@@ -22,10 +22,11 @@
 
 package com.rivescript.lang;
 
-import com.rivescript.ObjectHandler;
-import com.rivescript.ObjectMacro;
+import com.rivescript.ZzObjectHandler;
+import com.rivescript.ZzObjectMacro;
 import com.rivescript.RiveScript;
-import com.rivescript.Util;
+import com.rivescript.ZzUtil;
+import com.rivescript.macro.ObjectHandler;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -33,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import static java.util.Objects.requireNonNull;
@@ -41,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  * Perl programming language support for RiveScript-Java.
  *
  * @author Noah Petherbridge
- * @see ObjectHandler
+ * @see ZzObjectHandler
  */
 public class Perl implements ObjectHandler {
 
@@ -50,7 +52,7 @@ public class Perl implements ObjectHandler {
 	private HashMap<String, String> codes = new HashMap<>(); // Object codes
 
 	/**
-	 * Creates a Perl {@link ObjectHandler}. Must take the path to the rsp4j script as its argument.
+	 * Creates a Perl {@link ZzObjectHandler}. Must take the path to the rsp4j script as its argument.
 	 *
 	 * @param rivescript The RiveScript instance, not null.
 	 * @param rsp4j      The path to the rsp4j script (either in .pl or .exe format), not null.
@@ -69,8 +71,8 @@ public class Perl implements ObjectHandler {
 	 * @param code The source code inside the object.
 	 */
 	@Override
-	public boolean onLoad(String name, String[] code) {
-		codes.put(name, Util.join(code, "\n"));
+	public boolean load(String name, String[] code) {
+		codes.put(name, ZzUtil.join(code, "\n"));
 		return true;
 	}
 
@@ -78,23 +80,23 @@ public class Perl implements ObjectHandler {
 	 * Handler for when a user invokes the object. Should return the text reply from the object.
 	 *
 	 * @param name The name of the object being called.
-	 * @param user The user's id.
-	 * @param args The argument list from the call tag.
+	 * @param fields The argument list from the call tag.
 	 */
 	@Override
-	public String onCall(String name, String user, String[] args) {
+	public String call(String name, String[] fields) {
+		String user = parent.currentUser();
 		// Prepare JSON data to send.
 		try {
 			JSONObject json = new JSONObject();
 
 			// Set the flat scalars first.
 			json.put("id", user);
-			json.put("message", Util.join(args, " "));
+			json.put("message", ZzUtil.join(fields, " "));
 			json.put("code", codes.get(name));
 
 			// Transcode the user's data into a JSON object.
 			JSONObject vars = new JSONObject();
-			HashMap<String, String> data = parent.getUservars(user);
+			Map<String, String> data = parent.getUservars(user).getVariables();
 			Iterator it = data.keySet().iterator();
 			while (it.hasNext()) {
 				String key = it.next().toString();
@@ -126,7 +128,7 @@ public class Perl implements ObjectHandler {
 				while ((line = stdOut.readLine()) != null) {
 					result.add(line);
 				}
-				incoming = Util.join(Util.Sv2s(result), "\n");
+				incoming = ZzUtil.join(ZzUtil.Sv2s(result), "\n");
 			} catch (java.io.IOException e) {
 				System.err.println("IOException error in " + this.getClass().getCanonicalName()
 						+ ": " + e.getMessage());
@@ -157,9 +159,5 @@ public class Perl implements ObjectHandler {
 					+ e.getMessage());
 			return "[ERR: JSONException: " + e.getMessage() + "]";
 		}
-	}
-
-	@Override
-	public void setClass(String name, ObjectMacro impl) {
 	}
 }

@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a RiveScript Topic.
+ * Represents a RiveScript zzTopic.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
- * @since 0.8
  */
 public class Topic {
 
@@ -151,7 +150,7 @@ public class Topic {
 
 	@Override
 	public String toString() {
-		return "Topic{" +
+		return "zzTopic{" +
 				"triggers=" + triggers +
 				", includes=" + includes +
 				", inherits=" + inherits +

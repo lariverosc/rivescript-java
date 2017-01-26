@@ -31,34 +31,34 @@ import java.util.Vector;
  *
  * @author Noah Petherbridge
  */
-public class ClientManager {
+public class ZzClientManager {
 
-	private HashMap<String, Client> clients = new HashMap<>(); // List of users
+	private HashMap<String, ZzClient> clients = new HashMap<>(); // List of users
 
 	/**
 	 * Creates a client manager. Only one needed per bot.
 	 */
-	public ClientManager() {
+	public ZzClientManager() {
 		// Nothing to construct here.
 	}
 
 	/**
-	 * Gets a {@link Client} object for a given user id.
+	 * Gets a {@link ZzClient} object for a given user id.
 	 *
 	 * @param userId The user id.
 	 */
-	public Client client(String userId) {
+	public ZzClient client(String userId) {
 		// Is this a new topic?
 		if (clients.containsKey(userId) == false) {
 			// Create it.
-			clients.put(userId, new Client(userId));
+			clients.put(userId, new ZzClient(userId));
 		}
 
 		return clients.get(userId);
 	}
 
 	/**
-	 * Gets a list of the {@link Client}s managed.
+	 * Gets a list of the {@link ZzClient}s managed.
 	 */
 	public String[] listClients() {
 		Vector<String> result = new Vector<>();
@@ -66,7 +66,7 @@ public class ClientManager {
 		while (it.hasNext()) {
 			result.add(it.next().toString());
 		}
-		return Util.Sv2s(result);
+		return ZzUtil.Sv2s(result);
 	}
 
 	/**

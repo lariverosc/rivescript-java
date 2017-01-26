@@ -22,6 +22,7 @@
 
 package com.rivescript.config;
 
+import com.rivescript.RiveScript;
 import com.rivescript.session.MapSessionManager;
 import com.rivescript.session.SessionManager;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.rivescript.config.Config.DEFAULT_DEPTH;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -45,8 +47,9 @@ public class ConfigBuilderTests {
 		Config config = Config.Builder.basic().build();
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(false)));
+		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
 		assertThat(config.isForceCase(), is(equalTo(false)));
-		assertThat(config.getDepth(), is(equalTo(Config.DEFAULT_DEPTH)));
+		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
 		assertThat(config.getErrors(), is(equalTo(null)));
 	}
@@ -56,8 +59,9 @@ public class ConfigBuilderTests {
 		Config config = Config.Builder.utf8().build();
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(true)));
+		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
 		assertThat(config.isForceCase(), is(equalTo(false)));
-		assertThat(config.getDepth(), is(equalTo(Config.DEFAULT_DEPTH)));
+		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
 		assertThat(config.getErrors(), is(equalTo(null)));
 	}
@@ -84,6 +88,12 @@ public class ConfigBuilderTests {
 	public void testBuildWithUtf8Istrue() {
 		Config config = Config.newBuilder().utf8(true).build();
 		assertThat(config.isUtf8(), is(equalTo(true)));
+	}
+
+	@Test
+	public void testBuildWithUnicodePunctuation() {
+		Config config = Config.newBuilder().unicodePunctuation("foobar").build();
+		assertThat(config.getUnicodePunctuation(), is(equalTo("foobar")));
 	}
 
 	@Test
