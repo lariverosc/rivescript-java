@@ -730,21 +730,53 @@ public class RiveScript {
 		List<SortedTriggerEntry> inThisTopic = new ArrayList<>();
 		if (!thats) {
 			// The non-thats structure is: {topics}->[ array of triggers ]
-			// TODO
+			if (topics.containsKey(topic)) {
+				for (Trigger trigger : topics.get(topic).getTriggers()) {
+					SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getTrigger(), trigger);
+					inThisTopic.add(entry);
+				}
+			}
 		} else {
-			// The 'that' structure is: {topic}->{cur trig}->{prev trig}->{trigger info}
-			// TODO
+			// The 'thats' structure is: {topic}->{cur trig}->{prev trig}->{trigger info}
+			if (this.thats.containsKey(topic)) {
+				for (Map<String, Trigger> currentTrigger : this.thats.get(topic).values()) {
+					for (Trigger previous : currentTrigger.values()) {
+						SortedTriggerEntry entry = new SortedTriggerEntry(previous.getTrigger(), previous);
+						inThisTopic.add(entry);
+					}
+				}
+			}
 		}
 
 		// Does this topic include others?
-		// TODO
+		if (includes.containsKey(topic)) {
+			for (String includes : this.includes.get(topic).keySet()) {
+				logger.debug("Topic {} includes {}", topic, includes);
+				triggers.addAll(getTopicTriggers(includes, thats, depth + 1, inheritance + 1, false));
+			}
+		}
 
 		// Does this topic inherit others?
-		// TODO
+		if (inherits.containsKey(topic)) {
+			for (String inherits : this.inherits.get(topic).keySet()) {
+				logger.debug("Topic {} inherits {}", topic, inherits);
+				triggers.addAll(getTopicTriggers(inherits, thats, depth + 1, inheritance + 1, true));
+			}
+		}
 
-		// Collect the triggers for *this* topic. If this topic inherits any othertopics, it means that this topic's triggers have higher
+		// Collect the triggers for *this* topic. If this topic inherits any other topics, it means that this topic's triggers have higher
 		// priority than those in any inherited topics. Enforce this with an {inherits} tag.
-		// TODO
+		if ((inherits.containsKey(topic) && this.inherits.get(topic).size() > 0) || inherited) {
+			for (SortedTriggerEntry trigger : inThisTopic) {
+				logger.debug("Prefixing trigger with {inherits={}} {}", inheritance, trigger.getTrigger());
+				String label = String.format("{inherits=%d}%s", inheritance, trigger.getTrigger());
+				triggers.add(new SortedTriggerEntry(label, trigger.getPointer()));
+			}
+		} else {
+			for (SortedTriggerEntry trigger : inThisTopic) {
+				triggers.add(new SortedTriggerEntry(trigger.getTrigger(), trigger.getPointer()));
+			}
+		}
 
 		return triggers;
 	}
@@ -759,6 +791,7 @@ public class RiveScript {
 
 		List<SortedTriggerEntry> running = new ArrayList<>();
 
+		running = triggers; // TODO remove
 		// TODO
 
 		return running;

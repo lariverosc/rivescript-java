@@ -35,6 +35,11 @@ public class SortedTriggerEntry {
 	String trigger;
 	Trigger pointer;
 
+	public SortedTriggerEntry(String trigger, Trigger pointer) {
+		this.trigger = trigger;
+		this.pointer = pointer;
+	}
+
 	public String getTrigger() {
 		return trigger;
 	}
