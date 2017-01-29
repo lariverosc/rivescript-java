@@ -26,9 +26,9 @@ package com.rivescript.session;
  * Specifies options for thawing the user's variables.
  * <p>
  * <ul>
- * <li>THAW: Restore the variables and delete the frozen copy.</li>
- * <li>DISCARD: Don't restore the variables, just delete the frozen copy.</li>
- * <li>KEEP: Keep the frozen copy after restoring.</li>
+ * <li>THAW: Restore the variables and delete the frozen copy.
+ * <li>DISCARD: Don't restore the variables, just delete the frozen copy.
+ * <li>KEEP: Keep the frozen copy after restoring.
  * </ul>
  *
  * @author Noah Petherbridge

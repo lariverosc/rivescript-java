@@ -22,11 +22,9 @@
 
 package com.rivescript.lang;
 
-import com.rivescript.ZzObjectHandler;
-import com.rivescript.ZzObjectMacro;
 import com.rivescript.RiveScript;
-import com.rivescript.ZzUtil;
 import com.rivescript.macro.ObjectHandler;
+import com.rivescript.util.StringUtils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -43,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * Perl programming language support for RiveScript-Java.
  *
  * @author Noah Petherbridge
- * @see ZzObjectHandler
+ * @see ObjectHandler
  */
 public class Perl implements ObjectHandler {
 
@@ -52,7 +50,7 @@ public class Perl implements ObjectHandler {
 	private HashMap<String, String> codes = new HashMap<>(); // Object codes
 
 	/**
-	 * Creates a Perl {@link ZzObjectHandler}. Must take the path to the rsp4j script as its argument.
+	 * Creates a Perl {@link ObjectHandler}. Must take the path to the rsp4j script as its argument.
 	 *
 	 * @param rivescript The RiveScript instance, not null.
 	 * @param rsp4j      The path to the rsp4j script (either in .pl or .exe format), not null.
@@ -72,7 +70,7 @@ public class Perl implements ObjectHandler {
 	 */
 	@Override
 	public boolean load(String name, String[] code) {
-		codes.put(name, ZzUtil.join(code, "\n"));
+		codes.put(name, StringUtils.join(code, "\n"));
 		return true;
 	}
 
@@ -91,7 +89,7 @@ public class Perl implements ObjectHandler {
 
 			// Set the flat scalars first.
 			json.put("id", user);
-			json.put("message", ZzUtil.join(fields, " "));
+			json.put("message", StringUtils.join(fields, " "));
 			json.put("code", codes.get(name));
 
 			// Transcode the user's data into a JSON object.
@@ -128,7 +126,7 @@ public class Perl implements ObjectHandler {
 				while ((line = stdOut.readLine()) != null) {
 					result.add(line);
 				}
-				incoming = ZzUtil.join(ZzUtil.Sv2s(result), "\n");
+				incoming = StringUtils.join(result.toArray(new String[0]), "\n");
 			} catch (java.io.IOException e) {
 				System.err.println("IOException error in " + this.getClass().getCanonicalName()
 						+ ": " + e.getMessage());

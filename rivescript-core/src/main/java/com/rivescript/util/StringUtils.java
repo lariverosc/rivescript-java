@@ -23,6 +23,7 @@
 package com.rivescript.util;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -82,5 +83,22 @@ public class StringUtils {
 		}
 
 		return count;
+	}
+
+	/**
+	 * TODO
+	 */
+	public static Comparator<String> byLengthReverse() {
+		return new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				int result = Integer.compare(o2.length(), o1.length());
+				if (result == 0) {
+					result = o1.compareTo(o2);
+				}
+				return result;
+			}
+		};
 	}
 }

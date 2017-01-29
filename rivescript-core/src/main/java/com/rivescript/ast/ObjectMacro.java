@@ -118,7 +118,7 @@ public class ObjectMacro {
 
 	@Override
 	public String toString() {
-		return "ZzObjectMacro{" +
+		return "ObjectMacro{" +
 				"name='" + name + '\'' +
 				", language='" + language + '\'' +
 				", code=" + code +

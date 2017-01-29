@@ -183,7 +183,7 @@ public class Trigger {
 
 	@Override
 	public String toString() {
-		return "ZzTrigger{" +
+		return "Trigger{" +
 				"trigger='" + trigger + '\'' +
 				", reply=" + reply +
 				", condition=" + condition +

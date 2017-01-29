@@ -424,7 +424,7 @@ public class Parser {
 						String mode = "";
 						if (fields.length >= 2) {
 							for (String field : fields) {
-								if (field.equals("includes") || fields.equals("inherits")) {
+								if (field.equals("includes") || field.equals("inherits")) {
 									mode = field;
 								} else if (mode.equals("includes")) {
 									ast.getTopic(topic).addInclude(field, true);

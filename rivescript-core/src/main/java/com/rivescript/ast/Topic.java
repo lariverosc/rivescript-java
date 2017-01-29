@@ -150,7 +150,7 @@ public class Topic {
 
 	@Override
 	public String toString() {
-		return "zzTopic{" +
+		return "Topic{" +
 				"triggers=" + triggers +
 				", includes=" + includes +
 				", inherits=" + inherits +
