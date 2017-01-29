@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.rivescript.regexp.Regexp.RE_META;
+import static com.rivescript.regexp.Regexp.RE_NASTIES;
+import static com.rivescript.regexp.Regexp.RE_SYMBOLS;
+
 /**
  * Miscellaneous {@link String} utility methods.
  *
@@ -55,6 +59,16 @@ public class StringUtils {
 			}
 		}
 		return buf.toString();
+	}
+
+	/**
+	 * Strips special characters out of a string.
+	 *
+	 * @param str TODO
+	 * @return
+	 */
+	public static String stripNasties(String str) {
+		return RE_NASTIES.matcher(str).replaceAll("");
 	}
 
 	/**

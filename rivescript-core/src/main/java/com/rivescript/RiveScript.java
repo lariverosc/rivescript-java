@@ -59,8 +59,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.rivescript.regexp.Regexp.RE_INHERITS;
+import static com.rivescript.regexp.Regexp.RE_META;
+import static com.rivescript.regexp.Regexp.RE_SYMBOLS;
 import static com.rivescript.regexp.Regexp.RE_WEIGHT;
 import static com.rivescript.util.StringUtils.byLengthReverse;
+import static com.rivescript.util.StringUtils.stripNasties;
 import static com.rivescript.util.StringUtils.wordCount;
 import static java.util.Objects.requireNonNull;
 
@@ -104,13 +107,12 @@ public class RiveScript {
 
 	private Parser parser;
 
-	private SessionManager sessionManager;
-
 	private Map<String, String> global;                           // 'global' variables
 	private Map<String, String> var;                              // 'var' bot variables
 	private Map<String, String> sub;                              // 'sub' substitutions
 	private Map<String, String> person;                           // 'person' substitutions
 	private Map<String, List<String>> array;                      // 'array' definitions
+	private SessionManager sessions;                              // user variable session manager
 	private Map<String, Map<String, Boolean>> includes;           // included topics
 	private Map<String, Map<String, Boolean>> inherits;           // inherited topics
 	private Map<String, String> objectLanguages;                  // object macro languages
@@ -148,7 +150,7 @@ public class RiveScript {
 		this.utf8 = config.isUtf8();
 		this.forceCase = config.isForceCase();
 		this.depth = config.getDepth();
-		this.sessionManager = config.getSessionManager();
+		this.sessions = config.getSessionManager();
 
 		String unicodePunctuation = config.getUnicodePunctuation();
 		if (unicodePunctuation == null) {
@@ -161,8 +163,8 @@ public class RiveScript {
 			logger.debug("No depth config: using default {}", Config.DEFAULT_DEPTH);
 		}
 
-		if (this.sessionManager == null) {
-			this.sessionManager = new MapSessionManager();
+		if (this.sessions == null) {
+			this.sessions = new MapSessionManager();
 			logger.debug("No SessionManager config: using default MapSessionManager");
 		}
 
@@ -880,7 +882,7 @@ public class RiveScript {
 					}
 					logger.debug("Trigger belongs to a topic that inherits other topics. Level={}", inherits);
 					pattern = pattern.replaceAll("\\{inherits=\\d+\\}", "");
-					trigger.setTrigger(pattern);
+					// TODO trigger.setTrigger(pattern);
 				} else {
 					inherits = -1;
 				}
@@ -1113,9 +1115,161 @@ public class RiveScript {
 	 * @return
 	 */
 	public String reply(String username, String message) {
+		logger.debug("Asked to reply to [{}] {}", username, message);
+
+		long startTime = System.currentTimeMillis();
+
+		// Store the current user's ID.
+		this.currentUser.set(username);
+
+		try {
+			// Initialize a user profile for this user?
+			sessions.init(username);
+
+			// Format their message.
+			message = formatMessage(message, false);
+
+			String reply;
+
+			// If the BEGIN block exists, consult it first.
+			if (topics.containsKey("__begin__")) {
+				String begin = getReply(username, "request", true, 0);
+
+				// OK to continue?
+				if (begin.contains("{ok}")) {
+					reply = getReply(username, message, false, 0);
+					begin = begin.replaceAll("\\{ok\\}", reply);
+				}
+
+				reply = begin;
+				reply = processTags(username, message, reply, new ArrayList<String>(), new ArrayList<String>(), 0);
+			} else {
+				reply = getReply(username, message, false, 0);
+			}
+
+			// Save their message history.
+			sessions.addHistory(username, message, reply);
+
+			if (logger.isTraceEnabled()) {
+				long elapsedTime = System.currentTimeMillis() - startTime;
+				logger.trace("Replied to [{}] in {} ms", username, elapsedTime);
+			}
+
+			return reply;
+
+		} finally {
+			// Unset the current user's ID.
+			this.currentUser.remove();
+		}
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @param username
+	 * @param message
+	 * @param isBegin
+	 * @param step
+	 * @return
+	 */
+	private String getReply(String username, String message, boolean isBegin, int step) {
+		// Needed to sort replies?
+		if (sorted.getTopics().size() == 0) {
+			logger.warn("You forgot to call sortReplies()!");
+			return "ERR: Replies Not Sorted";
+		}
+
+		// Collect data on this user.
+
+
+		// TODO
+
+		return null;
+	}
+
+	/**
+	 * Formats a user's message for safe processing.
+	 *
+	 * @param message TODO
+	 * @param botReply TODO
+	 * @return the formatted message
+	 */
+	private String formatMessage(String message, boolean botReply) {
+		// Lowercase it.
+		message = "" + message;
+		message = message.toLowerCase();
+
+		// Run substitutions and sanitize what's left.
+		message = substitute(message, sub, sorted.getSub());
+
+		// In UTF-8 mode, only strip metacharacters and HTML brackets (to protect against obvious XSS attacks).
+		if (utf8) {
+			message = RE_META.matcher(message).replaceAll("");
+			if (unicodePunctuation != null) {
+				message = unicodePunctuation.matcher(message).replaceAll("");
+			}
+
+			// For the bot's reply, also strip common punctuation.
+			if (botReply) {
+				message = RE_SYMBOLS.matcher(message).replaceAll("");
+			}
+		} else {
+			// For everything else, strip all non-alphanumerics.
+			message = stripNasties(message);
+		}
+
+		// Cut leading and trailing blanks once punctuation dropped office.
+		message = message.trim();
+		message = message.replaceAll("\\s+", "");
+
+		return message;
+	}
+
+	/**
+	 * Pocesses tags in a reply element.
+	 *
+	 * @param username
+	 * @param message
+	 * @param reply
+	 * @param st
+	 * @param bst
+	 * @param step
+	 * @return
+	 */
+	private String processTags(String username, String message, String reply, List<String> st, List<String> bst, int step) {
 		// TODO
 		return null;
 	}
+
+	/**
+	 * Applies a substitution to an input message.
+	 *
+	 * @param message TODO
+	 * @param subs
+	 * @param sorted
+	 * @return the substituted message
+	 */
+	private String substitute(String message, Map<String, String> subs, List<String> sorted) {
+		// Safety checking.
+		if (subs == null || subs.size() == 0) {
+			return message;
+		}
+
+		// Make placeholders each time we substitute something.
+		List<String> ph = new ArrayList<>();
+		int pi = 0;
+
+		for (String pattern : sorted) {
+			String result = subs.get(pattern);
+
+			// TODO
+		}
+
+		// TODO
+
+		return message;
+	}
+
 
 	/*------------------*/
 	/*-- User Methods --*/
@@ -1133,7 +1287,7 @@ public class RiveScript {
 	public void setUservar(String username, String name, String value) {
 		Map<String, String> vars = new HashMap<>();
 		vars.put(name, value);
-		sessionManager.set(username, vars);
+		sessions.set(username, vars);
 	}
 
 	/**
@@ -1146,7 +1300,7 @@ public class RiveScript {
 	 * @param vars     the user variables
 	 */
 	public void setUservars(String username, Map<String, String> vars) {
-		sessionManager.set(username, vars);
+		sessions.set(username, vars);
 	}
 
 	/**
@@ -1159,7 +1313,7 @@ public class RiveScript {
 	 * @return the variable value
 	 */
 	public String getUservar(String username, String name) {
-		return sessionManager.get(username, name);
+		return sessions.get(username, name);
 	}
 
 	/**
@@ -1169,14 +1323,14 @@ public class RiveScript {
 	 * @return the variables
 	 */
 	public UserData getUservars(String username) {
-		return sessionManager.getAny(username);
+		return sessions.getAny(username);
 	}
 
 	/**
 	 * Clears all variables for all users.
 	 */
 	public void clearAllUservars() {
-		sessionManager.clearAll();
+		sessions.clearAll();
 	}
 
 	/**
@@ -1185,7 +1339,7 @@ public class RiveScript {
 	 * @param username the username
 	 */
 	public void clearUservars(String username) {
-		sessionManager.clear(username);
+		sessions.clear(username);
 	}
 
 	/**
@@ -1194,7 +1348,7 @@ public class RiveScript {
 	 * @param username the username
 	 */
 	public void freezeUservars(String username) {
-		sessionManager.freeze(username);
+		sessions.freeze(username);
 	}
 
 	/**
@@ -1205,7 +1359,7 @@ public class RiveScript {
 	 * @see ThawAction
 	 */
 	public void thawUservars(String username, ThawAction action) {
-		sessionManager.thaw(username, action);
+		sessions.thaw(username, action);
 	}
 
 	/**
@@ -1215,7 +1369,7 @@ public class RiveScript {
 	 * @return the last matched trigger
 	 */
 	public String lastMatch(String username) {
-		return sessionManager.getLastMatch(username);
+		return sessions.getLastMatch(username);
 	}
 
 	/**

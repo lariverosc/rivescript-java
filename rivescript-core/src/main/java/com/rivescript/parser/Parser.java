@@ -527,9 +527,9 @@ public class Parser {
 			}
 		}
 
-		if (this.logger.isInfoEnabled()) {
+		if (logger.isInfoEnabled()) {
 			long elapsedTime = System.currentTimeMillis() - startTime;
-			this.logger.info("Parsing {} completed in {} ms", filename, elapsedTime);
+			logger.info("Parsing {} completed in {} ms", filename, elapsedTime);
 		}
 
 		return ast;
