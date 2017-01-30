@@ -36,5 +36,19 @@ public class History {
 	private List<String> input = new ArrayList<>();
 	private List<String> reply = new ArrayList<>();
 
-	// TODO
+	public List<String> getInput() {
+		return input;
+	}
+
+	public void setInput(List<String> input) {
+		this.input = input;
+	}
+
+	public List<String> getReply() {
+		return reply;
+	}
+
+	public void setReply(List<String> reply) {
+		this.reply = reply;
+	}
 }

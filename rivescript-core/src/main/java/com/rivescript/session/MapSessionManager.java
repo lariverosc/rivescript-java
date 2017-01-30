@@ -39,6 +39,11 @@ public class MapSessionManager implements SessionManager {
 	}
 
 	@Override
+	public void set(String username, String name, String value) {
+		// TODO
+	}
+
+	@Override
 	public void set(String username, Map<String, String> vars) {
 		// TODO
 	}

@@ -33,6 +33,7 @@ import com.rivescript.macro.Subroutine;
 import com.rivescript.parser.Parser;
 import com.rivescript.parser.ParserConfig;
 import com.rivescript.parser.ParserException;
+import com.rivescript.session.History;
 import com.rivescript.session.MapSessionManager;
 import com.rivescript.session.SessionManager;
 import com.rivescript.session.ThawAction;
@@ -51,16 +52,21 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.rivescript.regexp.Regexp.RE_CONDITION;
 import static com.rivescript.regexp.Regexp.RE_INHERITS;
 import static com.rivescript.regexp.Regexp.RE_META;
+import static com.rivescript.regexp.Regexp.RE_SET;
 import static com.rivescript.regexp.Regexp.RE_SYMBOLS;
+import static com.rivescript.regexp.Regexp.RE_TOPIC;
 import static com.rivescript.regexp.Regexp.RE_WEIGHT;
 import static com.rivescript.util.StringUtils.byLengthReverse;
 import static com.rivescript.util.StringUtils.stripNasties;
@@ -96,6 +102,7 @@ import static java.util.Objects.requireNonNull;
 public class RiveScript {
 
 	private static final String[] DEFAULT_FILE_EXTENSIONS = new String[] {".rive", ".rs"};
+	private static final Random RANDOM = new Random();
 
 	private static Logger logger = LoggerFactory.getLogger(RiveScript.class);
 
@@ -104,6 +111,7 @@ public class RiveScript {
 	private boolean forceCase;
 	private int depth;
 	private Pattern unicodePunctuation;
+	private Map<String, String> errors;
 
 	private Parser parser;
 
@@ -157,6 +165,17 @@ public class RiveScript {
 			unicodePunctuation = Config.DEFAULT_UNICODE_PUNCTUATION_PATTERN;
 		}
 		this.unicodePunctuation = Pattern.compile(unicodePunctuation);
+
+		this.errors = new HashMap<>();
+		this.errors.put("replyNotMatched", "ERR: No Reply Matched");
+		this.errors.put("replyNotFound", "ERR: No Reply Found");
+		this.errors.put("objectNotFound", "[ERR: Object Not Found]");
+		this.errors.put("deepRecursion", "ERR: Deep Recursion Detected");
+		if (config.getErrors() != null) {
+			for (Map.Entry<String, String> entry : config.getErrors().entrySet()) {
+				this.errors.put(entry.getKey(), entry.getValue());
+			}
+		}
 
 		if (this.depth <= 0) {
 			this.depth = Config.DEFAULT_DEPTH;
@@ -829,9 +848,9 @@ public class RiveScript {
 
 			// Check the trigger text for any {weight} tags, default being 0.
 			int weight = 0;
-			Matcher m = RE_WEIGHT.matcher(trigger.getTrigger());
-			if (m.find()) {
-				weight = Integer.parseInt(m.group(1));
+			Matcher matcher = RE_WEIGHT.matcher(trigger.getTrigger());
+			if (matcher.find()) {
+				weight = Integer.parseInt(matcher.group(1));
 			}
 
 			// First trigger of this priority? Initialize the weight map.
@@ -874,15 +893,15 @@ public class RiveScript {
 				logger.debug("Looking at trigger: {}", pattern);
 
 				// See if the trigger has an {inherits} tag.
-				Matcher m = RE_INHERITS.matcher(pattern);
-				if (m.find()) {
-					inherits = Integer.parseInt(m.group(1));
+				Matcher matcher = RE_INHERITS.matcher(pattern);
+				if (matcher.find()) {
+					inherits = Integer.parseInt(matcher.group(1));
 					if (inherits > highestInherits) {
 						highestInherits = inherits;
 					}
 					logger.debug("Trigger belongs to a topic that inherits other topics. Level={}", inherits);
 					pattern = pattern.replaceAll("\\{inherits=\\d+\\}", "");
-					// TODO trigger.setTrigger(pattern);
+					trigger.setTrigger(pattern);
 				} else {
 					inherits = -1;
 				}
@@ -1180,17 +1199,337 @@ public class RiveScript {
 		}
 
 		// Collect data on this user.
+		String topic = sessions.get(username, "topic");
+		if (topic == null) {
+			topic = "random";
+		}
+		List<String> stars = new ArrayList<>();
+		List<String> thatStars = new ArrayList<>();
+		String reply = null;
 
+		// Avoid letting them fall into a missing topic.
+		if (!topics.containsKey(topic)) {
+			logger.warn("User {} was in an empty topic named '{}'", username, topic);
+			topic = "random";
+			sessions.set(username, "topic", topic);
+		}
 
-		// TODO
+		// Avoid deep recursion.
+		if (step > depth) {
+			return errors.get("deepRecursion");
+		}
 
-		return null;
+		// Are we in the BEGIN block?
+		if (isBegin) {
+			topic = "__begin__";
+		}
+
+		// More topic sanity checking.
+		if (!topics.containsKey(topic)) {
+			// This was handled before, which would mean topic=random and it doesn't exist. Serious issue!
+			return "ERR: No default topic 'random' was found!"; // TODO custom errors!
+		}
+
+		// Create a pointer for the matched data when we find it.
+		Trigger matched = null;
+		String matchedTrigger = null;
+		boolean foundMatch = false;
+
+		// See if there were any %Previous's in this topic, or any topic related to it.
+		// This should only be done the first time -- not during a recursive redirection.
+		// This is because in a redirection, "lastReply" is still gonna be the same as it was the first time,
+		// resulting in an infinite loop!
+		if (step == 0) {
+			List<String> allTopics = new ArrayList<>(Arrays.asList(topic));
+			if (topics.get(topic).getIncludes().size() > 0 || topics.get(topic).getInherits().size() > 0) {
+				// Get ALL the topics!
+				allTopics = getTopicTree(topic, 0);
+			}
+
+			// Scan them all.
+			for (String top : allTopics) {
+				logger.debug("Checking topic {} for any %Previous's", top);
+
+				if (sorted.getThats().get(top).size() > 0) {
+					logger.debug("There's a %Previous in this topic!");
+
+					// Get the bot's last reply to the user.
+					History history = sessions.getHistory(username);
+					String lastReply = history.getReply().get(0);
+
+					// Format the bot's reply the same way as the human's.
+					lastReply = formatMessage(lastReply, true);
+					logger.debug("Bot's last reply: {}", lastReply);
+
+					// See if it's a match.
+					for (SortedTriggerEntry trigger : sorted.getThats().get(top)) {
+						String pattern = trigger.getPointer().getPrevious();
+						String botside = triggerRegexp(username, pattern);
+						logger.debug("Try to match lastReply {} to {} ({})", lastReply, pattern, botside);
+
+						// Match?
+						Pattern re = Pattern.compile("^" + botside + "$");
+						Matcher matcher = re.matcher(lastReply);
+						if (matcher.find()) {
+							// Huzzah! See if OUR message is right too...
+							logger.debug("Bot side matched!");
+
+							// Collect the bot stars.
+							if (matcher.groupCount() > 1) {
+								for (int i = 1; i <= matcher.groupCount(); i++) {
+									thatStars.add(matcher.group(i));
+								}
+							}
+
+							// Compare the triggers to the user's message.
+							Trigger userSide = trigger.getPointer();
+							String regexp = triggerRegexp(username, userSide.getTrigger());
+							logger.debug("Try to match {} against {} ({})", message, userSide.getTrigger(), regexp);
+
+							// If the trigger is atomic, we don't need to deal with the regexp engine.
+							boolean isMatch = false;
+							if (isAtomic(userSide.getTrigger())) {
+								if (message.equals(regexp)) {
+									isMatch = true;
+								}
+							} else {
+								re = Pattern.compile("^" + regexp + "$");
+								matcher = re.matcher(message);
+								if (matcher.find()) {
+									isMatch = true;
+
+									// Get the user's message stars.
+									if (matcher.groupCount() > 1) {
+										for (int i = 1; i <= matcher.groupCount(); i++) {
+											stars.add(matcher.group(i));
+										}
+									}
+								}
+							}
+
+							// Was it a match?
+							if (isMatch) {
+								// Keep the trigger pointer.
+								matched = userSide;
+								foundMatch = true;
+								matchedTrigger = userSide.getTrigger();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Search their topic for a match to their trigger.
+		if (!foundMatch) {
+			logger.debug("Searching their topic for a match...");
+			for (SortedTriggerEntry trigger : sorted.getTopics().get(topic)) {
+				String pattern = trigger.getTrigger();
+				String regexp = triggerRegexp(username, pattern);
+				logger.debug("Try to match {} against {} ({})", message, pattern, regexp);
+
+				// If the trigger is atomic, we don't need to bother with the regexp engine.
+				boolean isMatch = false;
+				if (isAtomic(pattern) && message.equals(regexp)) {
+					isMatch = true;
+				} else {
+					// Non-atomic triggers always need the regexp.
+					Pattern re = Pattern.compile("^" + regexp + "$");
+					Matcher matcher = re.matcher(message);
+					if (matcher.find()) {
+						// The regexp matched!
+						isMatch = true;
+
+						// Collect the stars.
+						if (matcher.groupCount() > 1) {
+							for (int i = 1; i <= matcher.groupCount(); i++) {
+								stars.add(matcher.group(i));
+							}
+						}
+					}
+				}
+
+				// A match somehow?
+				if (isMatch) {
+					logger.debug("Found a match!");
+
+					// Keep the pointer to this trigger's data.
+					matched = trigger.getPointer();
+					foundMatch = true;
+					matchedTrigger = pattern;
+					break;
+				}
+			}
+		}
+
+		// Store what trigger they matched on.
+		sessions.setLastMatch(username, matchedTrigger);
+
+		// Did we match?
+		if (foundMatch) {
+			for (int n = 0; n < 1; n++) { // A single loop so we can break out early.
+				// See if there are any hard redirects.
+				if (matched.getRedirect() != null && matched.getRedirect().length() > 0) {
+					logger.debug("Redirecting us to {}", matched.getRedirect());
+					String redirect = matched.getRedirect();
+					redirect = processTags(username, message, redirect, stars, thatStars, 0);
+					logger.debug("Pretend user said: {}", redirect);
+					reply = getReply(username, redirect, isBegin, step + 1);
+					break;
+				}
+
+				// Check the conditionals.
+				for (String row : matched.getCondition()) {
+					String[] halves = row.split("=>");
+					if (halves.length == 2) {
+						Matcher matcher = RE_CONDITION.matcher(halves[0].trim());
+						if (matcher.find()) {
+							String left = matcher.group(1).trim();
+							String eq = matcher.group(2);
+							String right = matcher.group(3).trim();
+							String potentialReply = halves[1].trim();
+
+							// Process tags all around.
+							left = processTags(username, message, left, stars, thatStars, step);
+							right = processTags(username, message, right, stars, thatStars, step);
+
+							// Defaults?
+							if (left.length() == 0) {
+								left = "undefined";
+							}
+							if (right.length() == 0) {
+								right = "undefined";
+							}
+
+							logger.debug("Check if {} {} {}", left, eq, right);
+
+							// Validate it.
+							boolean passed = false;
+
+							if (eq.equals("eq") || eq.equals("==")) {
+								if (left.equals(right)) {
+									passed = true;
+								}
+							} else if (eq.equals("ne") || eq.equals("!=") || eq.equals("<>")) {
+								if (!left.equals(right)) {
+									passed = true;
+								}
+							} else {
+								// Dealing with numbers here.
+								int intLeft;
+								int intRight;
+								try {
+									intLeft = Integer.parseInt(left);
+									intRight = Integer.parseInt(right);
+									if (eq.equals("<") && intLeft < intRight) {
+										passed = true;
+									} else if (eq.equals("<=") && intLeft <= intRight) {
+										passed = true;
+									} else if (eq.equals(">") && intLeft > intRight) {
+										passed = true;
+									} else if (eq.equals(">=") && intLeft >= intRight) {
+										passed = true;
+									}
+
+								} catch (NumberFormatException e) {
+									logger.warn("Failed to evaluate numeric condition!");
+								}
+
+							}
+
+							if (passed) {
+								reply = potentialReply;
+								break;
+							}
+						}
+					}
+				}
+
+				// Have our reply yet?
+				if (reply != null && reply.length() > 0) {
+					break;
+				}
+
+				// Process weights in the replies.
+				List<String> bucket = new ArrayList<>();
+				for (String rep : matched.getReply()) {
+					int weight = 1;
+					Matcher matcher = RE_WEIGHT.matcher(rep);
+					if (matcher.find()) {
+						weight = Integer.parseInt(matcher.group(1));
+						if (weight <= 0) {
+							weight = 1;
+						}
+
+						for (int i = weight; i > 0; i--) {
+							bucket.add(rep);
+						}
+					} else {
+						bucket.add(rep);
+					}
+				}
+
+				// Get a random reply.
+				if (bucket.size() > 0) {
+					reply = bucket.get(RANDOM.nextInt(bucket.size()));
+				}
+				break;
+			}
+		}
+
+		// Still no reply?? Give up with the fallback error replies.
+		if (!foundMatch) {
+			reply = errors.get("replyNotMatched");
+		} else if (reply == null || reply.length() == 0) {
+			reply = errors.get("replyNotFound");
+		}
+
+		logger.debug("Reply: {}", reply);
+
+		// Process tags for the BEGIN block.
+		if (isBegin) {
+			// The BEGIN block can set {topic} and user vars.
+
+			// Topic setter.
+			Matcher matcher = RE_TOPIC.matcher(reply);
+			int giveup = 0;
+			while (matcher.find()) {
+				giveup++;
+				if (giveup > depth) {
+					logger.warn("Infinite loop looking for topic tag!");
+					break;
+				}
+				String name = matcher.group(1);
+				sessions.set(username, "topic", name);
+				reply = reply.replace(matcher.group(0), "");
+			}
+
+			// Set user vars.
+			matcher = RE_SET.matcher(reply);
+			giveup = 0;
+			while (matcher.find()) {
+				giveup++;
+				if (giveup > depth) {
+					logger.warn("Infinite loop looking for set tag!");
+					break;
+				}
+				String name = matcher.group(1);
+				String value = matcher.group(2);
+				sessions.set(username, name, value);
+				reply = reply.replace(matcher.group(0), "");
+			}
+		} else {
+			reply = processTags(username, message, reply, stars, thatStars, 0);
+		}
+
+		return reply;
 	}
 
 	/**
 	 * Formats a user's message for safe processing.
 	 *
-	 * @param message TODO
+	 * @param message  TODO
 	 * @param botReply TODO
 	 * @return the formatted message
 	 */
@@ -1270,6 +1609,63 @@ public class RiveScript {
 		return message;
 	}
 
+	/**
+	 * Returns an array of every topic related to a topic (all the topics it inherits or includes,
+	 * plus all the topics included or inherited by those topics, and so on).
+	 * The array includes the original topic, too.
+	 *
+	 * @param topic TODO
+	 * @param depth TODO
+	 * @return
+	 */
+	private List<String> getTopicTree(String topic, int depth) {
+		// Break if we're in too deep.
+		if (depth > this.depth) {
+			logger.warn("Deep recursion while scanning topic tree!");
+			return new ArrayList<>();
+		}
+
+		// Collect an array of all topics.
+		List<String> topics = new ArrayList<>(Arrays.asList(topic));
+		for (String includes : this.topics.get(topic).getIncludes().keySet()) {
+			topics.addAll(getTopicTree(includes, depth + 1));
+		}
+		for (String inherits : this.topics.get(topic).getInherits().keySet()) {
+			topics.addAll(getTopicTree(inherits, depth + 1));
+		}
+
+		return topics;
+	}
+
+	/**
+	 * Prepares a trigger pattern for the regular expression engine.
+	 *
+	 * @param username TODO
+	 * @param pattern
+	 * @return
+	 */
+	private String triggerRegexp(String username, String pattern) {
+		// TODO
+		return null;
+	}
+
+	/**
+	 * Returns whether a string is atomic or not.
+	 *
+	 * @param pattern TODO
+	 * @return
+	 */
+	private boolean isAtomic(String pattern) {
+		// Atomic triggers don't contain any wildcards or parenthesis or anything of the sort.
+		// We don't need to test the full character set, just left brackets will do.
+		List<String> specials = Arrays.asList("*", "#", "_", "(", "[", "<", "@");
+		for (String special : specials) {
+			if (pattern.contains(special)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/*------------------*/
 	/*-- User Methods --*/
@@ -1443,65 +1839,4 @@ public class RiveScript {
 			}
 		}
 	}
-
-	// OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-	// OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-	// OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-
-	//	/*---------------------------*/
-	//	/*-- Configuration Methods --*/
-	//	/*---------------------------*/
-	//
-	//	/**
-	//	 * Sets a global variable for the interpreter (equivalent to {@code ! global}).
-	//	 * Set the value to {@code null} to delete the variable.<p>
-	//	 * <p>
-	//	 * There are two special globals that require certain data types:<p>
-	//	 * <p>
-	//	 * {@code debug} is boolean-like and its value must be a string value containing
-	//	 * "true", "yes", "1", "false", "no" or "0".<p>
-	//	 * <p>
-	//	 * {@code depth} is integer-like and its value must be a quoted integer like "50".
-	//	 * The "depth" variable controls how many levels deep RiveScript will go when
-	//	 * following reply redirections.<p>
-	//	 * <p>
-	//	 * Returns {@code true} on success, {@code false} on error.
-	//	 *
-	//	 * @param name  The variable name.
-	//	 * @param value The variable's value.
-	//	 */
-	//	public boolean setGlobal(String name, String value) {
-	//		boolean delete = false;
-	//		if (value == null || value == "<undef>") {
-	//			delete = true;
-	//		}
-	//
-	//		// Special globals // TODO MARCEL NEED TO COPY THIS BEHAVIOUR!
-	//		if (name.equals("debug")) {
-	//			// Debug is a boolean.
-	//			if (value.equals("true") || value.equals("1") || value.equals("yes")) {
-	//				this.debug = true;
-	//			} else if (value.equals("false") || value.equals("0") || value.equals("no") || delete) {
-	//				this.debug = false;
-	//			} else {
-	//				return error("Global variable \"debug\" needs a boolean value");
-	//			}
-	//		} else if (name.equals("depth")) {
-	//			// Depth is an integer.
-	//			try {
-	//				this.depth = Integer.parseInt(value);
-	//			} catch (NumberFormatException e) {
-	//				return error("Global variable \"depth\" needs an integer value");
-	//			}
-	//		}
-	//
-	//		// It's a user-defined global. OK.
-	//		if (delete) {
-	//			globals.remove(name);
-	//		} else {
-	//			globals.put(name, value);
-	//		}
-	//
-	//		return true;
-	//	}
 }

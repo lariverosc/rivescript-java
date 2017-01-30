@@ -41,6 +41,15 @@ public interface SessionManager {
 	UserData init(String username);
 
 	/**
+	 * Sets a user's variable.
+	 *
+	 * @param username the username
+	 * @param name the variable name
+	 * @param value the variable value
+	 */
+	void set(String username, String name, String value);
+
+	/**
 	 * Sets a user's variables.
 	 *
 	 * @param username the username
