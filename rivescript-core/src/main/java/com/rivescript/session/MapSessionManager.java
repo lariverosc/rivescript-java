@@ -62,10 +62,10 @@ public class MapSessionManager implements SessionManager {
 	public void addHistory(String username, String input, String reply) {
 		UserData userData = init(username);
 		// TODO
-//		data.History.Input = data.History.Input[:len(data.History.Input)-1]                    // Pop
-//		data.History.Input = append([]string{strings.TrimSpace(input)}, data.History.Input...) // Unshift
-//		data.History.Reply = data.History.Reply[:len(data.History.Reply)-1]                    // Pop
-//		data.History.Reply = append([]string{strings.TrimSpace(reply)}, data.History.Reply...) // Unshift
+		//		data.History.Input = data.History.Input[:len(data.History.Input)-1]                    // Pop
+		//		data.History.Input = append([]string{strings.TrimSpace(input)}, data.History.Input...) // Unshift
+		//		data.History.Reply = data.History.Reply[:len(data.History.Reply)-1]                    // Pop
+		//		data.History.Reply = append([]string{strings.TrimSpace(reply)}, data.History.Reply...) // Unshift
 	}
 
 	@Override

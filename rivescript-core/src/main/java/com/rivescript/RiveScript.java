@@ -1686,7 +1686,7 @@ public class RiveScript {
 		}
 
 		// Person substitution and string formatting.
-		String[] formats = new String[] { "person", "formal", "sentence", "uppercase", "lowercase" };
+		String[] formats = new String[] {"person", "formal", "sentence", "uppercase", "lowercase"};
 		for (String format : formats) {
 			re = Pattern.compile("\\{" + format + "\\}(.+?)\\{\\/" + format + "\\}");
 			matcher = re.matcher(reply);
@@ -1728,7 +1728,8 @@ public class RiveScript {
 			String tag = parts[0].toLowerCase();
 			String data = "";
 			if (parts.length > 1) {
-				data = StringUtils.join(Arrays.copyOfRange(parts, 1, parts.length), " ");;
+				data = StringUtils.join(Arrays.copyOfRange(parts, 1, parts.length), " ");
+				;
 			}
 			String insert = "";
 
@@ -2020,7 +2021,7 @@ public class RiveScript {
 			String optional = matcher.group(0);
 			String[] parts = matcher.group(1).split("\\|");
 			List<String> opts = new ArrayList<>();
-			for (String p :parts) {
+			for (String p : parts) {
 				opts.add("(?:\\s|\\b)+" + p + "(?:\\s|\\b)+");
 			}
 

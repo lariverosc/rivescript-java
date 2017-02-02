@@ -75,7 +75,7 @@ public class Java implements ObjectHandler {
 	/**
 	 * Handler for when a user invokes the object. Should return the text reply from the object.
 	 *
-	 * @param name The name of the object being called.
+	 * @param name   The name of the object being called.
 	 * @param fields The argument list from the tag.
 	 */
 	@Override

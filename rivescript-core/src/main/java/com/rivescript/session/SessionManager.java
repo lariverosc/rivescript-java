@@ -44,8 +44,8 @@ public interface SessionManager {
 	 * Sets a user's variable.
 	 *
 	 * @param username the username
-	 * @param name the variable name
-	 * @param value the variable value
+	 * @param name     the variable name
+	 * @param value    the variable value
 	 */
 	void set(String username, String name, String value);
 
@@ -53,7 +53,7 @@ public interface SessionManager {
 	 * Sets a user's variables.
 	 *
 	 * @param username the username
-	 * @param vars the user variables
+	 * @param vars     the user variables
 	 */
 	void set(String username, Map<String, String> vars);
 
@@ -61,8 +61,8 @@ public interface SessionManager {
 	 * Adds input and reply to a user's history.
 	 *
 	 * @param username the username
-	 * @param input the input
-	 * @param reply the reply
+	 * @param input    the input
+	 * @param reply    the reply
 	 */
 	void addHistory(String username, String input, String reply);
 
@@ -70,7 +70,7 @@ public interface SessionManager {
 	 * Sets a user's the last matched trigger.
 	 *
 	 * @param username the username
-	 * @param trigger the trigger
+	 * @param trigger  the trigger
 	 */
 	void setLastMatch(String username, String trigger);
 
@@ -78,7 +78,7 @@ public interface SessionManager {
 	 * Returns a user variable.
 	 *
 	 * @param username the username
-	 * @param name the variable name
+	 * @param name     the variable name
 	 * @return the variable value
 	 */
 	String get(String username, String name);
@@ -137,7 +137,7 @@ public interface SessionManager {
 	 * Unfreezes a user's variables.
 	 *
 	 * @param username the username
-	 * @param action the thaw action
+	 * @param action   the thaw action
 	 * @see ThawAction
 	 */
 	void thaw(String username, ThawAction action);
