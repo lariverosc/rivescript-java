@@ -24,6 +24,8 @@ package com.rivescript;
 
 import com.rivescript.config.Config;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link RiveScript}.
@@ -61,15 +63,28 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"! global debug = false",
-				"+ debug mode",
-				"- Debug mode is: <env debug>",
-				"+ set debug mode *",
-				"- <env debug=<star>>Switched to <star>.",
+				"! sub who's  = who is",
+				"! sub it's   = it is",
+				"! sub didn't = did not",
+				"+ knock knock",
+				"- Who's there?",
+				"+ *",
+				"% who is there",
+				"- <sentence> who?",
+				"+ *",
+				"% * who",
+				"- Haha! <sentence>!",
+				"+ *",
+				"- I don't know."
 		});
 		rs.sortReplies();
-		System.out.println(rs.reply("human", "Debug mode.")); 			// --> "Debug mode is: false"
-		System.out.println(rs.reply("human", "Set debug mode true")); 	// --> "Switched to true."
-		System.out.println(rs.reply("human", "Debug mode?")); 			// --> "Debug mode is: true"
+		getReply(rs, "knock knock"); 						// --> "Who's there?"
+		getReply(rs, "Canoe"); 								// --> "Canoe who?"
+		getReply(rs, "Canoe help me with my homework?"); 	// --> "Haha! Canoe help me with my homework!"
+		getReply(rs, "Hello"); 								// --> "I don't know."
+	}
+
+	private void getReply(RiveScript rs, String message) {
+		System.out.println(message + " --> " + rs.reply("human", message));
 	}
 }

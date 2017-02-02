@@ -1917,7 +1917,7 @@ public class RiveScript {
 
 			// Make a placeholder.
 			ph.add(result);
-			String placeholder = "\\x00" + pi + "\\x00";
+			String placeholder = "\\\\x00" + pi + "\\\\x00";
 			pi++;
 
 			// Run substitutions.

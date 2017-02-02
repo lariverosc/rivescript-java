@@ -22,6 +22,7 @@
 
 package com.rivescript.session;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,11 +62,10 @@ public class MapSessionManager implements SessionManager {
 	@Override
 	public void addHistory(String username, String input, String reply) {
 		UserData userData = init(username);
-		// TODO
-		//		data.History.Input = data.History.Input[:len(data.History.Input)-1]                    // Pop
-		//		data.History.Input = append([]string{strings.TrimSpace(input)}, data.History.Input...) // Unshift
-		//		data.History.Reply = data.History.Reply[:len(data.History.Reply)-1]                    // Pop
-		//		data.History.Reply = append([]string{strings.TrimSpace(reply)}, data.History.Reply...) // Unshift
+		Collections.rotate(userData.getHistory().getInput(), 1); // Rotate right.
+		userData.getHistory().getInput().add(0, input.trim());   // Now set the first item
+		Collections.rotate(userData.getHistory().getReply(), 1); // Rotate right.
+		userData.getHistory().getReply().add(0, reply.trim());   // Now set the first item.
 	}
 
 	@Override
