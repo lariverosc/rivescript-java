@@ -1339,7 +1339,7 @@ public class RiveScript {
 			for (SortedTriggerEntry trigger : sorted.getTopics().get(topic)) {
 				String pattern = trigger.getTrigger();
 				String regexp = triggerRegexp(username, pattern);
-				logger.debug("Try to match {} against {} ({})", message, pattern, regexp);
+				logger.debug("Try to match \"{}\" against {} ({})", message, pattern, regexp);
 
 				// If the trigger is atomic, we don't need to bother with the regexp engine.
 				boolean isMatch = false;
@@ -1571,7 +1571,7 @@ public class RiveScript {
 
 		// Cut leading and trailing blanks once punctuation dropped office.
 		message = message.trim();
-		message = message.replaceAll("\\s+", "");
+		message = message.replaceAll("\\s+", " ");
 
 		return message;
 	}

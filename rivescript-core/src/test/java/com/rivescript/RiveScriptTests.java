@@ -39,9 +39,9 @@ public class RiveScriptTests {
 		rs.loadFile(path);
 		rs.sortReplies();
 
-		System.out.println("**** START DUMP TOPICS ****");
-		rs.dumpTopics();
-		System.out.println("**** DONE DUMP TOPICS ****");
+//		System.out.println("**** START DUMP TOPICS ****");
+//		rs.dumpTopics();
+//		System.out.println("**** DONE DUMP TOPICS ****");
 
 		System.out.println("**** START DUMP SORTED ****");
 		rs.dumpSorted();
