@@ -33,8 +33,20 @@ import java.util.List;
  */
 public class History {
 
+	/**
+	 * The number of entries stored in the history.
+	 */
+	public static final int HISTORY_SIZE = 9;
+
 	private List<String> input = new ArrayList<>();
 	private List<String> reply = new ArrayList<>();
+
+	public History() {
+		for (int i = 0; i < HISTORY_SIZE; i++) {
+			input.add("undefined");
+			reply.add("undefined");
+		}
+	}
 
 	public List<String> getInput() {
 		return input;

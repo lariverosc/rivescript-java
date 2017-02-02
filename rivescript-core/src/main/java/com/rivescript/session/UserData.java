@@ -22,6 +22,7 @@
 
 package com.rivescript.session;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,12 +33,9 @@ import java.util.Map;
  */
 public class UserData {
 
-	private Map<String, String> variables;
+	private Map<String, String> variables = new HashMap<>();
 	private String lastMatch;
-	private History history;
-
-	// TODO
-
+	private History history = new History();
 
 	public Map<String, String> getVariables() {
 		return variables;

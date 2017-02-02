@@ -46,6 +46,8 @@ public class RiveScriptTests {
 		System.out.println("**** START DUMP SORTED ****");
 		rs.dumpSorted();
 		System.out.println("**** START DUMP SORTED ****");
+
+		System.out.println(rs.reply("human", "hello bot"));
 	}
 
 	@Test

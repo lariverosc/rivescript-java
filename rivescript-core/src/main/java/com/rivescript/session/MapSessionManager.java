@@ -22,6 +22,7 @@
 
 package com.rivescript.session;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,36 +33,53 @@ import java.util.Map;
  */
 public class MapSessionManager implements SessionManager {
 
+	private Map<String, UserData> users = new HashMap<>();
+	private Map<String, UserData> frozen = new HashMap<>();
+
 	@Override
 	public UserData init(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			users.put(username, defaultSession());
+		}
+		return users.get(username);
 	}
 
 	@Override
 	public void set(String username, String name, String value) {
-		// TODO
+		UserData userData = init(username);
+		userData.getVariables().put(name, value);
 	}
 
 	@Override
 	public void set(String username, Map<String, String> vars) {
-		// TODO
+		UserData userData = init(username);
+		for (Map.Entry<String, String> var : vars.entrySet()) {
+			userData.getVariables().put(var.getKey(), var.getValue());
+		}
 	}
 
 	@Override
 	public void addHistory(String username, String input, String reply) {
+		UserData userData = init(username);
 		// TODO
+//		data.History.Input = data.History.Input[:len(data.History.Input)-1]                    // Pop
+//		data.History.Input = append([]string{strings.TrimSpace(input)}, data.History.Input...) // Unshift
+//		data.History.Reply = data.History.Reply[:len(data.History.Reply)-1]                    // Pop
+//		data.History.Reply = append([]string{strings.TrimSpace(reply)}, data.History.Reply...) // Unshift
 	}
 
 	@Override
 	public void setLastMatch(String username, String trigger) {
-		// TODO
+		UserData userData = init(username);
+		userData.setLastMatch(trigger);
 	}
 
 	@Override
 	public String get(String username, String name) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getVariables().get(name);
 	}
 
 	@Override
@@ -78,33 +96,48 @@ public class MapSessionManager implements SessionManager {
 
 	@Override
 	public String getLastMatch(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getLastMatch();
 	}
 
 	@Override
 	public History getHistory(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getHistory();
 	}
 
 	@Override
 	public void clear(String username) {
-		// TODO
+		users.remove(username);
+		frozen.remove(username);
 	}
 
 	@Override
 	public void clearAll() {
-		// TODO
+		users.clear();
+		frozen.clear();
 	}
 
 	@Override
 	public void freeze(String username) {
+
 		// TODO
 	}
 
 	@Override
 	public void thaw(String username, ThawAction action) {
+
 		// TODO
+	}
+
+	private UserData defaultSession() {
+		UserData userData = new UserData();
+		userData.getVariables().put("topic", "random");
+		userData.setLastMatch("");
+		return userData;
 	}
 }

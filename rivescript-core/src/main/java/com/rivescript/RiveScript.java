@@ -61,14 +61,26 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.rivescript.regexp.Regexp.RE_ANY_TAG;
+import static com.rivescript.regexp.Regexp.RE_ARRAY;
+import static com.rivescript.regexp.Regexp.RE_BOT_VAR;
+import static com.rivescript.regexp.Regexp.RE_CALL;
 import static com.rivescript.regexp.Regexp.RE_CONDITION;
 import static com.rivescript.regexp.Regexp.RE_INHERITS;
 import static com.rivescript.regexp.Regexp.RE_META;
+import static com.rivescript.regexp.Regexp.RE_OPTIONAL;
+import static com.rivescript.regexp.Regexp.RE_PLACEHOLDER;
+import static com.rivescript.regexp.Regexp.RE_RANDOM;
+import static com.rivescript.regexp.Regexp.RE_REDIRECT;
 import static com.rivescript.regexp.Regexp.RE_SET;
 import static com.rivescript.regexp.Regexp.RE_SYMBOLS;
 import static com.rivescript.regexp.Regexp.RE_TOPIC;
+import static com.rivescript.regexp.Regexp.RE_USER_VAR;
 import static com.rivescript.regexp.Regexp.RE_WEIGHT;
+import static com.rivescript.regexp.Regexp.RE_ZERO_WITH_STAR;
+import static com.rivescript.session.History.HISTORY_SIZE;
 import static com.rivescript.util.StringUtils.byLengthReverse;
+import static com.rivescript.util.StringUtils.quoteMeta;
 import static com.rivescript.util.StringUtils.stripNasties;
 import static com.rivescript.util.StringUtils.wordCount;
 import static java.util.Objects.requireNonNull;
@@ -1565,7 +1577,7 @@ public class RiveScript {
 	}
 
 	/**
-	 * Pocesses tags in a reply element.
+	 * Processes tags in a reply element.
 	 *
 	 * @param username
 	 * @param message
@@ -1576,8 +1588,314 @@ public class RiveScript {
 	 * @return
 	 */
 	private String processTags(String username, String message, String reply, List<String> st, List<String> bst, int step) {
-		// TODO
-		return null;
+		// Prepare the stars and botstars.
+		List<String> stars = new ArrayList<>();
+		stars.add("");
+		stars.addAll(st);
+		List<String> botstars = new ArrayList<>();
+		botstars.add("");
+		botstars.addAll(bst);
+		if (stars.size() == 1) {
+			stars.add("undefined");
+		}
+		if (botstars.size() == 1) {
+			botstars.add("undefined");
+		}
+
+		// Turn arrays into randomized sets.
+		Pattern re = Pattern.compile("\\(@([A-Za-z0-9_]+)\\)");
+		Matcher matcher = re.matcher(reply);
+		int giveup = 0;
+		while (matcher.find()) {
+			if (giveup > depth) {
+				logger.warn("Infinite loop looking for arrays in reply!");
+				break;
+			}
+
+			String name = matcher.group(1);
+			String result;
+			if (array.containsKey(name)) {
+				result = "{random}" + StringUtils.join(array.get(name).toArray(new String[0]), "|") + "{/random}";
+			} else {
+				result = "\\x00@" + name + "\\x00"; // Dummy it out so we can reinsert it later.
+			}
+			reply = reply.replace(result, result);
+		}
+		reply = reply.replaceAll("\\\\x00@([A-Za-z0-9_]+)\\\\x00", "(@$1)");
+
+		// Tag shortcuts.
+		reply = reply.replaceAll("<person>", "{person}<star>{/person}");
+		reply = reply.replaceAll("<@>", "{@<star>}");
+		reply = reply.replaceAll("<formal>", "{formal}<star>{/formal}");
+		reply = reply.replaceAll("<sentence>", "{sentence}<star>{/sentence}");
+		reply = reply.replaceAll("<uppercase>", "{uppercase}<star>{/uppercase}");
+		reply = reply.replaceAll("<lowercase>", "{lowercase}<star>{/lowercase}");
+
+		// Weight and star tags.
+		reply = RE_WEIGHT.matcher(reply).replaceAll(""); // Remove {weight} tags.
+		reply = reply.replaceAll("<star>", stars.get(1));
+		reply = reply.replaceAll("<botstar>", botstars.get(1));
+		for (int i = 1; i < stars.size(); i++) {
+			reply = reply.replaceAll("<star" + i + ">", stars.get(i));
+		}
+		for (int i = 1; i < botstars.size(); i++) {
+			reply = reply.replaceAll("<botstar" + i + ">", botstars.get(i));
+		}
+
+		// <input> and <reply> tags.
+		reply = reply.replaceAll("<input>", "<input1>");
+		reply = reply.replaceAll("<reply>", "<reply1>");
+		History history = sessions.getHistory(username);
+		if (history != null) {
+			for (int i = 1; i <= HISTORY_SIZE; i++) {
+				reply = reply.replaceAll("<input" + i + ">", history.getInput().get(i - 1));
+				reply = reply.replaceAll("<reply" + i + ">", history.getReply().get(i - 1));
+			}
+		}
+
+		// <id> and escape codes.
+		reply = reply.replaceAll("<id>", username);
+		reply = reply.replaceAll("\\\\s", " ");
+		reply = reply.replaceAll("\\\\n", "\n");
+		reply = reply.replaceAll("\\#", "#");
+
+		// {random}
+		matcher = RE_RANDOM.matcher(reply);
+		giveup = 0;
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				logger.warn("Infinite loop looking for random tag!");
+				break;
+			}
+
+			String[] random;
+			String text = matcher.group(1);
+			if (text.contains("|")) {
+				random = text.split("|");
+			} else {
+				random = text.split(" ");
+			}
+
+			String output = "";
+			if (random.length > 0) {
+				output = random[RANDOM.nextInt(random.length)];
+			}
+
+			reply = reply.replace(matcher.group(0), output);
+		}
+
+		// Person substitution and string formatting.
+		String[] formats = new String[] { "person", "formal", "sentence", "uppercase", "lowercase" };
+		for (String format : formats) {
+			re = Pattern.compile("\\{" + format + "\\}(.+?)\\{\\/" + format + "\\}");
+			matcher = re.matcher(reply);
+			giveup = 0;
+			while (matcher.find()) {
+				giveup++;
+				if (giveup > depth) {
+					logger.warn("Infinite loop looking for {} tag!", format);
+					break;
+				}
+
+				String content = matcher.group(1);
+				String replace;
+				if (format.equals("person")) {
+					replace = substitute(content, person, sorted.getPerson());
+				} else {
+					replace = StringUtils.stringFormat(format, content);
+				}
+
+				reply = reply.replace(matcher.group(0), replace);
+			}
+		}
+
+		// Handle all variable-related tags with an iterative regexp approach to
+		// allow for nesting of tags in arbitrary ways (think <set a=<get b>>)
+		// Dummy out the <call> tags first, because we don't handle them here.
+		reply = reply.replaceAll("<call>", "{__call__}");
+		reply = reply.replaceAll("</call>", "{/__call__}");
+		while (true) {
+
+			// Look for tags that don't contain any other tags inside them.
+			matcher = RE_ANY_TAG.matcher(reply);
+			if (!matcher.find()) {
+				break; // No tags left!
+			}
+
+			String match = matcher.group(1);
+			String[] parts = match.split(" ");
+			String tag = parts[0].toLowerCase();
+			String data = "";
+			if (parts.length > 1) {
+				data = StringUtils.join(Arrays.copyOfRange(parts, 1, parts.length), " ");;
+			}
+			String insert = "";
+
+			// Handle the various types of tags.
+			if (tag.equals("bot") || tag.equals("env")) {
+				// <bot> and <env> tags are similar.
+				Map<String, String> target;
+				if (tag.equals("bot")) {
+					target = var;
+				} else {
+					target = global;
+				}
+
+				if (data.contains("=")) {
+					// Assigning the value.
+					parts = data.split("=");
+					String name = parts[0];
+					String value = parts[1];
+					logger.debug("Assign {} variable {} = }{", tag, name, value);
+					target.put(name, value);
+				} else {
+					// Getting a bot/env variable.
+					if (target.containsKey(data)) {
+						insert = target.get(data);
+					} else {
+						insert = "undefined";
+					}
+				}
+			} else if (tag.equals("set")) {
+				// <set> user vars.
+				parts = data.split("=");
+				if (parts.length > 1) {
+					String name = parts[0];
+					String value = parts[1];
+					logger.debug("Set uservar {} = {}", name, value);
+					sessions.set(username, name, value);
+				} else {
+					logger.warn("Malformed <set> tag: {}", match);
+				}
+			} else if (tag.equals("add") || tag.equals("sub") || tag.equals("mult") || tag.equals("div")) {
+				// Math operator tags
+				parts = data.split("=");
+				String name = parts[0];
+				String strValue = parts[1];
+				int result = 0;
+
+				// Initialize the variable?
+				String origStr = sessions.get(username, name);
+				if (origStr == null) {
+					origStr = "0";
+					sessions.set(username, name, origStr);
+				}
+
+				// Sanity check.
+				try {
+					int value = Integer.parseInt(strValue);
+					try {
+						result = Integer.parseInt(origStr);
+
+						// Run the operation.
+						if (tag.equals("add")) {
+							result += value;
+						} else if (tag.equals("sub")) {
+							result -= value;
+						} else if (tag.equals("mult")) {
+							result *= value;
+						} else {
+							// Don't divide by zero.
+							if (value == 0) {
+								insert = "[ERR: Can't divide by zero!]";
+							}
+							result /= value;
+						}
+						sessions.set(username, name, Integer.toString(result));
+					} catch (NumberFormatException e) {
+						insert = "[ERR: Math can't \"" + tag + "\" non-numeric variable " + name + "]";
+					}
+				} catch (NumberFormatException e) {
+					insert = "[ERR: Math can't " + tag + " non-numeric value " + strValue + "]";
+				}
+			} else if (tag.equals("get")) {
+				// <get> user vars.
+				insert = sessions.get(username, data);
+				if (insert == null) {
+					insert = "undefined";
+				}
+			} else {
+				// Unrecognized tag; preserve it.
+				insert = "\\x00" + match + "\\x01";
+			}
+
+			reply = reply.replace(matcher.group(0), insert);
+		}
+
+		// Recover mangled HTML-like tags.
+		reply = reply.replaceAll("\\\\x00", "<");
+		reply = reply.replaceAll("\\\\x01", ">");
+
+		// Topic setter.
+		matcher = RE_TOPIC.matcher(reply);
+		giveup = 0;
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				logger.warn("Infinite loop looking for topic tag!");
+				break;
+			}
+
+			String name = matcher.group(1);
+			sessions.set(username, "topic", name);
+			reply = reply.replace(matcher.group(0), "");
+		}
+
+		// Inline redirector.
+		matcher = RE_REDIRECT.matcher(reply);
+		giveup = 0;
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				logger.warn("Infinite loop looking for redirect tag!");
+				break;
+			}
+
+			String target = matcher.group(1);
+			logger.debug("Inline redirection to: {}", target);
+			String subreply = getReply(username, target, false, step + 1);
+			reply = reply.replace(matcher.group(0), subreply);
+		}
+
+		// Object caller.
+		reply = reply.replaceAll("\\{__call__}", "<call>");
+		reply = reply.replaceAll("\\{/__call__}", "</call>");
+		matcher = RE_CALL.matcher(reply);
+		giveup = 0;
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				logger.warn("Infinite loop looking for call tag!");
+				break;
+			}
+
+			String text = matcher.group(1).trim();
+			String[] parts = text.split(" ");
+			String obj = parts[0];
+			String[] args;
+			if (parts.length > 1) {
+				args = Arrays.copyOfRange(parts, 1, parts.length);
+			} else {
+				args = new String[0];
+			}
+
+			// Do we know this object?
+			String output;
+			if (subroutines.containsKey(obj)) {
+				// It exists as a native Java macro.
+				output = subroutines.get(obj).call(this, args);
+			} else if (objectLanguages.containsKey(obj)) {
+				String languange = objectLanguages.get(obj);
+				output = handlers.get(languange).call(obj, args);
+			} else {
+				output = errors.get("objectNotFound");
+			}
+
+			reply = reply.replace(matcher.group(0), output);
+		}
+
+		return reply;
 	}
 
 	/**
@@ -1600,11 +1918,36 @@ public class RiveScript {
 
 		for (String pattern : sorted) {
 			String result = subs.get(pattern);
+			String qm = quoteMeta(pattern);
 
-			// TODO
+			// Make a placeholder.
+			ph.add(result);
+			String placeholder = "\\x00" + pi + "\\x00";
+			pi++;
+
+			// Run substitutions.
+			message = message.replaceAll("^" + qm + "$", placeholder);
+			message = message.replaceAll("^" + qm + "(\\W+)", placeholder + "$1");
+			message = message.replaceAll("(\\W+)" + qm + "(\\W+)", "$1" + placeholder + "$2");
+			message = message.replaceAll("(\\W+)" + qm + "$", "$1" + placeholder);
 		}
 
-		// TODO
+		// Convert the placeholders back in.
+		int tries = 0;
+		while (message.contains("\\x00")) {
+			tries++;
+			if (tries > depth) {
+				logger.warn("Too many loops in substitution placeholders!");
+				break;
+			}
+
+			Matcher matcher = RE_PLACEHOLDER.matcher(message);
+			if (matcher.find()) {
+				int i = Integer.parseInt(matcher.group(1));
+				String result = ph.get(i);
+				message = message.replace(matcher.group(0), result);
+			}
+		}
 
 		return message;
 	}
@@ -1645,8 +1988,141 @@ public class RiveScript {
 	 * @return
 	 */
 	private String triggerRegexp(String username, String pattern) {
-		// TODO
-		return null;
+		// If the trigger is simply '*' then the * needs to become (.*?) to match the blank string too.
+		pattern = RE_ZERO_WITH_STAR.matcher(pattern).replaceAll("<zerowidthstar>");
+
+		// Simple replacements.
+		pattern = pattern.replaceAll("\\*", "(.+?)");             // Convert * into (.+?)
+		pattern = pattern.replaceAll("#", "(\\\\d+?)");           // Convert # into (\d+?)
+		pattern = pattern.replaceAll("_", "(\\\\w+?)");           // Convert _ into (\w+?)
+		pattern = RE_WEIGHT.matcher(pattern).replaceAll("");      // Remove {weight} tags
+		pattern = pattern.replaceAll("<zerowidthstar>", "(.*?)"); // Convert <zerowidthstar> into (.+?)
+		pattern = pattern.replaceAll("\\|{2,}", "|");             // Remove empty entities
+		pattern = pattern.replaceAll("(\\(|\\[)\\|", "$1");       // Remove empty entities from start of alt/opts
+		pattern = pattern.replaceAll("\\|(\\)|\\])", "$1");       // Remove empty entities from end of alt/opts
+
+		// UTF-8 mode special characters.
+		if (utf8) {
+			// Literal @ symbols (like in an e-mail address) conflict with arrays.
+			pattern = pattern.replaceAll("\\\\@", "\\\\u0040");
+		}
+
+		// Optionals.
+		Matcher matcher = RE_OPTIONAL.matcher(pattern);
+		int giveup = 0;
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				logger.warn("Infinite loop when trying to process optionals in a trigger!");
+				return "";
+			}
+
+			String optional = matcher.group(0);
+			String[] parts = matcher.group(1).split("\\|");
+			List<String> opts = new ArrayList<>();
+			for (String p :parts) {
+				opts.add("(?:\\s|\\b)+" + p + "(?:\\s|\\b)+");
+			}
+
+			// If this optional had a star or anything in it, make it non-matching.
+			String pipes = StringUtils.join(opts.toArray(new String[0]), "|");
+			pipes.replaceAll(StringUtils.quoteMeta("(.+?)"), "(?:.+?)");
+			pipes.replaceAll(StringUtils.quoteMeta("(\\d+?)"), "(?:\\\\d+?)");
+			pipes.replaceAll(StringUtils.quoteMeta("(\\w+?)"), "(?:\\\\w+?)");
+
+			// Put the new text in.
+			pipes = "(?:" + pipes + "|(?:\\b|\\s)+)";
+			pattern = pattern.replace(optional, pipes);
+		}
+
+		// _ wildcards can't match numbers!
+		// Quick note on why I did it this way: the initial replacement above (_ => (\w+?)) needs to be \w because the square brackets
+		// in [A-Za-z] will confuse the optionals logic just above. So then we switch it back down here.
+		pattern = pattern.replaceAll("\\\\w", "[A-Za-z]");
+
+		// Filter in arrays.
+		giveup = 0;
+		matcher = RE_ARRAY.matcher(pattern);
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				break;
+			}
+
+			String name = matcher.group(1);
+			String rep = "";
+			if (array.containsKey(name)) {
+				rep = "(?:" + StringUtils.join(array.get(name).toArray(new String[0]), "|") + ")";
+			}
+			pattern = pattern.replace(matcher.group(0), rep);
+		}
+
+		// Filter in bot variables.
+		giveup = 0;
+		matcher = RE_BOT_VAR.matcher(pattern);
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				break;
+			}
+
+			String name = matcher.group(1);
+			String rep = "";
+			if (var.containsKey(name)) {
+				rep = StringUtils.stripNasties(var.get(name));
+			}
+			pattern = pattern.replace(matcher.group(0), rep.toLowerCase());
+		}
+
+		// Filter in user variables.
+		giveup = 0;
+		matcher = RE_USER_VAR.matcher(pattern);
+		while (matcher.find()) {
+			giveup++;
+			if (giveup > depth) {
+				break;
+			}
+
+			String name = matcher.group(1);
+			String rep = "undefined";
+			String value = sessions.get(username, name);
+			if (value != null) {
+				rep = value;
+			}
+			pattern = pattern.replace(matcher.group(0), rep.toLowerCase());
+		}
+
+		// Filter in <input> and <reply> tags.
+		giveup = 0;
+		pattern = pattern.replaceAll("<input>", "<input1>");
+		pattern = pattern.replaceAll("<reply>", "<reply1>");
+
+		while (pattern.contains("<input") || pattern.contains("<reply")) {
+			giveup++;
+			if (giveup > depth) {
+				break;
+			}
+
+			for (int i = 1; i <= HISTORY_SIZE; i++) {
+				String inputPattern = "<input" + i + ">";
+				String replyPattern = "<reply" + i + ">";
+				History history = sessions.getHistory(username);
+				if (history == null) {
+					pattern = pattern.replace(inputPattern, history.getInput().get(i - 1));
+					pattern = pattern.replace(replyPattern, history.getReply().get(i - 1));
+				} else {
+					pattern = pattern.replace(inputPattern, "undefined");
+					pattern = pattern.replace(replyPattern, "undefined");
+				}
+			}
+		}
+
+		// Recover escaped Unicode symbols.
+		if (utf8) {
+			pattern = pattern.replaceAll("\\u0040", "@");
+		}
+
+		return pattern;
 	}
 
 	/**

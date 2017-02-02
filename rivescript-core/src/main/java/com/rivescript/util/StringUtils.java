@@ -22,13 +22,10 @@
 
 package com.rivescript.util;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.regex.Pattern;
 
-import static com.rivescript.regexp.Regexp.RE_META;
 import static com.rivescript.regexp.Regexp.RE_NASTIES;
-import static com.rivescript.regexp.Regexp.RE_SYMBOLS;
 
 /**
  * Miscellaneous {@link String} utility methods.
@@ -41,7 +38,7 @@ public class StringUtils {
 	/**
 	 * Joins a {@link String} array into a single {@link String}.
 	 *
-	 * @param array the array to join
+	 * @param array     the array to join
 	 * @param delimiter the delimiter character to use, {@code null} treated as {@code ""}
 	 */
 	public static String join(String[] array, String delimiter) {
@@ -101,6 +98,8 @@ public class StringUtils {
 
 	/**
 	 * TODO
+	 *
+	 * @return
 	 */
 	public static Comparator<String> byLengthReverse() {
 		return new Comparator<String>() {
@@ -114,5 +113,50 @@ public class StringUtils {
 				return result;
 			}
 		};
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @param str
+	 * @return
+	 */
+	public static String quoteMeta(String str) {
+		String[] unsafe = "\\.+*?[^]$(){}=!<>|:".split("");
+		for (String c : unsafe) {
+			str = str.replaceAll(Pattern.quote(c), "\\\\\\" + c);
+		}
+		return str;
+	}
+
+	/**
+	 * Formats a {@link String}.
+	 *
+	 * @return the formatted string.
+	 */
+	public static String stringFormat(String format, String text) {
+		if (format.equals("uppercase")) {
+			return text.toUpperCase();
+		} else if (format.equals("lowercase")) {
+			return text.toLowerCase();
+		} else if (format.equals("sentence")) {
+			if (text.length() > 1) {
+				return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+			} else {
+				return text.toUpperCase();
+			}
+		} else if (format.equals("formal")) {
+			String[] words = text.split(" ");
+			for (int i = 0; i < words.length; i++) {
+				String word = words[i];
+				if (word.length() > 1) {
+					words[i] = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+				} else {
+					words[i] = word.toUpperCase();
+				}
+			}
+			return join(words, " ");
+		}
+		return text;
 	}
 }
