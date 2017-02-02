@@ -1287,10 +1287,8 @@ public class RiveScript {
 							logger.debug("Bot side matched!");
 
 							// Collect the bot stars.
-							if (matcher.groupCount() > 1) {
-								for (int i = 1; i <= matcher.groupCount(); i++) {
-									thatStars.add(matcher.group(i));
-								}
+							for (int i = 1; i <= matcher.groupCount(); i++) {
+								thatStars.add(matcher.group(i));
 							}
 
 							// Compare the triggers to the user's message.
@@ -1311,10 +1309,8 @@ public class RiveScript {
 									isMatch = true;
 
 									// Get the user's message stars.
-									if (matcher.groupCount() > 1) {
-										for (int i = 1; i <= matcher.groupCount(); i++) {
-											stars.add(matcher.group(i));
-										}
+									for (int i = 1; i <= matcher.groupCount(); i++) {
+										stars.add(matcher.group(i));
 									}
 								}
 							}
@@ -1354,10 +1350,8 @@ public class RiveScript {
 						isMatch = true;
 
 						// Collect the stars.
-						if (matcher.groupCount() > 1) {
-							for (int i = 1; i <= matcher.groupCount(); i++) {
-								stars.add(matcher.group(i));
-							}
+						for (int i = 1; i <= matcher.groupCount(); i++) {
+							stars.add(matcher.group(i));
 						}
 					}
 				}

@@ -61,41 +61,15 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"! version = 2.00",
-				"! global debug = 1",
-				"! var name      = RiveScript Bot",
-				"! var age       = 0",
-				"! var gender    = androgynous",
-				"! var location  = Cyberspace",
-				"! var generator = RiveScript",
-				"! array be      = is are was were",
-				"! array whatis  = what is|what are|what was|what were,",
-				"! array blues   = azure blue aqua cyan baby\\sblue sky\\sblue",
-				"! array colors  = red green blue cyan magenta yellow",
-				"^ light red|light green|light blue|light cyan|light magenta|light yellow",
-				"^ dark red|dark green|dark blue|dark cyan|dark magenta|dark yellow",
-				"^ white orange teal brown pink",
-				"^ dark white|dark orange|dark teal|dark brown|dark pink",
-				"! sub what's  = what is",
-				"! sub what're = what are",
-				"! sub what'd  = what did",
-				"! sub a/s/l   = age sex location",
-				"! sub brb     = be right back",
-				"! sub afk     = away from keyboard",
-				"! sub l o l   = lol",
-				"! person you are = I am",
-				"! person i am    = you are",
-				"! person you     = I",
-				"! person i       = you",
-				"t",
-				"t test",
-				"+ hi bot",
-				"- hi human",
-				"- hi there",
-				"+ how are you doing?",
-				"* <get mood> eq great => I'm great",
-				"* <get mood> eq bad   => I'm not feeling so well",
-				"- I'm fine",
+				"! global debug = false",
+				"+ debug mode",
+				"- Debug mode is: <env debug>",
+				"+ set debug mode *",
+				"- <env debug=<star>>Switched to <star>.",
 		});
+		rs.sortReplies();
+		System.out.println(rs.reply("human", "Debug mode.")); 			// --> "Debug mode is: false"
+		System.out.println(rs.reply("human", "Set debug mode true")); 	// --> "Switched to true."
+		System.out.println(rs.reply("human", "Debug mode?")); 			// --> "Debug mode is: true"
 	}
 }
