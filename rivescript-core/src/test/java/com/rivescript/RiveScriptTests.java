@@ -63,25 +63,24 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"! sub who's  = who is",
-				"! sub it's   = it is",
-				"! sub didn't = did not",
-				"+ knock knock",
-				"- Who's there?",
-				"+ *",
-				"% who is there",
-				"- <sentence> who?",
-				"+ *",
-				"% * who",
-				"- Haha! <sentence>!",
-				"+ *",
-				"- I don't know."
+				"! array greek = alpha beta gamma",
+				"! array test = testing trying",
+				"! array format = <uppercase>|<lowercase>|<formal>|<sentence>",
+				"+ test random array",
+				"- Testing (@greekk) array.",
+				"+ test two random arrays",
+				"- {formal}(@test){/formal} another (@greek) array.",
+				"+ test nonexistant array",
+				"- This (@array) does not exist.",
+				"+ test more arrays",
+				"- I'm (@test) more (@greek) (@arrays).",
+				"+ test weird syntax",
+				"- This (@ greek) shouldn't work, and neither should this @test.",
+				"+ random format *",
+				"- (@format)"
 		});
 		rs.sortReplies();
-		getReply(rs, "knock knock"); 						// --> "Who's there?"
-		getReply(rs, "Canoe"); 								// --> "Canoe who?"
-		getReply(rs, "Canoe help me with my homework?"); 	// --> "Haha! Canoe help me with my homework!"
-		getReply(rs, "Hello"); 								// --> "I don't know."
+		getReply(rs, "test random array");
 	}
 
 	private void getReply(RiveScript rs, String message) {

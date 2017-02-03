@@ -1613,7 +1613,7 @@ public class RiveScript {
 			} else {
 				result = "\\x00@" + name + "\\x00"; // Dummy it out so we can reinsert it later.
 			}
-			reply = reply.replace(result, result);
+			reply = reply.replace(matcher.group(0), result);
 		}
 		reply = reply.replaceAll("\\\\x00@([A-Za-z0-9_]+)\\\\x00", "(@$1)");
 
@@ -1666,7 +1666,7 @@ public class RiveScript {
 			String[] random;
 			String text = matcher.group(1);
 			if (text.contains("|")) {
-				random = text.split("|");
+				random = text.split("\\|");
 			} else {
 				random = text.split(" ");
 			}
