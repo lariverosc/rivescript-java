@@ -2012,7 +2012,6 @@ public class RiveScript {
 				return "";
 			}
 
-			String optional = matcher.group(0);
 			String[] parts = matcher.group(1).split("\\|");
 			List<String> opts = new ArrayList<>();
 			for (String p : parts) {
@@ -2026,8 +2025,8 @@ public class RiveScript {
 			pipes.replaceAll(StringUtils.quoteMeta("(\\w+?)"), "(?:\\\\w+?)");
 
 			// Put the new text in.
-			pipes = "(?:" + pipes + "|(?:\\b|\\s)+)";
-			pattern = pattern.replace(optional, pipes);
+			pipes = "(?:" + pipes + "|(?:\\s|\\b)+)";
+			pattern = pattern.replaceAll("\\s*\\[" + StringUtils.quoteMeta(matcher.group(1)) + "\\]\\s*", StringUtils.quoteMeta(pipes));
 		}
 
 		// _ wildcards can't match numbers!

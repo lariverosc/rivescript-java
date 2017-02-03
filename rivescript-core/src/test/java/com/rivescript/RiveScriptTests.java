@@ -63,24 +63,20 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"+ hello",
-				"- Hi there!",
-				"+ hey",
-				"@ hello",
-				"// Test the {@} tag with and without spaces.",
-				"+ hi there",
-				"- {@hello}",
-				"+ howdy",
-				"- {@ hello}",
-				"+ hola",
-				"- {@ hello }"
+				"+ what (are|is) you",
+				"- I am a robot.",
+				"+ what is your (home|office|cell) [phone] number",
+				"- It is 555-1234.",
+				"+ [please|can you] ask me a question",
+				"- Why is the sky blue?",
+				"+ (aa|bb|cc) [bogus]",
+				"- Matched.",
+				"+ (yo|hi) [computer|bot] *",
+				"- Matched."
 		});
 		rs.sortReplies();
-//		getReply(rs, "hello");
-//		getReply(rs, "hey");
-//		getReply(rs, "hi there");
-		getReply(rs, "howdy");
-//		getReply(rs, "hola");
+		getReply(rs, "What is your home number?");  // --> "It is 555-1234."
+		getReply(rs, "Can you ask me a question?"); // --> "Why is the sky blue?"
 	}
 
 	private void getReply(RiveScript rs, String message) {
