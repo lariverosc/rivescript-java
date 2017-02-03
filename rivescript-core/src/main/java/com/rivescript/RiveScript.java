@@ -1987,14 +1987,14 @@ public class RiveScript {
 		pattern = RE_ZERO_WITH_STAR.matcher(pattern).replaceAll("<zerowidthstar>");
 
 		// Simple replacements.
-		pattern = pattern.replaceAll("\\*", "(.+?)");             // Convert * into (.+?)
-		pattern = pattern.replaceAll("#", "(\\\\d+?)");           // Convert # into (\d+?)
-		pattern = pattern.replaceAll("_", "(\\\\w+?)");           // Convert _ into (\w+?)
-		pattern = RE_WEIGHT.matcher(pattern).replaceAll("");      // Remove {weight} tags
-		pattern = pattern.replaceAll("<zerowidthstar>", "(.*?)"); // Convert <zerowidthstar> into (.+?)
-		pattern = pattern.replaceAll("\\|{2,}", "|");             // Remove empty entities
-		pattern = pattern.replaceAll("(\\(|\\[)\\|", "$1");       // Remove empty entities from start of alt/opts
-		pattern = pattern.replaceAll("\\|(\\)|\\])", "$1");       // Remove empty entities from end of alt/opts
+		pattern = pattern.replaceAll("\\*", "(.+?)");                  // Convert * into (.+?)
+		pattern = pattern.replaceAll("#", "(\\\\d+?)");                // Convert # into (\d+?)
+		pattern = pattern.replaceAll("_", "(\\\\w+?)");                // Convert _ into (\w+?)
+		pattern = pattern.replaceAll("\\s*\\{weight=\\d+\\}\\s*", ""); // Remove {weight} tags
+		pattern = pattern.replaceAll("<zerowidthstar>", "(.*?)");      // Convert <zerowidthstar> into (.+?)
+		pattern = pattern.replaceAll("\\|{2,}", "|");                  // Remove empty entities
+		pattern = pattern.replaceAll("(\\(|\\[)\\|", "$1");            // Remove empty entities from start of alt/opts
+		pattern = pattern.replaceAll("\\|(\\)|\\])", "$1");            // Remove empty entities from end of alt/opts
 
 		// UTF-8 mode special characters.
 		if (utf8) {

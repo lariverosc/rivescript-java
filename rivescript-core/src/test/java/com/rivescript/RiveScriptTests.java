@@ -63,20 +63,37 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"+ what (are|is) you",
-				"- I am a robot.",
-				"+ what is your (home|office|cell) [phone] number",
-				"- It is 555-1234.",
-				"+ [please|can you] ask me a question",
-				"- Why is the sky blue?",
-				"+ (aa|bb|cc) [bogus]",
-				"- Matched.",
-				"+ (yo|hi) [computer|bot] *",
-				"- Matched."
+				"+ * or something{weight=10}",
+				"- Or something. <@>",
+				"+ can you run a google search for *",
+				"- Sure!",
+				"+ hello *{weight=20}",
+				"- Hi there!",
+				"// Test that spaces before or after the {weight} tag are gobbled up along",
+				"// with the {weight} tag itself.",
+				"+ something{weight=100}",
+				"- Weighted something",
+				"+ something",
+				"- Unweighted something",
+				"+ nothing {weight=100}",
+				"- Weighted nothing",
+				"+ nothing",
+				"- Unweighted nothing",
+				"+ {weight=100}everything",
+				"- Weighted everything",
+				"+ everything",
+				"- Unweighted everything",
+				"+ {weight=100}   blank",
+				"- Weighted blank",
+				"+ blank",
+				"- Unweighted blank"
 		});
 		rs.sortReplies();
-		getReply(rs, "What is your home number?");  // --> "It is 555-1234."
-		getReply(rs, "Can you ask me a question?"); // --> "Why is the sky blue?"
+		System.out.println("\n\n");
+		rs.dumpSorted();
+		System.out.println("\n\n");
+
+		getReply(rs, "nothing");  // --> "Weighted nothing"
 	}
 
 	private void getReply(RiveScript rs, String message) {
