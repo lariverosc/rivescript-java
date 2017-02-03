@@ -63,24 +63,24 @@ public class RiveScriptTests {
 	public void testStreamCustom() {
 		RiveScript rs = new RiveScript(Config.basic());
 		rs.stream(new String[] {
-				"! array greek = alpha beta gamma",
-				"! array test = testing trying",
-				"! array format = <uppercase>|<lowercase>|<formal>|<sentence>",
-				"+ test random array",
-				"- Testing (@greekk) array.",
-				"+ test two random arrays",
-				"- {formal}(@test){/formal} another (@greek) array.",
-				"+ test nonexistant array",
-				"- This (@array) does not exist.",
-				"+ test more arrays",
-				"- I'm (@test) more (@greek) (@arrays).",
-				"+ test weird syntax",
-				"- This (@ greek) shouldn't work, and neither should this @test.",
-				"+ random format *",
-				"- (@format)"
+				"+ hello",
+				"- Hi there!",
+				"+ hey",
+				"@ hello",
+				"// Test the {@} tag with and without spaces.",
+				"+ hi there",
+				"- {@hello}",
+				"+ howdy",
+				"- {@ hello}",
+				"+ hola",
+				"- {@ hello }"
 		});
 		rs.sortReplies();
-		getReply(rs, "test random array");
+//		getReply(rs, "hello");
+//		getReply(rs, "hey");
+//		getReply(rs, "hi there");
+		getReply(rs, "howdy");
+//		getReply(rs, "hola");
 	}
 
 	private void getReply(RiveScript rs, String message) {

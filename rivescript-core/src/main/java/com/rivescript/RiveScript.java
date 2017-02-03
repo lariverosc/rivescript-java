@@ -1849,7 +1849,7 @@ public class RiveScript {
 
 			String target = matcher.group(1);
 			logger.debug("Inline redirection to: {}", target);
-			String subreply = getReply(username, target, false, step + 1);
+			String subreply = getReply(username, target.trim(), false, step + 1);
 			reply = reply.replace(matcher.group(0), subreply);
 		}
 
