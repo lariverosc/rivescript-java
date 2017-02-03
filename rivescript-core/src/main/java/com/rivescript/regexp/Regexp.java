@@ -44,7 +44,7 @@ public class Regexp {
 	public static final Pattern RE_OPTIONAL = Pattern.compile("\\[(.+?)\\]");
 	public static final Pattern RE_PLACEHOLDER = Pattern.compile("\\\\x00(\\d+)\\\\x00");
 	public static final Pattern RE_RANDOM = Pattern.compile("\\{random\\}(.+?)\\{/random\\}");
-	public static final Pattern RE_REDIRECT = Pattern.compile("\\{@(.+?)\\}");
+	public static final Pattern RE_REDIRECT = Pattern.compile("\\{@([^\\}]*?)\\}");
 	public static final Pattern RE_REPLY = Pattern.compile("<reply([1-9])>");
 	public static final Pattern RE_SET = Pattern.compile("<set (.+?)=(.+?)>");
 	public static final Pattern RE_SYMBOLS = Pattern.compile("[.?,!;:@#$%^&*()]+");
