@@ -96,6 +96,19 @@ public class RiveScriptTests {
 		getReply(rs, "nothing");  // --> "Weighted nothing"
 	}
 
+	@Test
+	public void testUnicode() {
+		String path = getClass().getClassLoader().getResource("unicode.rive").getFile();
+		RiveScript rs = new RiveScript(Config.utf8());
+		rs.loadFile(path);
+		rs.sortReplies();
+		System.out.println("\n\n");
+		rs.dumpSorted();
+		System.out.println("\n\n");
+
+		getReply(rs, "My name is Bảo");
+	}
+
 	private void getReply(RiveScript rs, String message) {
 		System.out.println(message + " --> " + rs.reply("human", message));
 	}
