@@ -1989,7 +1989,8 @@ public class RiveScript {
 		// Simple replacements.
 		pattern = pattern.replaceAll("\\*", "(.+?)");                  // Convert * into (.+?)
 		pattern = pattern.replaceAll("#", "(\\\\d+?)");                // Convert # into (\d+?)
-		pattern = pattern.replaceAll("_", "(\\\\w+?)");                // Convert _ into (\w+?)
+		pattern = pattern.replaceAll("(?<!\\\\)_", "(\\\\w+?)");       // Convert _ into (\w+?)
+		pattern = pattern.replaceAll("\\\\_", "_");                    // Convert \_ into _
 		pattern = pattern.replaceAll("\\s*\\{weight=\\d+\\}\\s*", ""); // Remove {weight} tags
 		pattern = pattern.replaceAll("<zerowidthstar>", "(.*?)");      // Convert <zerowidthstar> into (.+?)
 		pattern = pattern.replaceAll("\\|{2,}", "|");                  // Remove empty entities

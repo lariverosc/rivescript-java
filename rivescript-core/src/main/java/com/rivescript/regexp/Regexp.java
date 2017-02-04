@@ -40,7 +40,7 @@ public class Regexp {
 	public static final Pattern RE_INHERITS = Pattern.compile("\\{inherits=(\\d+)\\}");
 	public static final Pattern RE_INPUT = Pattern.compile("<input([1-9])>");
 	public static final Pattern RE_META = Pattern.compile("[\\<>]+");
-	public static final Pattern RE_NASTIES = Pattern.compile("[^A-Za-z0-9 ]");
+	public static final Pattern RE_NASTIES = Pattern.compile("[^A-Za-z0-9_ ]");
 	public static final Pattern RE_OPTIONAL = Pattern.compile("\\[(.+?)\\]");
 	public static final Pattern RE_PLACEHOLDER = Pattern.compile("\\\\x00(\\d+)\\\\x00");
 	public static final Pattern RE_RANDOM = Pattern.compile("\\{random\\}(.+?)\\{/random\\}");
