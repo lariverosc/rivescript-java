@@ -127,7 +127,7 @@ public class RiveScript {
 	private Parser parser;
 
 	private Map<String, String> global;                           // 'global' variables
-	private Map<String, String> var;                              // 'var' bot variables
+	private Map<String, String> vars;                             // 'vars' bot variables
 	private Map<String, String> sub;                              // 'sub' substitutions
 	private Map<String, String> person;                           // 'person' substitutions
 	private Map<String, List<String>> array;                      // 'array' definitions
@@ -207,7 +207,7 @@ public class RiveScript {
 
 		// Initialize all the data structures.
 		this.global = new HashMap<>();
-		this.var = new HashMap<>();
+		this.vars = new HashMap<>();
 		this.sub = new HashMap<>();
 		this.person = new HashMap<>();
 		this.array = new HashMap<>();
@@ -318,16 +318,16 @@ public class RiveScript {
 	/**
 	 * Sets a bot variable.
 	 * <p>
-	 * This is equivalent to {@code ! var} in RiveScript. Set the value to {@code null} to delete a bot variable.
+	 * This is equivalent to {@code ! vars} in RiveScript. Set the value to {@code null} to delete a bot variable.
 	 *
 	 * @param name  the variable name
 	 * @param value the variable value or {@code null}
 	 */
 	public void setVariable(String name, String value) {
 		if (value == null) {
-			var.remove(name);
+			vars.remove(name);
 		} else {
-			var.put(name, value);
+			vars.put(name, value);
 		}
 	}
 
@@ -340,7 +340,7 @@ public class RiveScript {
 	 * @return the variable value or {@code null}
 	 */
 	public String getVariable(String name) {
-		return var.get(name);
+		return vars.get(name);
 	}
 
 	/**
@@ -582,9 +582,9 @@ public class RiveScript {
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getVar().entrySet()) {
 			if (entry.getValue().equals("<undef>")) {
-				var.remove(entry.getKey());
+				vars.remove(entry.getKey());
 			} else {
-				var.put(entry.getKey(), entry.getValue());
+				vars.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getSub().entrySet()) {
@@ -1741,7 +1741,7 @@ public class RiveScript {
 				// <bot> and <env> tags are similar.
 				Map<String, String> target;
 				if (tag.equals("bot")) {
-					target = var;
+					target = vars;
 				} else {
 					target = global;
 				}
@@ -2074,8 +2074,8 @@ public class RiveScript {
 
 			String name = matcher.group(1);
 			String rep = "";
-			if (var.containsKey(name)) {
-				rep = StringUtils.stripNasties(var.get(name));
+			if (vars.containsKey(name)) {
+				rep = StringUtils.stripNasties(vars.get(name));
 			}
 			pattern = pattern.replace(matcher.group(0), rep.toLowerCase());
 		}
