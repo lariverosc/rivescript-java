@@ -65,6 +65,13 @@ configure(allprojects) { project ->
 			downloadSources = true
 		}
 	}
+
+	test {
+		outputs.upToDateWhen { false }
+		testLogging {
+			events "passed", "skipped", "failed"
+		}
+	}
 }
 
 configure(subprojects - sampleprojects) { subproject ->

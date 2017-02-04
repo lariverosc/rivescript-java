@@ -142,9 +142,8 @@ public class StringUtils {
 		} else if (format.equals("sentence")) {
 			if (text.length() > 1) {
 				return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
-			} else {
-				return text.toUpperCase();
 			}
+			return text.toUpperCase();
 		} else if (format.equals("formal")) {
 			String[] words = text.split(" ");
 			for (int i = 0; i < words.length; i++) {
