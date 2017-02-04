@@ -26,7 +26,6 @@ import com.rivescript.ast.ObjectMacro;
 import com.rivescript.ast.Root;
 import com.rivescript.ast.Topic;
 import com.rivescript.ast.Trigger;
-import com.rivescript.config.Config;
 import com.rivescript.lang.Java;
 import com.rivescript.macro.ObjectHandler;
 import com.rivescript.macro.Subroutine;
@@ -1380,6 +1379,7 @@ public class RiveScript {
 					logger.debug("Redirecting us to {}", matched.getRedirect());
 					String redirect = matched.getRedirect();
 					redirect = processTags(username, message, redirect, stars, thatStars, 0);
+					redirect = redirect.toLowerCase();
 					logger.debug("Pretend user said: {}", redirect);
 					reply = getReply(username, redirect, isBegin, step + 1);
 					break;

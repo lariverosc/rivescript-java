@@ -22,10 +22,7 @@
 
 package com.rivescript;
 
-import com.rivescript.config.Config;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link RiveScript}.

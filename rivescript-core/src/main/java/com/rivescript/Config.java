@@ -20,9 +20,8 @@
  * SOFTWARE.
  */
 
-package com.rivescript.config;
+package com.rivescript;
 
-import com.rivescript.RiveScript;
 import com.rivescript.session.SessionManager;
 
 import java.util.HashMap;

@@ -22,7 +22,7 @@
 
 package com.rivescript.config;
 
-import com.rivescript.RiveScript;
+import com.rivescript.Config;
 import com.rivescript.session.MapSessionManager;
 import com.rivescript.session.SessionManager;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.rivescript.config.Config.DEFAULT_DEPTH;
+import static com.rivescript.Config.DEFAULT_DEPTH;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

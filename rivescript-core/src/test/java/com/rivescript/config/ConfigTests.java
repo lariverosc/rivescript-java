@@ -22,10 +22,10 @@
 
 package com.rivescript.config;
 
-import com.rivescript.RiveScript;
+import com.rivescript.Config;
 import org.junit.Test;
 
-import static com.rivescript.config.Config.DEFAULT_DEPTH;
+import static com.rivescript.Config.DEFAULT_DEPTH;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
