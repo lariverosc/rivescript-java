@@ -255,6 +255,14 @@ public class RiveScript {
 	 * @param name the name of the programming language
 	 */
 	public void removeHandler(String name) {
+		// Purge all loaded objects for this handler.
+		for (Map.Entry<String, String> entry : objectLanguages.entrySet()) {
+			if (entry.getValue().equals(name)) {
+				objectLanguages.remove(entry.getKey());
+			}
+		}
+
+		// And delete the handler itself.
 		handlers.remove(name);
 	}
 
@@ -1252,7 +1260,8 @@ public class RiveScript {
 		// resulting in an infinite loop!
 		if (step == 0) {
 			List<String> allTopics = new ArrayList<>(Arrays.asList(topic));
-			if (topics.get(topic).getIncludes().size() > 0 || topics.get(topic).getInherits().size() > 0) {
+			if (includes.get(topic).size() > 0 || inherits.get(topic).size() > 0) {
+			// TODO if (topics.get(topic).getIncludes().size() > 0 || topics.get(topic).getInherits().size() > 0) {
 				// Get ALL the topics!
 				allTopics = getTopicTree(topic, 0);
 			}
@@ -1460,7 +1469,7 @@ public class RiveScript {
 				// Process weights in the replies.
 				List<String> bucket = new ArrayList<>();
 				for (String rep : matched.getReply()) {
-					int weight = 1;
+					int weight;
 					Matcher matcher = RE_WEIGHT.matcher(rep);
 					if (matcher.find()) {
 						weight = Integer.parseInt(matcher.group(1));

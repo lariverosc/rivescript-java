@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.rivescript.config;
+package com.rivescript;
 
 import com.rivescript.Config;
 import org.junit.Test;

@@ -280,13 +280,13 @@ public class Parser {
 					String[] halves = line.split("=", 2);
 					String[] left = halves[0].trim().split(" ", 2);
 					String value = "";
-					String type = "";
+					String kind = ""; // global, var, sub, ...
 					String name = "";
 					if (halves.length == 2) {
 						value = halves[1].trim();
 					}
 					if (left.length >= 1) {
-						type = left[0].trim();
+						kind = left[0].trim();
 						if (left.length >= 2) {
 							left = Arrays.copyOfRange(left, 1, left.length);
 							name = StringUtils.join(left, " ").trim();
@@ -294,12 +294,12 @@ public class Parser {
 					}
 
 					// Remove 'fake' line breaks unless this is an array.
-					if (!type.equals("array")) {
+					if (!kind.equals("array")) {
 						value = value.replaceAll("<crlf>", "");
 					}
 
 					// Handle version numbers.
-					if (type.equals("version")) {
+					if (kind.equals("version")) {
 						double parsedVersion = 0;
 						try {
 							parsedVersion = Double.parseDouble(value);
@@ -325,7 +325,7 @@ public class Parser {
 					}
 
 					// Handle the rest of the !Define types.
-					switch (type) {
+					switch (kind) {
 
 						case "local": {
 							// Local file-scoped parser options.
@@ -383,13 +383,13 @@ public class Parser {
 							break;
 						}
 						default:
-							logger.warn("Unknown definition type '{}' found at {} line {}", type, filename, lineno);
+							logger.warn("Unknown definition type '{}' found at {} line {}", kind, filename, lineno);
 					}
 					break;
 				}
 				case ">": { // > Label
 					String[] temp = line.trim().split(" ");
-					String type = temp[0];
+					String kind = temp[0];
 					temp = Arrays.copyOfRange(temp, 1, temp.length);
 					String name = "";
 					String[] fields = new String[0];
@@ -402,12 +402,12 @@ public class Parser {
 					}
 
 					// Handle the label types.
-					if (type.equals("begin")) {
+					if (kind.equals("begin")) {
 						logger.debug("Found the BEGIN block at {} line {}", filename, lineno);
-						type = "topic";
+						kind = "topic";
 						name = "__begin__";
 					}
-					if (type.equals("topic")) {
+					if (kind.equals("topic")) {
 						// Force case on topics.
 						if (forceCase) {
 							name = name.toLowerCase();
@@ -433,7 +433,7 @@ public class Parser {
 								}
 							}
 						}
-					} else if (type.equals("object")) {
+					} else if (kind.equals("object")) {
 						// If a field was provided, it should be the programming language.
 						String language = "";
 						if (fields.length > 0) {
@@ -443,6 +443,9 @@ public class Parser {
 						// Missing language?
 						if (language.equals("")) {
 							logger.warn("No programming language specified for object '{}' at {} line", name, filename, lineno);
+							inObject = true;
+							objectName = name;
+							objectLanguage = "__unknown__";
 							continue;
 						}
 
@@ -452,20 +455,20 @@ public class Parser {
 						objectBuffer = new ArrayList<>();
 						inObject = true;
 					} else {
-						logger.warn("Unknown label type '{}' at {} line {}", type, filename, lineno);
+						logger.warn("Unknown label type '{}' at {} line {}", kind, filename, lineno);
 					}
 					break;
 				}
 				case "<": { // < Label
-					String type = line;
-					if (type.equals("begin") || type.equals("topic")) {
+					String kind = line;
+					if (kind.equals("begin") || kind.equals("topic")) {
 						logger.debug("\tEnd the topic label.");
 						topic = "random"; // Go back to default topic.
-					} else if (type.equals("object")) {
+					} else if (kind.equals("object")) {
 						logger.debug("\tEnd the object label.");
 						inObject = false;
 					} else {
-						logger.warn("Unknown end topic type '{}' at {} line {}", type, filename, lineno);
+						logger.warn("Unknown end topic type '{}' at {} line {}", kind, filename, lineno);
 					}
 					break;
 				}
