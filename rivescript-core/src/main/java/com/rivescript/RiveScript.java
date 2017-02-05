@@ -696,13 +696,13 @@ public class RiveScript {
 
 			// Collect a list of all the triggers we're going to worry about.
 			// If this topic inherits another topic, we need to recursively add those to the list as well.
-			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic);
+			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic, false, 0, 0, false);
 
 			// Sort these triggers.
-			sorted.getTopics().put(topic, sortTriggerSet(allTriggers));
+			sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
 
 			// Get all of the %Previous triggers for this topic.
-			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true);
+			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true, 0, 0, false);
 
 			// And sort them, too.
 			sorted.getThats().put(topic, sortTriggerSet(thatTriggers, false));
@@ -711,14 +711,6 @@ public class RiveScript {
 		// Sort the substitution lists.
 		sorted.setSub(sortList(sub.keySet()));
 		sorted.setPerson(sortList(person.keySet()));
-	}
-
-	private List<SortedTriggerEntry> getTopicTriggers(String topic) {
-		return getTopicTriggers(topic, false, 0, 0, false);
-	}
-
-	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats) {
-		return getTopicTriggers(topic, thats, 0, 0, false);
 	}
 
 	/**
@@ -824,17 +816,6 @@ public class RiveScript {
 		}
 
 		return triggers;
-	}
-
-	/**
-	 * Sorts a group of triggers in an optimal sorting order.
-	 *
-	 * @param triggers the triggers to sort
-	 * @return the sorted triggers
-	 * @see #sortTriggerSet(List, boolean)
-	 */
-	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers) {
-		return sortTriggerSet(triggers, true);
 	}
 
 	/**
@@ -1261,7 +1242,6 @@ public class RiveScript {
 		if (step == 0) {
 			List<String> allTopics = new ArrayList<>(Arrays.asList(topic));
 			if (includes.get(topic).size() > 0 || inherits.get(topic).size() > 0) {
-			// TODO if (topics.get(topic).getIncludes().size() > 0 || topics.get(topic).getInherits().size() > 0) {
 				// Get ALL the topics!
 				allTopics = getTopicTree(topic, 0);
 			}
