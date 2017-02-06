@@ -32,8 +32,8 @@ import com.rivescript.macro.Subroutine;
 import com.rivescript.parser.Parser;
 import com.rivescript.parser.ParserConfig;
 import com.rivescript.parser.ParserException;
+import com.rivescript.session.ConcurrentHashMapSessionManager;
 import com.rivescript.session.History;
-import com.rivescript.session.MapSessionManager;
 import com.rivescript.session.SessionManager;
 import com.rivescript.session.ThawAction;
 import com.rivescript.session.UserData;
@@ -193,8 +193,8 @@ public class RiveScript {
 		}
 
 		if (this.sessions == null) {
-			this.sessions = new MapSessionManager();
-			logger.debug("No SessionManager config: using default MapSessionManager");
+			this.sessions = new ConcurrentHashMapSessionManager();
+			logger.debug("No SessionManager config: using default ConcurrentHashMapSessionManager");
 		}
 
 		// Initialize the parser.

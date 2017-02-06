@@ -22,7 +22,10 @@
 
 package com.rivescript.session;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TODO
@@ -32,36 +35,52 @@ import java.util.Map;
  */
 public class ConcurrentHashMapSessionManager implements SessionManager {
 
+	private ConcurrentHashMap<String, UserData> users = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, UserData> frozen = new ConcurrentHashMap<>();
+
 	@Override
 	public UserData init(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			users.put(username, defaultSession());
+		}
+		return users.get(username);
 	}
 
 	@Override
 	public void set(String username, String name, String value) {
-		// TODO
+		UserData userData = init(username);
+		userData.getVariables().put(name, value);
 	}
 
 	@Override
 	public void set(String username, Map<String, String> vars) {
-		// TODO
+		UserData userData = init(username);
+		for (Map.Entry<String, String> var : vars.entrySet()) {
+			userData.getVariables().put(var.getKey(), var.getValue());
+		}
 	}
 
 	@Override
 	public void addHistory(String username, String input, String reply) {
-		// TODO
+		UserData userData = init(username);
+		Collections.rotate(userData.getHistory().getInput(), 1); // Rotate right.
+		userData.getHistory().getInput().add(0, input.trim());   // Now set the first item
+		Collections.rotate(userData.getHistory().getReply(), 1); // Rotate right.
+		userData.getHistory().getReply().add(0, reply.trim());   // Now set the first item.
 	}
 
 	@Override
 	public void setLastMatch(String username, String trigger) {
-		// TODO
+		UserData userData = init(username);
+		userData.setLastMatch(trigger);
 	}
 
 	@Override
 	public String get(String username, String name) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getVariables().get(name);
 	}
 
 	@Override
@@ -78,33 +97,48 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	@Override
 	public String getLastMatch(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getLastMatch();
 	}
 
 	@Override
 	public History getHistory(String username) {
-		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username).getHistory();
 	}
 
 	@Override
 	public void clear(String username) {
-		// TODO
+		users.remove(username);
+		frozen.remove(username);
 	}
 
 	@Override
 	public void clearAll() {
-		// TODO
+		users.clear();
+		frozen.clear();
 	}
 
 	@Override
 	public void freeze(String username) {
+
 		// TODO
 	}
 
 	@Override
 	public void thaw(String username, ThawAction action) {
+
 		// TODO
+	}
+
+	private UserData defaultSession() {
+		UserData userData = new UserData();
+		userData.getVariables().put("topic", "random");
+		userData.setLastMatch("");
+		return userData;
 	}
 }

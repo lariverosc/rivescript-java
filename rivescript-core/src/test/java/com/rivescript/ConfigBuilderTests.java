@@ -22,8 +22,7 @@
 
 package com.rivescript;
 
-import com.rivescript.Config;
-import com.rivescript.session.MapSessionManager;
+import com.rivescript.session.ConcurrentHashMapSessionManager;
 import com.rivescript.session.SessionManager;
 import org.junit.Test;
 
@@ -122,7 +121,7 @@ public class ConfigBuilderTests {
 
 	@Test
 	public void testBuildWithMapSessionManager() {
-		SessionManager sessionManager = new MapSessionManager();
+		SessionManager sessionManager = new ConcurrentHashMapSessionManager();
 		Config config = Config.newBuilder().sessionManager(sessionManager).build();
 		assertThat(config.getSessionManager(), is(equalTo(sessionManager)));
 	}
