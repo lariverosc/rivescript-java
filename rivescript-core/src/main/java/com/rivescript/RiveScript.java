@@ -138,7 +138,6 @@ public class RiveScript {
 	private Map<String, ObjectHandler> handlers;                  // object language handlers
 	private Map<String, Subroutine> subroutines;                  // Java object handlers
 	private Map<String, Topic> topics;                            // main topic structure
-	private Map<String, Map<String, Map<String, Trigger>>> thats; // %Previous mapper
 	private SortBuffer sorted;                                    // Sorted data from sortReplies()
 
 	// State information.
@@ -217,7 +216,6 @@ public class RiveScript {
 		this.handlers = new HashMap<>();
 		this.subroutines = new HashMap<>();
 		this.topics = new HashMap<>();
-		this.thats = new HashMap<>();
 		this.sorted = new SortBuffer();
 
 		// Set the default Java macro handler.
@@ -646,18 +644,6 @@ public class RiveScript {
 				trigger.setPrevious(trig.getPrevious());
 
 				topics.get(topic).addTrigger(trigger);
-
-				// Does this one have a %Previous? If so, make a pointer to this exact trigger in this.thats.
-				if (trigger.getPrevious() != null) {
-					// Initialize the structure first.
-					if (!thats.containsKey(topic)) {
-						thats.put(topic, new HashMap<String, Map<String, Trigger>>());
-					}
-					if (!thats.get(topic).containsKey(trigger.getTrigger())) {
-						thats.get(topic).put(trigger.getTrigger(), new HashMap<String, Trigger>());
-					}
-					thats.get(topic).get(trigger.getTrigger()).put(trigger.getPrevious(), trigger);
-				}
 			}
 		}
 
@@ -765,20 +751,15 @@ public class RiveScript {
 
 		// Get those that exist in this topic directly.
 		List<SortedTriggerEntry> inThisTopic = new ArrayList<>();
-		if (!thats) {
-			// The non-thats structure is: {topics}->[ array of triggers ]
-			if (topics.containsKey(topic)) {
-				for (Trigger trigger : topics.get(topic).getTriggers()) {
+		if (topics.containsKey(topic)) {
+			for (Trigger trigger : topics.get(topic).getTriggers()) {
+				if (!thats) {
 					SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getTrigger(), trigger);
 					inThisTopic.add(entry);
-				}
-			}
-		} else {
-			// The 'thats' structure is: {topic}->{cur trig}->{prev trig}->{trigger info}
-			if (this.thats.containsKey(topic)) {
-				for (Map<String, Trigger> currentTrigger : this.thats.get(topic).values()) {
-					for (Trigger previous : currentTrigger.values()) {
-						SortedTriggerEntry entry = new SortedTriggerEntry(previous.getTrigger(), previous);
+				} else {
+					// Does this one have a %Previous? If so, make a pointer to this exact trigger.
+					if (trigger.getPrevious() != null) {
+						SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getPrevious(), trigger);
 						inThisTopic.add(entry);
 					}
 				}
