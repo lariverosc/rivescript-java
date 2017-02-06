@@ -45,6 +45,7 @@ public class Config {
 	 */
 	public static final String DEFAULT_UNICODE_PUNCTUATION_PATTERN = "[.,!?;:]";
 
+	private boolean throwExceptions;
 	private boolean strict;
 	private boolean utf8;
 	private String unicodePunctuation = DEFAULT_UNICODE_PUNCTUATION_PATTERN;
@@ -54,6 +55,15 @@ public class Config {
 	private Map<String, String> errors;
 
 	protected Config() {
+	}
+
+	/**
+	 * Returns whether exception throwing is enabled.
+	 *
+	 * @return whether exception throwing is enabled
+	 */
+	public boolean isThrowExceptions() {
+		return throwExceptions;
 	}
 
 	/**
@@ -128,6 +138,9 @@ public class Config {
 			return false;
 		}
 		Config that = (Config) o;
+		if (throwExceptions != that.throwExceptions) {
+			return false;
+		}
 		if (strict != that.strict) {
 			return false;
 		}
@@ -152,7 +165,8 @@ public class Config {
 
 	@Override
 	public int hashCode() {
-		int result = (strict ? 1 : 0);
+		int result = (throwExceptions ? 1 : 0);
+		result = 31 * result + (strict ? 1 : 0);
 		result = 31 * result + (utf8 ? 1 : 0);
 		result = 31 * result + (unicodePunctuation != null ? unicodePunctuation.hashCode() : 0);
 		result = 31 * result + (forceCase ? 1 : 0);
@@ -165,7 +179,8 @@ public class Config {
 	@Override
 	public String toString() {
 		return "Config{" +
-				"strict=" + strict +
+				"throwExceptions=" + throwExceptions +
+				", strict=" + strict +
 				", utf8=" + utf8 +
 				", unicodePunctuation='" + unicodePunctuation + '\'' +
 				", forceCase=" + forceCase +
@@ -182,6 +197,7 @@ public class Config {
 	 */
 	public Builder toBuilder() {
 		return newBuilder()
+				.throwExceptions(this.throwExceptions)
 				.strict(this.strict)
 				.utf8(this.utf8)
 				.unicodePunctuation(this.unicodePunctuation)
@@ -223,6 +239,7 @@ public class Config {
 	 */
 	public static final class Builder {
 
+		private boolean throwExceptions;
 		private boolean strict;
 		private boolean utf8;
 		private String unicodePunctuation = DEFAULT_UNICODE_PUNCTUATION_PATTERN;
@@ -232,6 +249,17 @@ public class Config {
 		private Map<String, String> errors;
 
 		private Builder() {
+		}
+
+		/**
+		 * Sets whether exception throwing is enabled.
+		 *
+		 * @param throwExceptions whether exception throwing is enabled
+		 * @return this builder
+		 */
+		public Builder throwExceptions(boolean throwExceptions) {
+			this.throwExceptions = throwExceptions;
+			return this;
 		}
 
 		/**
@@ -333,6 +361,7 @@ public class Config {
 		 */
 		public Config build() {
 			Config config = new Config();
+			config.throwExceptions = this.throwExceptions;
 			config.strict = this.strict;
 			config.utf8 = this.utf8;
 			config.unicodePunctuation = this.unicodePunctuation;

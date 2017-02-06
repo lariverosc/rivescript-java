@@ -40,6 +40,7 @@ public class ConfigTests {
 	@Test
 	public void testBasicConfig() {
 		Config config = Config.basic();
+		assertThat(config.isThrowExceptions(), is(equalTo(false)));
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(false)));
 		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
@@ -52,6 +53,7 @@ public class ConfigTests {
 	@Test
 	public void testUtf8Config() {
 		Config config = Config.utf8();
+		assertThat(config.isThrowExceptions(), is(equalTo(false)));
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(true)));
 		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));

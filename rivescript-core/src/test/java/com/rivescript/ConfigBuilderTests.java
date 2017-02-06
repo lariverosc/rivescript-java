@@ -44,6 +44,7 @@ public class ConfigBuilderTests {
 	@Test
 	public void testBasicBuilder() {
 		Config config = Config.Builder.basic().build();
+		assertThat(config.isThrowExceptions(), is(equalTo(false)));
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(false)));
 		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
@@ -56,6 +57,7 @@ public class ConfigBuilderTests {
 	@Test
 	public void testUtf8Builder() {
 		Config config = Config.Builder.utf8().build();
+		assertThat(config.isThrowExceptions(), is(equalTo(false)));
 		assertThat(config.isStrict(), is(equalTo(true)));
 		assertThat(config.isUtf8(), is(equalTo(true)));
 		assertThat(config.getUnicodePunctuation(), is(equalTo("[.,!?;:]")));
@@ -63,6 +65,18 @@ public class ConfigBuilderTests {
 		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
 		assertThat(config.getErrors(), is(equalTo(null)));
+	}
+
+	@Test
+	public void testBuildWithThrowExceptionsIsFalse() {
+		Config config = Config.newBuilder().throwExceptions(false).build();
+		assertThat(config.isThrowExceptions(), is(equalTo(false)));
+	}
+
+	@Test
+	public void testBuildWithThrowExceptionsIstrue() {
+		Config config = Config.newBuilder().throwExceptions(true).build();
+		assertThat(config.isThrowExceptions(), is(equalTo(true)));
 	}
 
 	@Test
@@ -120,7 +134,7 @@ public class ConfigBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithMapSessionManager() {
+	public void testBuildWithConcurrentHashMapSessionManager() {
 		SessionManager sessionManager = new ConcurrentHashMapSessionManager();
 		Config config = Config.newBuilder().sessionManager(sessionManager).build();
 		assertThat(config.getSessionManager(), is(equalTo(sessionManager)));

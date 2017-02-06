@@ -117,6 +117,7 @@ public class RiveScript {
 
 	private static Logger logger = LoggerFactory.getLogger(RiveScript.class);
 
+	private boolean throwExceptions;
 	private boolean strict;
 	private boolean utf8;
 	private boolean forceCase;
@@ -164,6 +165,7 @@ public class RiveScript {
 			config = Config.basic();
 		}
 
+		this.throwExceptions = config.isThrowExceptions();
 		this.strict = config.isStrict();
 		this.utf8 = config.isUtf8();
 		this.forceCase = config.isForceCase();
