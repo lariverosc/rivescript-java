@@ -177,10 +177,17 @@ public class RiveScript {
 		this.unicodePunctuation = Pattern.compile(unicodePunctuation);
 
 		this.errors = new HashMap<>();
+		this.errors.put("deepRecursion", "ERR: Deep Recursion Detected");
+		this.errors.put("repliesNotSorted", "ERR: Replies Not Sorted");
+		this.errors.put("defaultTopicNotFound", "ERR: No default topic 'random' was found");
 		this.errors.put("replyNotMatched", "ERR: No Reply Matched");
 		this.errors.put("replyNotFound", "ERR: No Reply Found");
 		this.errors.put("objectNotFound", "[ERR: Object Not Found]");
-		this.errors.put("deepRecursion", "ERR: Deep Recursion Detected");
+		this.errors.put("cannotDivideByZero", "[ERR: Can't Divide By Zero]");
+		this.errors.put("cannotMathVariable", "[ERR: Can't perform math operation on non-numeric variable]");
+		this.errors.put("cannotMathValue", "[ERR: Can't perform math operation on non-numeric value]");
+		this.errors.put("undefined", "undefined");
+
 		if (config.getErrors() != null) {
 			for (Map.Entry<String, String> entry : config.getErrors().entrySet()) {
 				this.errors.put(entry.getKey(), entry.getValue());
@@ -1176,7 +1183,7 @@ public class RiveScript {
 		// Needed to sort replies?
 		if (sorted.getTopics().size() == 0) {
 			logger.warn("You forgot to call sortReplies()!");
-			return "ERR: Replies Not Sorted";
+			return errors.get("repliesNotSorted");
 		}
 
 		// Collect data on this user.
@@ -1208,7 +1215,7 @@ public class RiveScript {
 		// More topic sanity checking.
 		if (!topics.containsKey(topic)) {
 			// This was handled before, which would mean topic=random and it doesn't exist. Serious issue!
-			return "ERR: No default topic 'random' was found!"; // TODO custom errors!
+			return errors.get("defaultTopicNotFound");
 		}
 
 		// Create a pointer for the matched data when we find it.
@@ -1763,16 +1770,19 @@ public class RiveScript {
 						} else {
 							// Don't divide by zero.
 							if (value == 0) {
-								insert = "[ERR: Can't divide by zero!]";
+								logger.warn("Can't divide by zero");
+								insert = errors.get("cannotDivideByZero");
 							}
 							result /= value;
 						}
 						sessions.set(username, name, Integer.toString(result));
 					} catch (NumberFormatException e) {
-						insert = "[ERR: Math can't \"" + tag + "\" non-numeric variable " + name + "]";
+						logger.warn("Math can't " + tag + " non-numeric variable " + name);
+						insert = errors.get("cannotMathVariable");
 					}
 				} catch (NumberFormatException e) {
-					insert = "[ERR: Math can't " + tag + " non-numeric value " + strValue + "]";
+					logger.warn("Math can't " + tag + " non-numeric value " + strValue);
+					insert = errors.get("cannotMathValue");
 				}
 			} else if (tag.equals("get")) {
 				// <get> user vars.
