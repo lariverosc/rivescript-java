@@ -114,6 +114,7 @@ public class RiveScript {
 
 	private static final String[] DEFAULT_FILE_EXTENSIONS = new String[] {".rive", ".rs"};
 	private static final Random RANDOM = new Random();
+	private static final String UNDEF_TAG = "<undef>";
 
 	private static Logger logger = LoggerFactory.getLogger(RiveScript.class);
 
@@ -127,19 +128,19 @@ public class RiveScript {
 
 	private Parser parser;
 
-	private Map<String, String> global;                           // 'global' variables
-	private Map<String, String> vars;                             // 'vars' bot variables
-	private Map<String, String> sub;                              // 'sub' substitutions
-	private Map<String, String> person;                           // 'person' substitutions
-	private Map<String, List<String>> array;                      // 'array' definitions
-	private SessionManager sessions;                              // user variable session manager
-	private Map<String, Map<String, Boolean>> includes;           // included topics
-	private Map<String, Map<String, Boolean>> inherits;           // inherited topics
-	private Map<String, String> objectLanguages;                  // object macro languages
-	private Map<String, ObjectHandler> handlers;                  // object language handlers
-	private Map<String, Subroutine> subroutines;                  // Java object handlers
-	private Map<String, Topic> topics;                            // main topic structure
-	private SortBuffer sorted;                                    // Sorted data from sortReplies()
+	private Map<String, String> global;                 // 'global' variables
+	private Map<String, String> vars;                   // 'vars' bot variables
+	private Map<String, String> sub;                    // 'sub' substitutions
+	private Map<String, String> person;                 // 'person' substitutions
+	private Map<String, List<String>> array;            // 'array' definitions
+	private SessionManager sessions;                    // user variable session manager
+	private Map<String, Map<String, Boolean>> includes; // included topics
+	private Map<String, Map<String, Boolean>> inherits; // inherited topics
+	private Map<String, String> objectLanguages;        // object macro languages
+	private Map<String, ObjectHandler> handlers;        // object language handlers
+	private Map<String, Subroutine> subroutines;        // Java object handlers
+	private Map<String, Topic> topics;                  // main topic structure
+	private SortBuffer sorted;                          // Sorted data from sortReplies()
 
 	// State information.
 	private ThreadLocal<String> currentUser = new ThreadLocal<>();
@@ -581,35 +582,35 @@ public class RiveScript {
 
 		// Get all of the "begin" type variables.
 		for (Map.Entry<String, String> entry : ast.getBegin().getGlobal().entrySet()) {
-			if (entry.getValue().equals("<undef>")) {
+			if (entry.getValue().equals(UNDEF_TAG)) {
 				global.remove(entry.getKey());
 			} else {
 				global.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getVar().entrySet()) {
-			if (entry.getValue().equals("<undef>")) {
+			if (entry.getValue().equals(UNDEF_TAG)) {
 				vars.remove(entry.getKey());
 			} else {
 				vars.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getSub().entrySet()) {
-			if (entry.getValue().equals("<undef>")) {
+			if (entry.getValue().equals(UNDEF_TAG)) {
 				sub.remove(entry.getKey());
 			} else {
 				sub.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getPerson().entrySet()) {
-			if (entry.getValue().equals("<undef>")) {
+			if (entry.getValue().equals(UNDEF_TAG)) {
 				person.remove(entry.getKey());
 			} else {
 				person.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, List<String>> entry : ast.getBegin().getArray().entrySet()) {
-			if (entry.getValue().equals("<undef>")) {
+			if (entry.getValue().equals(UNDEF_TAG)) {
 				array.remove(entry.getKey());
 			} else {
 				array.put(entry.getKey(), entry.getValue());
@@ -2105,7 +2106,7 @@ public class RiveScript {
 	}
 
 	/**
-	 * Returns whether a string is atomic or not.
+	 * Returns whether a trigger is atomic or not.
 	 *
 	 * @param pattern TODO
 	 * @return
