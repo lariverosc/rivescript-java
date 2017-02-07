@@ -710,42 +710,37 @@ public class RiveScript {
 	}
 
 	/**
-	 * TODO
+	 * Recursively scans topics and collects triggers therein.
 	 * <p>
-	 * Keep in mind here that there is a difference between 'includes' and
-	 * 'inherits' -- topics that inherit other topics are able to OVERRIDE
-	 * triggers that appear in the inherited topic. This means that if the top
-	 * topic has a trigger of simply '*', then NO triggers are capable of
-	 * matching in ANY inherited topic, because even though * has the lowest
-	 * priority, it has an automatic priority over all inherited topics.
+	 * This method scans through a topic and collects its triggers, along with the triggers belonging to any topic that's inherited by or
+	 * included by the parent topic. Some triggers will come out with an {@code {inherits}} tag to signify inheritance depth.
 	 * <p>
-	 * The getTopicTriggers method takes this into account. All topics that
-	 * inherit other topics will have their triggers prefixed with a fictional
-	 * {inherits} tag, which would start at {inherits=0} and increment if this
-	 * topic has other inheriting topics. So we can use this tag to make sure
-	 * topics that inherit things will have their triggers always be on top of
-	 * the stack, from inherits=0 to inherits=n.
+	 * Keep in mind here that there is a difference between 'includes' and 'inherits' -- topics that inherit other topics are able to
+	 * OVERRIDE triggers that appear in the inherited topic. This means that if the top topic has a trigger of simply {@code *}, then NO
+	 * triggers are capable of matching in ANY inherited topic, because even though {@code *} has the lowest priority, it has an automatic
+	 * priority over all inherited topics.
 	 * <p>
-	 * Important info about the depth vs. inheritance params to this function:
-	 * depth increments by 1 each time this function recursively calls itself.
-	 * inheritance increments by 1 only when this topic inherits another topic.
+	 * The {@link #getTopicTriggers(String, boolean, int, int, boolean)} method takes this into account. All topics that inherit other
+	 * topics will have their triggers prefixed with a fictional {@code {inherits}} tag, which would start at {@code {inherits=0}} and
+	 * increment if this topic has other inheriting topics. So we can use this tag to make sure topics that inherit things will have their
+	 * triggers always be on top of the stack, from {@code inherits=0} to {@code inherits=n}.
 	 * <p>
-	 * This way, '> topic alpha includes beta inherits gamma' will have this
-	 * effect:
-	 * alpha and beta's triggers are combined together into one matching pool,
-	 * and then those triggers have higher priority than gamma's.
+	 * Important info about the {@code depth} vs. {@code inheritance} params to this function:
+	 * {@code depth} increments by 1 each time this method recursively calls itself. {@code inheritance} increments by 1 only when this
+	 * topic inherits another topic.
 	 * <p>
-	 * The inherited option is true if this is a recursive call, from a topic
-	 * that inherits other topics. This forces the {inherits} tag to be added to
-	 * the triggers. This only applies when the top topic 'includes' another
-	 * topic.
+	 * This way, {@code > topic alpha includes beta inherits gamma} will have this effect:
+	 * alpha and beta's triggers are combined together into one matching pool, and then those triggers have higher priority than gamma's.
+	 * <p>
+	 * The {@code inherited} option is {@code true} if this is a recursive call, from a topic that inherits other topics. This forces the
+	 * {@code {inherits}} tag to be added to the triggers. This only applies when the top topic 'includes' another topic.
 	 *
-	 * @param topic
-	 * @param thats
-	 * @param depth
-	 * @param inheritance
-	 * @param inherited
-	 * @return
+	 * @param topic       the name of the topic to scan through
+	 * @param thats       indicates to get replies with {@code %Previous} or not
+	 * @param depth       the recursion depth counter
+	 * @param inheritance the inheritance counter
+	 * @param inherited   the inherited status
+	 * @return the list of triggers
 	 */
 	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats, int depth, int inheritance, boolean inherited) {
 		// Break if we're in too deep.
@@ -815,8 +810,8 @@ public class RiveScript {
 	 * This function has two use cases:
 	 * <p>
 	 * <ol>
-	 * <li>Create a sort buffer for "normal" (matchable) triggers, which are triggers that are NOT accompanied by a %Previous tag.
-	 * <li>Create a sort buffer for triggers that had %Previous tags.
+	 * <li>Create a sort buffer for "normal" (matchable) triggers, which are triggers that are NOT accompanied by a {@code %Previous} tag.
+	 * <li>Create a sort buffer for triggers that had {@code %Previous} tags.
 	 * </ol>
 	 * <p>
 	 * Use the {@code excludePrevious} parameter to control which one is being done.
@@ -824,12 +819,12 @@ public class RiveScript {
 	 * (unless the source RiveScript code explicitly uses the same duplicate pattern twice, which is a user error).
 	 *
 	 * @param triggers        the triggers to sort
-	 * @param excludePrevious TODO
+	 * @param excludePrevious indicates to exclude triggers with {@code %Previous} or not
 	 * @return the sorted triggers
 	 */
 	private List<SortedTriggerEntry> sortTriggerSet(List<SortedTriggerEntry> triggers, boolean excludePrevious) {
 		// Create a priority map, of priority numbers -> their triggers.
-		Map<Integer, List<SortedTriggerEntry>> prior = new HashMap<>();
+		Map<Integer, List<SortedTriggerEntry>> priority = new HashMap<>();
 
 		// Go through and bucket each trigger by weight (priority).
 		for (SortedTriggerEntry trigger : triggers) {
@@ -845,11 +840,11 @@ public class RiveScript {
 			}
 
 			// First trigger of this priority? Initialize the weight map.
-			if (!prior.containsKey(weight)) {
-				prior.put(weight, new ArrayList<SortedTriggerEntry>());
+			if (!priority.containsKey(weight)) {
+				priority.put(weight, new ArrayList<SortedTriggerEntry>());
 			}
 
-			prior.get(weight).add(trigger);
+			priority.get(weight).add(trigger);
 		}
 
 		// Keep a running list of sorted triggers for this topic.
@@ -857,7 +852,7 @@ public class RiveScript {
 
 		// Sort the priorities with the highest number first.
 		List<Integer> sortedPriorities = new ArrayList<>();
-		for (Integer k : prior.keySet()) {
+		for (Integer k : priority.keySet()) {
 			sortedPriorities.add(k);
 		}
 		Collections.sort(sortedPriorities);
@@ -879,7 +874,7 @@ public class RiveScript {
 			track.put(inherits, new SortTrack());
 
 			// Loop through all the triggers.
-			for (SortedTriggerEntry trigger : prior.get(p)) {
+			for (SortedTriggerEntry trigger : priority.get(p)) {
 				String pattern = trigger.getTrigger();
 				logger.debug("Looking at trigger: {}", pattern);
 
