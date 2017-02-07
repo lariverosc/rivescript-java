@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
 public class Java implements ObjectHandler {
 
 	private RiveScript parent;
-	private HashMap<String, Subroutine> handlers = new HashMap<>();
+	private HashMap<String, Subroutine> handlers;
 
 	/**
 	 * Constructs a Java {@link ObjectHandler}.
@@ -53,11 +53,11 @@ public class Java implements ObjectHandler {
 	 */
 	public Java(RiveScript rivescript) {
 		this.parent = requireNonNull(rivescript, "'rivescript' must not be null");
+		this.handlers = new HashMap<>();
 	}
 
 	/**
-	 * Handler for when object code is read (loaded) by RiveScript. Should return {@code true} for
-	 * success or {@code false} to indicate error.
+	 * Handler for when object code is read (loaded) by RiveScript. Should return {@code true} for success or {@code false} to indicate error.
 	 * <p>
 	 * We can't dynamically evaluate Java code, so this function just logs an error.
 	 *
@@ -66,9 +66,8 @@ public class Java implements ObjectHandler {
 	 */
 	@Override
 	public boolean load(String name, String[] code) {
-		System.err.println("NOTICE: Can't dynamically eval Java code from an "
-				+ "inline object macro! Use the setSubroutine() function instead "
-				+ "to define an object at compile time.");
+		System.err.println("NOTICE: Can't dynamically eval Java code from an inline object macro! "
+				+ "Use the setSubroutine() function instead to define an object at compile time.");
 		return false;
 	}
 

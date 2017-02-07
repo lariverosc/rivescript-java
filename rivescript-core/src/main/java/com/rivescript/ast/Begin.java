@@ -34,11 +34,19 @@ import java.util.Map;
  */
 public class Begin {
 
-	private Map<String, String> global = new HashMap<>();
-	private Map<String, String> var = new HashMap<>();
-	private Map<String, String> sub = new HashMap<>();
-	private Map<String, String> person = new HashMap<>();
+	private Map<String, String> global;
+	private Map<String, String> var;
+	private Map<String, String> sub;
+	private Map<String, String> person;
 	private Map<String, List<String>> array = new HashMap<>();
+
+	public Begin() {
+		this.global = new HashMap<>();
+		this.var = new HashMap<>();
+		this.sub = new HashMap<>();
+		this.person = new HashMap<>();
+		this.array = new HashMap<>();
+	}
 
 	/**
 	 * Returns the global variables.

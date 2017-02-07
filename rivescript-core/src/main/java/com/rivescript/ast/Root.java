@@ -35,14 +35,17 @@ import java.util.Map;
  */
 public class Root {
 
-	private Begin begin = new Begin();
-	private Map<String, Topic> topics = new HashMap<>();
-	private List<ObjectMacro> objects = new ArrayList<>();
+	private Begin begin;
+	private Map<String, Topic> topics;
+	private List<ObjectMacro> objects;
 
 	/**
 	 * Creates a new Abstract Syntax Tree (AST) containing an empty "random" topic.
 	 */
 	public Root() {
+		this.begin = new Begin();
+		this.topics = new HashMap<>();
+		this.objects = new ArrayList<>();
 		addTopic("random");
 	}
 

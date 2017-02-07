@@ -33,9 +33,14 @@ import java.util.Map;
  */
 public class UserData {
 
-	private Map<String, String> variables = new HashMap<>();
+	private Map<String, String> variables;
 	private String lastMatch;
-	private History history = new History();
+	private History history;
+
+	public UserData() {
+		this.variables = new HashMap<>();
+		this.history = new History();
+	}
 
 	public Map<String, String> getVariables() {
 		return variables;

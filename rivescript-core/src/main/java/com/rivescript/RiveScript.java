@@ -578,42 +578,42 @@ public class RiveScript {
 		logger.debug("Parsing code...");
 
 		// Get the abstract syntax tree of this file.
-		Root ast = parser.parse(filename, code);
+		Root ast = this.parser.parse(filename, code);
 
 		// Get all of the "begin" type variables.
 		for (Map.Entry<String, String> entry : ast.getBegin().getGlobal().entrySet()) {
 			if (entry.getValue().equals(UNDEF_TAG)) {
-				global.remove(entry.getKey());
+				this.global.remove(entry.getKey());
 			} else {
-				global.put(entry.getKey(), entry.getValue());
+				this.global.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getVar().entrySet()) {
 			if (entry.getValue().equals(UNDEF_TAG)) {
-				vars.remove(entry.getKey());
+				this.vars.remove(entry.getKey());
 			} else {
-				vars.put(entry.getKey(), entry.getValue());
+				this.vars.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getSub().entrySet()) {
 			if (entry.getValue().equals(UNDEF_TAG)) {
-				sub.remove(entry.getKey());
+				this.sub.remove(entry.getKey());
 			} else {
-				sub.put(entry.getKey(), entry.getValue());
+				this.sub.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, String> entry : ast.getBegin().getPerson().entrySet()) {
 			if (entry.getValue().equals(UNDEF_TAG)) {
-				person.remove(entry.getKey());
+				this.person.remove(entry.getKey());
 			} else {
-				person.put(entry.getKey(), entry.getValue());
+				this.person.put(entry.getKey(), entry.getValue());
 			}
 		}
 		for (Map.Entry<String, List<String>> entry : ast.getBegin().getArray().entrySet()) {
 			if (entry.getValue().equals(UNDEF_TAG)) {
-				array.remove(entry.getKey());
+				this.array.remove(entry.getKey());
 			} else {
-				array.put(entry.getKey(), entry.getValue());
+				this.array.put(entry.getKey(), entry.getValue());
 			}
 		}
 
@@ -623,46 +623,46 @@ public class RiveScript {
 			Topic data = entry.getValue();
 
 			// Keep a map of the topics that are included/inherited under this topic.
-			if (!includes.containsKey(topic)) {
-				includes.put(topic, new HashMap<String, Boolean>());
+			if (!this.includes.containsKey(topic)) {
+				this.includes.put(topic, new HashMap<String, Boolean>());
 			}
-			if (!inherits.containsKey(topic)) {
-				inherits.put(topic, new HashMap<String, Boolean>());
+			if (!this.inherits.containsKey(topic)) {
+				this.inherits.put(topic, new HashMap<String, Boolean>());
 			}
 
 			// Merge in the topic inclusions/inherits.
 			for (String included : data.getIncludes().keySet()) {
-				includes.get(topic).put(included, true);
+				this.includes.get(topic).put(included, true);
 			}
 			for (String inherited : data.getInherits().keySet()) {
-				inherits.get(topic).put(inherited, true);
+				this.inherits.get(topic).put(inherited, true);
 			}
 
 			// Initialize the topic structure.
-			if (!topics.containsKey(topic)) {
-				topics.put(topic, new Topic());
+			if (!this.topics.containsKey(topic)) {
+				this.topics.put(topic, new Topic());
 			}
 
 			// Consume the AST triggers into the brain.
-			for (Trigger trig : data.getTriggers()) {
+			for (Trigger astTrigger : data.getTriggers()) {
 				// Convert this AST trigger into an internal trigger.
 				Trigger trigger = new Trigger();
-				trigger.setTrigger(trig.getTrigger());
-				trigger.setReply(new ArrayList<>(trig.getReply()));
-				trigger.setCondition(new ArrayList<>(trig.getCondition()));
-				trigger.setRedirect(trig.getRedirect());
-				trigger.setPrevious(trig.getPrevious());
+				trigger.setTrigger(astTrigger.getTrigger());
+				trigger.setReply(new ArrayList<>(astTrigger.getReply()));
+				trigger.setCondition(new ArrayList<>(astTrigger.getCondition()));
+				trigger.setRedirect(astTrigger.getRedirect());
+				trigger.setPrevious(astTrigger.getPrevious());
 
-				topics.get(topic).addTrigger(trigger);
+				this.topics.get(topic).addTrigger(trigger);
 			}
 		}
 
 		// Load all the parsed objects.
 		for (ObjectMacro object : ast.getObjects()) {
 			// Have a language handler for this?
-			if (handlers.containsKey(object.getLanguage())) {
-				handlers.get(object.getLanguage()).load(object.getName(), object.getCode().toArray(new String[0]));
-				objectLanguages.put(object.getName(), object.getLanguage());
+			if (this.handlers.containsKey(object.getLanguage())) {
+				this.handlers.get(object.getLanguage()).load(object.getName(), object.getCode().toArray(new String[0]));
+				this.objectLanguages.put(object.getName(), object.getLanguage());
 			} else {
 				logger.warn("Object '{}' not loaded as no handler was found for programming language '{}'", object.getName(),
 						object.getLanguage());
@@ -682,12 +682,12 @@ public class RiveScript {
 	 */
 	public void sortReplies() {
 		// (Re)initialize the sort cache.
-		sorted.getTopics().clear();
-		sorted.getThats().clear();
+		this.sorted.getTopics().clear();
+		this.sorted.getThats().clear();
 		logger.debug("Sorting triggers...");
 
 		// Loop through all the topics.
-		for (String topic : topics.keySet()) {
+		for (String topic : this.topics.keySet()) {
 			logger.debug("Analyzing topic {}", topic);
 
 			// Collect a list of all the triggers we're going to worry about.
@@ -695,18 +695,18 @@ public class RiveScript {
 			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic, false, 0, 0, false);
 
 			// Sort these triggers.
-			sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
+			this.sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
 
 			// Get all of the %Previous triggers for this topic.
 			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true, 0, 0, false);
 
 			// And sort them, too.
-			sorted.getThats().put(topic, sortTriggerSet(thatTriggers, false));
+			this.sorted.getThats().put(topic, sortTriggerSet(thatTriggers, false));
 		}
 
 		// Sort the substitution lists.
-		sorted.setSub(sortList(sub.keySet()));
-		sorted.setPerson(sortList(person.keySet()));
+		this.sorted.setSub(sortList(this.sub.keySet()));
+		this.sorted.setPerson(sortList(this.person.keySet()));
 	}
 
 	/**
@@ -761,8 +761,8 @@ public class RiveScript {
 
 		// Get those that exist in this topic directly.
 		List<SortedTriggerEntry> inThisTopic = new ArrayList<>();
-		if (topics.containsKey(topic)) {
-			for (Trigger trigger : topics.get(topic).getTriggers()) {
+		if (this.topics.containsKey(topic)) {
+			for (Trigger trigger : this.topics.get(topic).getTriggers()) {
 				if (!thats) {
 					SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getTrigger(), trigger);
 					inThisTopic.add(entry);
@@ -777,7 +777,7 @@ public class RiveScript {
 		}
 
 		// Does this topic include others?
-		if (includes.containsKey(topic)) {
+		if (this.includes.containsKey(topic)) {
 			for (String includes : this.includes.get(topic).keySet()) {
 				logger.debug("Topic {} includes {}", topic, includes);
 				triggers.addAll(getTopicTriggers(includes, thats, depth + 1, inheritance + 1, false));
@@ -785,7 +785,7 @@ public class RiveScript {
 		}
 
 		// Does this topic inherit others?
-		if (inherits.containsKey(topic)) {
+		if (this.inherits.containsKey(topic)) {
 			for (String inherits : this.inherits.get(topic).keySet()) {
 				logger.debug("Topic {} inherits {}", topic, inherits);
 				triggers.addAll(getTopicTriggers(inherits, thats, depth + 1, inheritance + 1, true));
@@ -794,7 +794,7 @@ public class RiveScript {
 
 		// Collect the triggers for *this* topic. If this topic inherits any other topics, it means that this topic's triggers have higher
 		// priority than those in any inherited topics. Enforce this with an {inherits} tag.
-		if ((inherits.containsKey(topic) && inherits.get(topic).size() > 0) || inherited) {
+		if ((this.inherits.containsKey(topic) && this.inherits.get(topic).size() > 0) || inherited) {
 			for (SortedTriggerEntry trigger : inThisTopic) {
 				logger.debug("Prefixing trigger with {inherits={}} {}", inheritance, trigger.getTrigger());
 				String label = String.format("{inherits=%d}%s", inheritance, trigger.getTrigger());
@@ -1134,7 +1134,7 @@ public class RiveScript {
 
 		try {
 			// Initialize a user profile for this user?
-			sessions.init(username);
+			this.sessions.init(username);
 
 			// Format their message.
 			message = formatMessage(message, false);
@@ -1142,7 +1142,7 @@ public class RiveScript {
 			String reply;
 
 			// If the BEGIN block exists, consult it first.
-			if (topics.containsKey("__begin__")) {
+			if (this.topics.containsKey("__begin__")) {
 				String begin = getReply(username, "request", true, 0);
 
 				// OK to continue?
@@ -1158,7 +1158,7 @@ public class RiveScript {
 			}
 
 			// Save their message history.
-			sessions.addHistory(username, message, reply);
+			this.sessions.addHistory(username, message, reply);
 
 			if (logger.isTraceEnabled()) {
 				long elapsedTime = System.currentTimeMillis() - startTime;
@@ -1184,13 +1184,13 @@ public class RiveScript {
 	 */
 	private String getReply(String username, String message, boolean isBegin, int step) {
 		// Needed to sort replies?
-		if (sorted.getTopics().size() == 0) {
+		if (this.sorted.getTopics().size() == 0) {
 			logger.warn("You forgot to call sortReplies()!");
-			return errors.get("repliesNotSorted");
+			return this.errors.get("repliesNotSorted");
 		}
 
 		// Collect data on this user.
-		String topic = sessions.get(username, "topic");
+		String topic = this.sessions.get(username, "topic");
 		if (topic == null) {
 			topic = "random";
 		}
@@ -1199,15 +1199,15 @@ public class RiveScript {
 		String reply = null;
 
 		// Avoid letting them fall into a missing topic.
-		if (!topics.containsKey(topic)) {
+		if (!this.topics.containsKey(topic)) {
 			logger.warn("User {} was in an empty topic named '{}'", username, topic);
 			topic = "random";
-			sessions.set(username, "topic", topic);
+			this.sessions.set(username, "topic", topic);
 		}
 
 		// Avoid deep recursion.
-		if (step > depth) {
-			return errors.get("deepRecursion");
+		if (step > this.depth) {
+			return this.errors.get("deepRecursion");
 		}
 
 		// Are we in the BEGIN block?
@@ -1216,9 +1216,9 @@ public class RiveScript {
 		}
 
 		// More topic sanity checking.
-		if (!topics.containsKey(topic)) {
+		if (!this.topics.containsKey(topic)) {
 			// This was handled before, which would mean topic=random and it doesn't exist. Serious issue!
-			return errors.get("defaultTopicNotFound");
+			return this.errors.get("defaultTopicNotFound");
 		}
 
 		// Create a pointer for the matched data when we find it.
@@ -1232,7 +1232,7 @@ public class RiveScript {
 		// resulting in an infinite loop!
 		if (step == 0) {
 			List<String> allTopics = new ArrayList<>(Arrays.asList(topic));
-			if (includes.get(topic).size() > 0 || inherits.get(topic).size() > 0) {
+			if (this.includes.get(topic).size() > 0 || this.inherits.get(topic).size() > 0) {
 				// Get ALL the topics!
 				allTopics = getTopicTree(topic, 0);
 			}
@@ -1241,11 +1241,11 @@ public class RiveScript {
 			for (String top : allTopics) {
 				logger.debug("Checking topic {} for any %Previous's", top);
 
-				if (sorted.getThats().get(top).size() > 0) {
+				if (this.sorted.getThats().get(top).size() > 0) {
 					logger.debug("There's a %Previous in this topic!");
 
 					// Get the bot's last reply to the user.
-					History history = sessions.getHistory(username);
+					History history = this.sessions.getHistory(username);
 					String lastReply = history.getReply().get(0);
 
 					// Format the bot's reply the same way as the human's.
@@ -1253,7 +1253,7 @@ public class RiveScript {
 					logger.debug("Bot's last reply: {}", lastReply);
 
 					// See if it's a match.
-					for (SortedTriggerEntry trigger : sorted.getThats().get(top)) {
+					for (SortedTriggerEntry trigger : this.sorted.getThats().get(top)) {
 						String pattern = trigger.getPointer().getPrevious();
 						String botside = triggerRegexp(username, pattern);
 						logger.debug("Try to match lastReply {} to {} ({})", lastReply, pattern, botside);
@@ -1311,7 +1311,7 @@ public class RiveScript {
 		// Search their topic for a match to their trigger.
 		if (!foundMatch) {
 			logger.debug("Searching their topic for a match...");
-			for (SortedTriggerEntry trigger : sorted.getTopics().get(topic)) {
+			for (SortedTriggerEntry trigger : this.sorted.getTopics().get(topic)) {
 				String pattern = trigger.getTrigger();
 				String regexp = triggerRegexp(username, pattern);
 				logger.debug("Try to match \"{}\" against {} ({})", message, pattern, regexp);
@@ -1349,7 +1349,7 @@ public class RiveScript {
 		}
 
 		// Store what trigger they matched on.
-		sessions.setLastMatch(username, matchedTrigger);
+		this.sessions.setLastMatch(username, matchedTrigger);
 
 		// Did we match?
 		if (foundMatch) {
@@ -1466,9 +1466,9 @@ public class RiveScript {
 
 		// Still no reply?? Give up with the fallback error replies.
 		if (!foundMatch) {
-			reply = errors.get("replyNotMatched");
+			reply = this.errors.get("replyNotMatched");
 		} else if (reply == null || reply.length() == 0) {
-			reply = errors.get("replyNotFound");
+			reply = this.errors.get("replyNotFound");
 		}
 
 		logger.debug("Reply: {}", reply);
@@ -1482,12 +1482,12 @@ public class RiveScript {
 			int giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > depth) {
+				if (giveup > this.depth) {
 					logger.warn("Infinite loop looking for topic tag!");
 					break;
 				}
 				String name = matcher.group(1);
-				sessions.set(username, "topic", name);
+				this.sessions.set(username, "topic", name);
 				reply = reply.replace(matcher.group(0), "");
 			}
 
@@ -1496,13 +1496,13 @@ public class RiveScript {
 			giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > depth) {
+				if (giveup > this.depth) {
 					logger.warn("Infinite loop looking for set tag!");
 					break;
 				}
 				String name = matcher.group(1);
 				String value = matcher.group(2);
-				sessions.set(username, name, value);
+				this.sessions.set(username, name, value);
 				reply = reply.replace(matcher.group(0), "");
 			}
 		} else {
@@ -1525,13 +1525,13 @@ public class RiveScript {
 		message = message.toLowerCase();
 
 		// Run substitutions and sanitize what's left.
-		message = substitute(message, sub, sorted.getSub());
+		message = substitute(message, this.sub, this.sorted.getSub());
 
 		// In UTF-8 mode, only strip metacharacters and HTML brackets (to protect against obvious XSS attacks).
-		if (utf8) {
+		if (this.utf8) {
 			message = RE_META.matcher(message).replaceAll("");
-			if (unicodePunctuation != null) {
-				message = unicodePunctuation.matcher(message).replaceAll("");
+			if (this.unicodePunctuation != null) {
+				message = this.unicodePunctuation.matcher(message).replaceAll("");
 			}
 
 			// For the bot's reply, also strip common punctuation.
@@ -1581,15 +1581,15 @@ public class RiveScript {
 		Matcher matcher = re.matcher(reply);
 		int giveup = 0;
 		while (matcher.find()) {
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop looking for arrays in reply!");
 				break;
 			}
 
 			String name = matcher.group(1);
 			String result;
-			if (array.containsKey(name)) {
-				result = "{random}" + StringUtils.join(array.get(name).toArray(new String[0]), "|") + "{/random}";
+			if (this.array.containsKey(name)) {
+				result = "{random}" + StringUtils.join(this.array.get(name).toArray(new String[0]), "|") + "{/random}";
 			} else {
 				result = "\\x00@" + name + "\\x00"; // Dummy it out so we can reinsert it later.
 			}
@@ -1619,7 +1619,7 @@ public class RiveScript {
 		// <input> and <reply> tags.
 		reply = reply.replaceAll("<input>", "<input1>");
 		reply = reply.replaceAll("<reply>", "<reply1>");
-		History history = sessions.getHistory(username);
+		History history = this.sessions.getHistory(username);
 		if (history != null) {
 			for (int i = 1; i <= HISTORY_SIZE; i++) {
 				reply = reply.replaceAll("<input" + i + ">", history.getInput().get(i - 1));
@@ -1638,7 +1638,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop looking for random tag!");
 				break;
 			}
@@ -1667,7 +1667,7 @@ public class RiveScript {
 			giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > depth) {
+				if (giveup > this.depth) {
 					logger.warn("Infinite loop looking for {} tag!", format);
 					break;
 				}
@@ -1675,7 +1675,7 @@ public class RiveScript {
 				String content = matcher.group(1);
 				String replace;
 				if (format.equals("person")) {
-					replace = substitute(content, person, sorted.getPerson());
+					replace = substitute(content, this.person, this.sorted.getPerson());
 				} else {
 					replace = StringUtils.stringFormat(format, content);
 				}
@@ -1703,7 +1703,6 @@ public class RiveScript {
 			String data = "";
 			if (parts.length > 1) {
 				data = StringUtils.join(Arrays.copyOfRange(parts, 1, parts.length), " ");
-				;
 			}
 			String insert = "";
 
@@ -1712,9 +1711,9 @@ public class RiveScript {
 				// <bot> and <env> tags are similar.
 				Map<String, String> target;
 				if (tag.equals("bot")) {
-					target = vars;
+					target = this.vars;
 				} else {
-					target = global;
+					target = this.global;
 				}
 
 				if (data.contains("=")) {
@@ -1739,7 +1738,7 @@ public class RiveScript {
 					String name = parts[0];
 					String value = parts[1];
 					logger.debug("Set uservar {} = {}", name, value);
-					sessions.set(username, name, value);
+					this.sessions.set(username, name, value);
 				} else {
 					logger.warn("Malformed <set> tag: {}", match);
 				}
@@ -1751,10 +1750,10 @@ public class RiveScript {
 				int result = 0;
 
 				// Initialize the variable?
-				String origStr = sessions.get(username, name);
+				String origStr = this.sessions.get(username, name);
 				if (origStr == null) {
 					origStr = "0";
-					sessions.set(username, name, origStr);
+					this.sessions.set(username, name, origStr);
 				}
 
 				// Sanity check.
@@ -1774,22 +1773,22 @@ public class RiveScript {
 							// Don't divide by zero.
 							if (value == 0) {
 								logger.warn("Can't divide by zero");
-								insert = errors.get("cannotDivideByZero");
+								insert = this.errors.get("cannotDivideByZero");
 							}
 							result /= value;
 						}
-						sessions.set(username, name, Integer.toString(result));
+						this.sessions.set(username, name, Integer.toString(result));
 					} catch (NumberFormatException e) {
 						logger.warn("Math can't " + tag + " non-numeric variable " + name);
-						insert = errors.get("cannotMathVariable");
+						insert = this.errors.get("cannotMathVariable");
 					}
 				} catch (NumberFormatException e) {
 					logger.warn("Math can't " + tag + " non-numeric value " + strValue);
-					insert = errors.get("cannotMathValue");
+					insert = this.errors.get("cannotMathValue");
 				}
 			} else if (tag.equals("get")) {
 				// <get> user vars.
-				insert = sessions.get(username, data);
+				insert = this.sessions.get(username, data);
 				if (insert == null) {
 					insert = "undefined";
 				}
@@ -1810,13 +1809,13 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop looking for topic tag!");
 				break;
 			}
 
 			String name = matcher.group(1);
-			sessions.set(username, "topic", name);
+			this.sessions.set(username, "topic", name);
 			reply = reply.replace(matcher.group(0), "");
 		}
 
@@ -1825,7 +1824,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop looking for redirect tag!");
 				break;
 			}
@@ -1843,7 +1842,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop looking for call tag!");
 				break;
 			}
@@ -1860,14 +1859,14 @@ public class RiveScript {
 
 			// Do we know this object?
 			String output;
-			if (subroutines.containsKey(obj)) {
+			if (this.subroutines.containsKey(obj)) {
 				// It exists as a native Java macro.
-				output = subroutines.get(obj).call(this, args);
-			} else if (objectLanguages.containsKey(obj)) {
-				String languange = objectLanguages.get(obj);
-				output = handlers.get(languange).call(obj, args);
+				output = this.subroutines.get(obj).call(this, args);
+			} else if (this.objectLanguages.containsKey(obj)) {
+				String languange = this.objectLanguages.get(obj);
+				output = this.handlers.get(languange).call(obj, args);
 			} else {
-				output = errors.get("objectNotFound");
+				output = this.errors.get("objectNotFound");
 			}
 
 			reply = reply.replace(matcher.group(0), output);
@@ -1914,7 +1913,7 @@ public class RiveScript {
 		int tries = 0;
 		while (message.contains("\\x00")) {
 			tries++;
-			if (tries > depth) {
+			if (tries > this.depth) {
 				logger.warn("Too many loops in substitution placeholders!");
 				break;
 			}
@@ -1981,7 +1980,7 @@ public class RiveScript {
 		pattern = pattern.replaceAll("\\|(\\)|\\])", "$1");            // Remove empty entities from end of alt/opts
 
 		// UTF-8 mode special characters.
-		if (utf8) {
+		if (this.utf8) {
 			// Literal @ symbols (like in an e-mail address) conflict with arrays.
 			pattern = pattern.replaceAll("\\\\@", "\\\\u0040");
 		}
@@ -1991,7 +1990,7 @@ public class RiveScript {
 		int giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				logger.warn("Infinite loop when trying to process optionals in a trigger!");
 				return "";
 			}
@@ -2025,14 +2024,14 @@ public class RiveScript {
 		matcher = RE_ARRAY.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				break;
 			}
 
 			String name = matcher.group(1);
 			String rep = "";
-			if (array.containsKey(name)) {
-				rep = "(?:" + StringUtils.join(array.get(name).toArray(new String[0]), "|") + ")";
+			if (this.array.containsKey(name)) {
+				rep = "(?:" + StringUtils.join(this.array.get(name).toArray(new String[0]), "|") + ")";
 			}
 			pattern = pattern.replace(matcher.group(0), rep);
 		}
@@ -2042,14 +2041,14 @@ public class RiveScript {
 		matcher = RE_BOT_VAR.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				break;
 			}
 
 			String name = matcher.group(1);
 			String rep = "";
-			if (vars.containsKey(name)) {
-				rep = StringUtils.stripNasties(vars.get(name));
+			if (this.vars.containsKey(name)) {
+				rep = StringUtils.stripNasties(this.vars.get(name));
 			}
 			pattern = pattern.replace(matcher.group(0), rep.toLowerCase());
 		}
@@ -2059,13 +2058,13 @@ public class RiveScript {
 		matcher = RE_USER_VAR.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				break;
 			}
 
 			String name = matcher.group(1);
 			String rep = "undefined";
-			String value = sessions.get(username, name);
+			String value = this.sessions.get(username, name);
 			if (value != null) {
 				rep = value;
 			}
@@ -2079,14 +2078,14 @@ public class RiveScript {
 
 		while (pattern.contains("<input") || pattern.contains("<reply")) {
 			giveup++;
-			if (giveup > depth) {
+			if (giveup > this.depth) {
 				break;
 			}
 
 			for (int i = 1; i <= HISTORY_SIZE; i++) {
 				String inputPattern = "<input" + i + ">";
 				String replyPattern = "<reply" + i + ">";
-				History history = sessions.getHistory(username);
+				History history = this.sessions.getHistory(username);
 				if (history == null) {
 					pattern = pattern.replace(inputPattern, history.getInput().get(i - 1));
 					pattern = pattern.replace(replyPattern, history.getReply().get(i - 1));
@@ -2098,7 +2097,7 @@ public class RiveScript {
 		}
 
 		// Recover escaped Unicode symbols.
-		if (utf8) {
+		if (this.utf8) {
 			pattern = pattern.replaceAll("\\u0040", "@");
 		}
 
@@ -2137,9 +2136,7 @@ public class RiveScript {
 	 * @param value    the variable value
 	 */
 	public void setUservar(String username, String name, String value) {
-		Map<String, String> vars = new HashMap<>();
-		vars.put(name, value);
-		sessions.set(username, vars);
+		sessions.set(username, name, value);
 	}
 
 	/**
@@ -2182,7 +2179,7 @@ public class RiveScript {
 	 * Clears all variables for all users.
 	 */
 	public void clearAllUservars() {
-		sessions.clearAll();
+		this.sessions.clearAll();
 	}
 
 	/**
@@ -2234,7 +2231,7 @@ public class RiveScript {
 	 * @return the user's ID or {@code null}
 	 */
 	public String currentUser() {
-		return this.currentUser.get();
+		return currentUser.get();
 	}
 
 	/*-----------------------*/

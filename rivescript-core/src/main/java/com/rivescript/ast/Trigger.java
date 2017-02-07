@@ -34,10 +34,15 @@ import java.util.List;
 public class Trigger {
 
 	private String trigger;
-	private List<String> reply = new ArrayList<>();
-	private List<String> condition = new ArrayList<>();
+	private List<String> reply;
+	private List<String> condition;
 	private String redirect;
 	private String previous;
+
+	public Trigger() {
+		this.reply = new ArrayList<>();
+		this.condition = new ArrayList<>();
+	}
 
 	/**
 	 * Returns the trigger pattern of this trigger.

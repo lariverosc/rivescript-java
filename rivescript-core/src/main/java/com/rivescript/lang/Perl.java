@@ -45,9 +45,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class Perl implements ObjectHandler {
 
-	private String rsp4j; // Path to the Perl script
 	private RiveScript parent; // Parent RS object
-	private HashMap<String, String> codes = new HashMap<>(); // Object codes
+	private String rsp4j; // Path to the Perl script
+	private HashMap<String, String> codes; // Object codes
 
 	/**
 	 * Creates a Perl {@link ObjectHandler}. Must take the path to the rsp4j script as its argument.
@@ -58,7 +58,7 @@ public class Perl implements ObjectHandler {
 	public Perl(RiveScript rivescript, String rsp4j) {
 		this.parent = requireNonNull(rivescript, "'rivescript' must not be null");
 		this.rsp4j = requireNonNull(rsp4j, "'rsp4j' must not be null");
-		;
+		this.codes = new HashMap<>();
 	}
 
 	/**
@@ -128,8 +128,7 @@ public class Perl implements ObjectHandler {
 				}
 				incoming = StringUtils.join(result.toArray(new String[0]), "\n");
 			} catch (java.io.IOException e) {
-				System.err.println("IOException error in " + this.getClass().getCanonicalName()
-						+ ": " + e.getMessage());
+				System.err.println("IOException error in " + this.getClass().getCanonicalName() + ": " + e.getMessage());
 				return "[ERR: IOException: " + e.getMessage() + "]";
 			}
 
@@ -153,8 +152,7 @@ public class Perl implements ObjectHandler {
 			return reply.getString("reply");
 
 		} catch (org.json.JSONException e) {
-			System.err.println("JSONException in " + this.getClass().getCanonicalName() + ": "
-					+ e.getMessage());
+			System.err.println("JSONException in " + this.getClass().getCanonicalName() + ": " + e.getMessage());
 			return "[ERR: JSONException: " + e.getMessage() + "]";
 		}
 	}

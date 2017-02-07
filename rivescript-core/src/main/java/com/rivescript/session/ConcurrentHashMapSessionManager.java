@@ -35,8 +35,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConcurrentHashMapSessionManager implements SessionManager {
 
-	private ConcurrentHashMap<String, UserData> users = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<String, UserData> frozen = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, UserData> users;
+	private ConcurrentHashMap<String, UserData> frozen;
+
+	public ConcurrentHashMapSessionManager() {
+		this.users = new ConcurrentHashMap<>();
+		this.frozen = new ConcurrentHashMap<>();
+	}
 
 	@Override
 	public UserData init(String username) {

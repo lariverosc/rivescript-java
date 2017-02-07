@@ -35,9 +35,15 @@ import java.util.Map;
  */
 public class Topic {
 
-	private List<Trigger> triggers = new ArrayList<>();
-	private Map<String, Boolean> includes = new HashMap<>();
-	private Map<String, Boolean> inherits = new HashMap<>();
+	private List<Trigger> triggers;
+	private Map<String, Boolean> includes;
+	private Map<String, Boolean> inherits;
+
+	public Topic() {
+		this.triggers = new ArrayList<>();
+		this.includes = new HashMap<>();
+		this.inherits = new HashMap<>();
+	}
 
 	/**
 	 * Returns the triggers of this topic.
