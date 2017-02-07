@@ -794,7 +794,7 @@ public class RiveScript {
 
 		// Collect the triggers for *this* topic. If this topic inherits any other topics, it means that this topic's triggers have higher
 		// priority than those in any inherited topics. Enforce this with an {inherits} tag.
-		if ((inherits.containsKey(topic) && this.inherits.get(topic).size() > 0) || inherited) {
+		if ((inherits.containsKey(topic) && inherits.get(topic).size() > 0) || inherited) {
 			for (SortedTriggerEntry trigger : inThisTopic) {
 				logger.debug("Prefixing trigger with {inherits={}} {}", inheritance, trigger.getTrigger());
 				String label = String.format("{inherits=%d}%s", inheritance, trigger.getTrigger());
