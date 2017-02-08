@@ -46,6 +46,7 @@ public class Root {
 		this.begin = new Begin();
 		this.topics = new HashMap<>();
 		this.objects = new ArrayList<>();
+		// Initialize the 'random' topic.
 		addTopic("random");
 	}
 
