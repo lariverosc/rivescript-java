@@ -306,6 +306,12 @@ public class RiveScript {
 	public void setGlobal(String name, String value) {
 		if (value == null) {
 			global.remove(name);
+		} else if (name.equals("depth")) {
+			try {
+				depth = Integer.parseInt(value);
+			} catch (NumberFormatException e) {
+				logger.warn("Can't set global 'depth' to '{}': {}", value, e.getMessage());
+			}
 		} else {
 			global.put(name, value);
 		}
@@ -320,7 +326,11 @@ public class RiveScript {
 	 * @return the variable value or {@code null}
 	 */
 	public String getGlobal(String name) {
-		return global.get(name);
+		if (name != null && name.equals("depth")) {
+			return Integer.toString(depth);
+		} else {
+			return global.get(name);
+		}
 	}
 
 	/**
@@ -759,10 +769,11 @@ public class RiveScript {
 		if (this.topics.containsKey(topic)) {
 			for (Trigger trigger : this.topics.get(topic).getTriggers()) {
 				if (!thats) {
+					// All triggers.
 					SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getTrigger(), trigger);
 					inThisTopic.add(entry);
 				} else {
-					// Does this one have a %Previous? If so, make a pointer to this exact trigger.
+					// Only triggers that have %Previous.
 					if (trigger.getPrevious() != null) {
 						SortedTriggerEntry entry = new SortedTriggerEntry(trigger.getPrevious(), trigger);
 						inThisTopic.add(entry);
@@ -1117,7 +1128,7 @@ public class RiveScript {
 	 *
 	 * @param username the username
 	 * @param message  the user's message
-	 * @return
+	 * @return the reply
 	 */
 	public String reply(String username, String message) {
 		logger.debug("Asked to reply to [{}] {}", username, message);
@@ -1169,13 +1180,13 @@ public class RiveScript {
 	}
 
 	/**
-	 * TODO
+	 * Returns a reply from the bot for a user's message.
 	 *
-	 * @param username
-	 * @param message
-	 * @param isBegin
-	 * @param step
-	 * @return
+	 * @param username the username
+	 * @param message  the user's message
+	 * @param isBegin  whether this reply is for the {@code BEGIN} block context or not.
+	 * @param step     the recursion depth counter
+	 * @return the reply
 	 */
 	private String getReply(String username, String message, boolean isBegin, int step) {
 		// Needed to sort replies?
@@ -1510,8 +1521,8 @@ public class RiveScript {
 	/**
 	 * Formats a user's message for safe processing.
 	 *
-	 * @param message  TODO
-	 * @param botReply TODO
+	 * @param message  the user's message
+	 * @param botReply whether it is a bot reply or not
 	 * @return the formatted message
 	 */
 	private String formatMessage(String message, boolean botReply) {
