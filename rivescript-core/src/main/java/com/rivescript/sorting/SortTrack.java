@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Temporary categorization of triggers while sorting.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk

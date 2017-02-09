@@ -25,15 +25,15 @@ package com.rivescript.sorting;
 import com.rivescript.ast.Trigger;
 
 /**
- * TODO
+ * Holds a sorted trigger and the pointer to that trigger's data
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
  */
 public class SortedTriggerEntry {
 
-	String trigger;
-	Trigger pointer;
+	private String trigger;
+	private Trigger pointer;
 
 	public SortedTriggerEntry(String trigger, Trigger pointer) {
 		this.trigger = trigger;

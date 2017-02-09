@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Sort buffer data.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
