@@ -22,7 +22,6 @@
 
 package com.rivescript;
 
-import com.rivescript.Config;
 import org.junit.Test;
 
 import static com.rivescript.Config.DEFAULT_DEPTH;
@@ -47,7 +46,7 @@ public class ConfigTests {
 		assertThat(config.isForceCase(), is(equalTo(false)));
 		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
-		assertThat(config.getErrors(), is(equalTo(null)));
+		assertThat(config.getErrorMessages(), is(equalTo(null)));
 	}
 
 	@Test
@@ -60,7 +59,7 @@ public class ConfigTests {
 		assertThat(config.isForceCase(), is(equalTo(false)));
 		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
-		assertThat(config.getErrors(), is(equalTo(null)));
+		assertThat(config.getErrorMessages(), is(equalTo(null)));
 	}
 
 	@Test

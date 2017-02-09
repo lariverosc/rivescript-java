@@ -52,7 +52,7 @@ public class Config {
 	private boolean forceCase;
 	private int depth = DEFAULT_DEPTH;
 	private SessionManager sessionManager;
-	private Map<String, String> errors;
+	private Map<String, String> errorMessages;
 
 	protected Config() {
 	}
@@ -125,8 +125,8 @@ public class Config {
 	 *
 	 * @return the custom error message overrides
 	 */
-	public Map<String, String> getErrors() {
-		return errors;
+	public Map<String, String> getErrorMessages() {
+		return errorMessages;
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class Config {
 		if (sessionManager != null ? !sessionManager.equals(that.sessionManager) : that.sessionManager != null) {
 			return false;
 		}
-		return errors != null ? errors.equals(that.errors) : that.errors == null;
+		return errorMessages != null ? errorMessages.equals(that.errorMessages) : that.errorMessages == null;
 
 	}
 
@@ -172,7 +172,7 @@ public class Config {
 		result = 31 * result + (forceCase ? 1 : 0);
 		result = 31 * result + depth;
 		result = 31 * result + (sessionManager != null ? sessionManager.hashCode() : 0);
-		result = 31 * result + (errors != null ? errors.hashCode() : 0);
+		result = 31 * result + (errorMessages != null ? errorMessages.hashCode() : 0);
 		return result;
 	}
 
@@ -186,7 +186,7 @@ public class Config {
 				", forceCase=" + forceCase +
 				", depth=" + depth +
 				", sessionManager=" + sessionManager +
-				", errors=" + errors +
+				", errorMessages=" + errorMessages +
 				'}';
 	}
 
@@ -204,7 +204,7 @@ public class Config {
 				.forceCase(this.forceCase)
 				.depth(this.depth)
 				.sessionManager(this.sessionManager)
-				.errors(this.errors);
+				.errorMessages(this.errorMessages);
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class Config {
 		private boolean forceCase;
 		private int depth = DEFAULT_DEPTH;
 		private SessionManager sessionManager;
-		private Map<String, String> errors;
+		private Map<String, String> errorMessages;
 
 		private Builder() {
 		}
@@ -331,11 +331,11 @@ public class Config {
 		/**
 		 * Sets the custom error message overrides.
 		 *
-		 * @param errors the custom error message overrides
+		 * @param errorMessages the custom error message overrides
 		 * @return this builder
 		 */
-		public Builder errors(Map<String, String> errors) {
-			this.errors = errors;
+		public Builder errorMessages(Map<String, String> errorMessages) {
+			this.errorMessages = errorMessages;
 			return this;
 		}
 
@@ -346,11 +346,11 @@ public class Config {
 		 * @param value the custom error message
 		 * @return this builder
 		 */
-		public Builder addError(String key, String value) {
-			if (this.errors == null) {
-				this.errors = new HashMap<>();
+		public Builder addErrorMessage(String key, String value) {
+			if (this.errorMessages == null) {
+				this.errorMessages = new HashMap<>();
 			}
-			this.errors.put(key, value);
+			this.errorMessages.put(key, value);
 			return this;
 		}
 
@@ -368,7 +368,7 @@ public class Config {
 			config.forceCase = this.forceCase;
 			config.depth = this.depth;
 			config.sessionManager = this.sessionManager;
-			config.errors = this.errors;
+			config.errorMessages = this.errorMessages;
 			return config;
 		}
 

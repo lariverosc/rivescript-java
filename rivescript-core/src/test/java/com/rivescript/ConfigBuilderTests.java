@@ -51,7 +51,7 @@ public class ConfigBuilderTests {
 		assertThat(config.isForceCase(), is(equalTo(false)));
 		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
-		assertThat(config.getErrors(), is(equalTo(null)));
+		assertThat(config.getErrorMessages(), is(equalTo(null)));
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class ConfigBuilderTests {
 		assertThat(config.isForceCase(), is(equalTo(false)));
 		assertThat(config.getDepth(), is(equalTo(DEFAULT_DEPTH)));
 		assertThat(config.getSessionManager(), is(equalTo(null)));
-		assertThat(config.getErrors(), is(equalTo(null)));
+		assertThat(config.getErrorMessages(), is(equalTo(null)));
 	}
 
 	@Test
@@ -142,23 +142,23 @@ public class ConfigBuilderTests {
 
 	@Test
 	public void testBuildWithErrorsIsNull() {
-		Config config = Config.newBuilder().errors(null).build();
-		assertThat(config.getErrors(), is(equalTo(null)));
+		Config config = Config.newBuilder().errorMessages(null).build();
+		assertThat(config.getErrorMessages(), is(equalTo(null)));
 	}
 
 	@Test
 	public void testBuildWithCustomErrors() {
-		Map<String, String> errors = new HashMap<>();
-		errors.put("foo", "bar");
-		Config config = Config.newBuilder().errors(errors).build();
-		assertThat(config.getErrors(), is(equalTo(errors)));
+		Map<String, String> errorsMessages = new HashMap<>();
+		errorsMessages.put("foo", "bar");
+		Config config = Config.newBuilder().errorMessages(errorsMessages).build();
+		assertThat(config.getErrorMessages(), is(equalTo(errorsMessages)));
 	}
 
 	@Test
 	public void testBuildWithAddCustomError() {
-		Map<String, String> errors = new HashMap<>();
-		errors.put("foo", "bar");
-		Config config = Config.newBuilder().addError("foo", "bar").build();
-		assertThat(config.getErrors(), is(equalTo(errors)));
+		Map<String, String> errorsMessages = new HashMap<>();
+		errorsMessages.put("foo", "bar");
+		Config config = Config.newBuilder().addErrorMessage("foo", "bar").build();
+		assertThat(config.getErrorMessages(), is(equalTo(errorsMessages)));
 	}
 }

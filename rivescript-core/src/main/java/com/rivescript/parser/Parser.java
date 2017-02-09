@@ -89,7 +89,7 @@ public class Parser {
 	 * <p>
 	 * This will return an Abstract Syntax Tree {@link Root} object containing all of the relevant information parsed from the source code.
 	 * <p>
-	 * In case of errors (e.g. a syntax error when strict mode is enabled) a {@link ParserException} will be thrown.
+	 * In case of errorMessages (e.g. a syntax error when strict mode is enabled) a {@link ParserException} will be thrown.
 	 *
 	 * @param filename the arbitrary name for the source code being parsed
 	 * @param code     the lines of RiveScript source code
@@ -590,7 +590,7 @@ public class Parser {
 			// - All brackets should be matched.
 			int parens = 0, square = 0, curly = 0, angle = 0; // Count the brackets
 
-			// Look for obvious errors first.
+			// Look for obvious errorMessages first.
 			if (utf8) {
 				// In UTF-8 mode, most symbols are allowed.
 				if (line.matches("[A-Z\\\\.]")) {

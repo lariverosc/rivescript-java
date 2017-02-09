@@ -26,6 +26,7 @@ import com.rivescript.ast.ObjectMacro;
 import com.rivescript.ast.Root;
 import com.rivescript.ast.Topic;
 import com.rivescript.ast.Trigger;
+import com.rivescript.exception.DeepRecursionException;
 import com.rivescript.lang.Java;
 import com.rivescript.macro.ObjectHandler;
 import com.rivescript.macro.Subroutine;
@@ -124,7 +125,7 @@ public class RiveScript {
 	private boolean forceCase;
 	private int depth;
 	private Pattern unicodePunctuation;
-	private Map<String, String> errors;
+	private Map<String, String> errorMessages;
 
 	private Parser parser;
 
@@ -179,21 +180,21 @@ public class RiveScript {
 		}
 		this.unicodePunctuation = Pattern.compile(unicodePunctuation);
 
-		this.errors = new HashMap<>();
-		this.errors.put("deepRecursion", "ERR: Deep Recursion Detected");
-		this.errors.put("repliesNotSorted", "ERR: Replies Not Sorted");
-		this.errors.put("defaultTopicNotFound", "ERR: No default topic 'random' was found");
-		this.errors.put("replyNotMatched", "ERR: No Reply Matched");
-		this.errors.put("replyNotFound", "ERR: No Reply Found");
-		this.errors.put("objectNotFound", "[ERR: Object Not Found]");
-		this.errors.put("cannotDivideByZero", "[ERR: Can't Divide By Zero]");
-		this.errors.put("cannotMathVariable", "[ERR: Can't perform math operation on non-numeric variable]");
-		this.errors.put("cannotMathValue", "[ERR: Can't perform math operation on non-numeric value]");
-		this.errors.put("undefined", "undefined");
+		this.errorMessages = new HashMap<>();
+		this.errorMessages.put("deepRecursion", "ERR: Deep Recursion Detected");
+		this.errorMessages.put("repliesNotSorted", "ERR: Replies Not Sorted");
+		this.errorMessages.put("defaultTopicNotFound", "ERR: No default topic 'random' was found");
+		this.errorMessages.put("replyNotMatched", "ERR: No Reply Matched");
+		this.errorMessages.put("replyNotFound", "ERR: No Reply Found");
+		this.errorMessages.put("objectNotFound", "[ERR: Object Not Found]");
+		this.errorMessages.put("cannotDivideByZero", "[ERR: Can't Divide By Zero]");
+		this.errorMessages.put("cannotMathVariable", "[ERR: Can't perform math operation on non-numeric variable]");
+		this.errorMessages.put("cannotMathValue", "[ERR: Can't perform math operation on non-numeric value]");
+		this.errorMessages.put("undefined", "undefined");
 
-		if (config.getErrors() != null) {
-			for (Map.Entry<String, String> entry : config.getErrors().entrySet()) {
-				this.errors.put(entry.getKey(), entry.getValue());
+		if (config.getErrorMessages() != null) {
+			for (Map.Entry<String, String> entry : config.getErrorMessages().entrySet()) {
+				this.errorMessages.put(entry.getKey(), entry.getValue());
 			}
 		}
 
@@ -246,6 +247,69 @@ public class RiveScript {
 	/*---------------------------*/
 	/*-- Configuration Methods --*/
 	/*---------------------------*/
+
+	/**
+	 * Returns whether exception throwing is enabled.
+	 *
+	 * @return whether exception throwing is enabled
+	 */
+	public boolean isThrowExceptions() {
+		return throwExceptions;
+	}
+
+	/**
+	 * Returns whether strict syntax checking is enabled.
+	 *
+	 * @return whether strict syntax checking is enabled
+	 */
+	public boolean isStrict() {
+		return strict;
+	}
+
+	/**
+	 * Returns whether UTF-8 mode is enabled for user messages and triggers.
+	 *
+	 * @return whether UTF-8 mode is enabled for user messages and triggers
+	 */
+	public boolean isUtf8() {
+		return utf8;
+	}
+
+	/**
+	 * Returns whether forcing triggers to lowercase is enabled.
+	 *
+	 * @return whether forcing triggers to lowercase is enabled
+	 */
+	public boolean isForceCase() {
+		return forceCase;
+	}
+
+	/**
+	 * Returns the recursion depth limit.
+	 *
+	 * @return the recursion depth limit
+	 */
+	public int getDepth() {
+		return depth;
+	}
+
+	/**
+	 * Returns the unicode punctuation pattern.
+	 *
+	 * @return the unicode punctuation pattern
+	 */
+	public String getUnicodePunctuation() {
+		return unicodePunctuation != null ? unicodePunctuation.toString() : null;
+	}
+
+	/**
+	 * Returns the error messages (unmodifiable).
+	 *
+	 * @return the error messages
+	 */
+	public Map<String, String> getErrorMessages() {
+		return Collections.unmodifiableMap(errorMessages);
+	}
 
 	/**
 	 * Sets a custom language handler for RiveScript object macros.
@@ -415,6 +479,17 @@ public class RiveScript {
 	 */
 	public String getPerson(String name) {
 		return person.get(name);
+	}
+
+	private boolean checkDeepRecursion(int depth, String message) throws DeepRecursionException {
+		if (depth > this.depth) {
+			logger.warn(message);
+			if (throwExceptions) {
+				throw new DeepRecursionException(message);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/*---------------------*/
@@ -1192,7 +1267,7 @@ public class RiveScript {
 		// Needed to sort replies?
 		if (this.sorted.getTopics().size() == 0) {
 			logger.warn("You forgot to call sortReplies()!");
-			return this.errors.get("repliesNotSorted");
+			return this.errorMessages.get("repliesNotSorted");
 		}
 
 		// Collect data on this user.
@@ -1213,7 +1288,7 @@ public class RiveScript {
 
 		// Avoid deep recursion.
 		if (step > this.depth) {
-			return this.errors.get("deepRecursion");
+			return this.errorMessages.get("deepRecursion");
 		}
 
 		// Are we in the BEGIN block?
@@ -1224,7 +1299,7 @@ public class RiveScript {
 		// More topic sanity checking.
 		if (!this.topics.containsKey(topic)) {
 			// This was handled before, which would mean topic=random and it doesn't exist. Serious issue!
-			return this.errors.get("defaultTopicNotFound");
+			return this.errorMessages.get("defaultTopicNotFound");
 		}
 
 		// Create a pointer for the matched data when we find it.
@@ -1472,9 +1547,9 @@ public class RiveScript {
 
 		// Still no reply?? Give up with the fallback error replies.
 		if (!foundMatch) {
-			reply = this.errors.get("replyNotMatched");
+			reply = this.errorMessages.get("replyNotMatched");
 		} else if (reply == null || reply.length() == 0) {
-			reply = this.errors.get("replyNotFound");
+			reply = this.errorMessages.get("replyNotFound");
 		}
 
 		logger.debug("Reply: {}", reply);
@@ -1779,18 +1854,18 @@ public class RiveScript {
 							// Don't divide by zero.
 							if (value == 0) {
 								logger.warn("Can't divide by zero");
-								insert = this.errors.get("cannotDivideByZero");
+								insert = this.errorMessages.get("cannotDivideByZero");
 							}
 							result /= value;
 						}
 						this.sessions.set(username, name, Integer.toString(result));
 					} catch (NumberFormatException e) {
 						logger.warn("Math can't " + tag + " non-numeric variable " + name);
-						insert = this.errors.get("cannotMathVariable");
+						insert = this.errorMessages.get("cannotMathVariable");
 					}
 				} catch (NumberFormatException e) {
 					logger.warn("Math can't " + tag + " non-numeric value " + strValue);
-					insert = this.errors.get("cannotMathValue");
+					insert = this.errorMessages.get("cannotMathValue");
 				}
 			} else if (tag.equals("get")) {
 				// <get> user vars.
@@ -1872,7 +1947,7 @@ public class RiveScript {
 				String languange = this.objectLanguages.get(obj);
 				output = this.handlers.get(languange).call(obj, args);
 			} else {
-				output = this.errors.get("objectNotFound");
+				output = this.errorMessages.get("objectNotFound");
 			}
 
 			reply = reply.replace(matcher.group(0), output);
