@@ -27,6 +27,10 @@ import com.rivescript.ast.Root;
 import com.rivescript.ast.Topic;
 import com.rivescript.ast.Trigger;
 import com.rivescript.exception.DeepRecursionException;
+import com.rivescript.exception.NoDefaultTopicException;
+import com.rivescript.exception.RepliesNotSortedException;
+import com.rivescript.exception.ReplyNotFoundException;
+import com.rivescript.exception.ReplyNotMatchedException;
 import com.rivescript.lang.Java;
 import com.rivescript.macro.ObjectHandler;
 import com.rivescript.macro.Subroutine;
@@ -1276,7 +1280,11 @@ public class RiveScript {
 		// Needed to sort replies?
 		if (this.sorted.getTopics().size() == 0) {
 			logger.warn("You forgot to call sortReplies()!");
-			return this.errorMessages.get("repliesNotSorted");
+			String errorMessage = this.errorMessages.get("repliesNotSorted");
+			if (this.throwExceptions) {
+				throw new RepliesNotSortedException(errorMessage);
+			}
+			return errorMessage;
 		}
 
 		// Collect data on this user.
@@ -1308,7 +1316,11 @@ public class RiveScript {
 		// More topic sanity checking.
 		if (!this.topics.containsKey(topic)) {
 			// This was handled before, which would mean topic=random and it doesn't exist. Serious issue!
-			return this.errorMessages.get("defaultTopicNotFound");
+			String errorMessage = this.errorMessages.get("defaultTopicNotFound");
+			if (this.throwExceptions) {
+				throw new NoDefaultTopicException(errorMessage);
+			}
+			return errorMessage;
 		}
 
 		// Create a pointer for the matched data when we find it.
@@ -1556,9 +1568,17 @@ public class RiveScript {
 
 		// Still no reply?? Give up with the fallback error replies.
 		if (!foundMatch) {
-			reply = this.errorMessages.get("replyNotMatched");
+			String errorMessage = this.errorMessages.get("replyNotMatched");
+			if (this.throwExceptions) {
+				throw new ReplyNotFoundException(errorMessage);
+			}
+			reply = errorMessage;
 		} else if (reply == null || reply.length() == 0) {
-			reply = this.errorMessages.get("replyNotFound");
+			String errorMessage = this.errorMessages.get("replyNotFound");
+			if (this.throwExceptions) {
+				throw new ReplyNotMatchedException(errorMessage);
+			}
+			reply = errorMessage;
 		}
 
 		logger.debug("Reply: {}", reply);
