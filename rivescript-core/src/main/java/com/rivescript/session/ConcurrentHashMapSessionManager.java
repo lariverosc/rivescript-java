@@ -23,7 +23,6 @@
 package com.rivescript.session;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,9 +68,9 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	public void addHistory(String username, String input, String reply) {
 		UserData userData = init(username);
 		Collections.rotate(userData.getHistory().getInput(), 1); // Rotate right.
-		userData.getHistory().addInputFirst(input.trim());       // Now set the first item
+		userData.getHistory().addInput(input.trim());       // Now set the first item
 		Collections.rotate(userData.getHistory().getReply(), 1); // Rotate right.
-		userData.getHistory().addReplyFirst(reply.trim());       // Now set the first item.
+		userData.getHistory().addReply(reply.trim());       // Now set the first item.
 	}
 
 	@Override

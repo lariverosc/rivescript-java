@@ -234,7 +234,7 @@ public class RiveScript {
 		this.sorted = new SortBuffer();
 
 		// Set the default Java macro handler.
-		this.setHandler("java", new Java(this));
+		setHandler("java", new Java(this));
 	}
 
 	/**

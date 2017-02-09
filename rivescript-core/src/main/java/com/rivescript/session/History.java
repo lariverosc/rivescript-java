@@ -42,11 +42,11 @@ public class History {
 	private List<String> reply;
 
 	public History() {
-		input = new ArrayList<>();
-		reply = new ArrayList<>();
+		this.input = new ArrayList<>();
+		this.reply = new ArrayList<>();
 		for (int i = 0; i < HISTORY_SIZE; i++) {
-			input.add("undefined");
-			reply.add("undefined");
+			addInput("undefined");
+			addReply("undefined");
 		}
 	}
 
@@ -58,7 +58,7 @@ public class History {
 		return input.get(index);
 	}
 
-	public void addInputFirst(String input) {
+	public void addInput(String input) {
 		this.input.add(0, input);
 	}
 
@@ -70,7 +70,7 @@ public class History {
 		return reply.get(index);
 	}
 
-	public void addReplyFirst(String reply) {
+	public void addReply(String reply) {
 		this.reply.add(0, reply);
 	}
 }

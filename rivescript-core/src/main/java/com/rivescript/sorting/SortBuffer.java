@@ -35,10 +35,17 @@ import java.util.Map;
  */
 public class SortBuffer {
 
-	private Map<String, List<SortedTriggerEntry>> topics = new HashMap<>();
-	private Map<String, List<SortedTriggerEntry>> thats = new HashMap<>();
-	private List<String> sub = new ArrayList<>();
-	private List<String> person = new ArrayList<>();
+	private Map<String, List<SortedTriggerEntry>> topics;
+	private Map<String, List<SortedTriggerEntry>> thats;
+	private List<String> sub;
+	private List<String> person;
+
+	public SortBuffer() {
+		this.topics = new HashMap<>();
+		this.thats = new HashMap<>();
+		this.sub = new ArrayList<>();
+		this.person = new ArrayList<>();
+	}
 
 	public List<SortedTriggerEntry> getTopic(String name) {
 		return topics.get(name);

@@ -35,14 +35,25 @@ import java.util.Map;
  */
 public class SortTrack {
 
-	private Map<Integer, List<SortedTriggerEntry>> atomic = new HashMap<>(); // Sort by number of whole words
-	private Map<Integer, List<SortedTriggerEntry>> option = new HashMap<>(); // Sort optionals by number of words
-	private Map<Integer, List<SortedTriggerEntry>> alpha = new HashMap<>();  // Sort alpha wildcards by no. of words
-	private Map<Integer, List<SortedTriggerEntry>> number = new HashMap<>(); // Sort numeric wildcards by no. of words
-	private Map<Integer, List<SortedTriggerEntry>> wild = new HashMap<>();   // Sort wildcards by no. of words
-	private List<SortedTriggerEntry> pound = new ArrayList<>();              // Triggers of just '#'
-	private List<SortedTriggerEntry> under = new ArrayList<>();              // Triggers of just '_'
-	private List<SortedTriggerEntry> star = new ArrayList<>();               // Triggers of just '*'
+	private Map<Integer, List<SortedTriggerEntry>> atomic; // Sort by number of whole words
+	private Map<Integer, List<SortedTriggerEntry>> option; // Sort optionals by number of words
+	private Map<Integer, List<SortedTriggerEntry>> alpha;  // Sort alpha wildcards by no. of words
+	private Map<Integer, List<SortedTriggerEntry>> number; // Sort numeric wildcards by no. of words
+	private Map<Integer, List<SortedTriggerEntry>> wild;   // Sort wildcards by no. of words
+	private List<SortedTriggerEntry> pound;                // Triggers of just '#'
+	private List<SortedTriggerEntry> under;                // Triggers of just '_'
+	private List<SortedTriggerEntry> star;                 // Triggers of just '*'
+
+	public SortTrack() {
+		this.atomic = new HashMap<>();
+		this.option = new HashMap<>();
+		this.alpha = new HashMap<>();
+		this.number = new HashMap<>();
+		this.wild = new HashMap<>();
+		this.pound = new ArrayList<>();
+		this.under = new ArrayList<>();
+		this.star = new ArrayList<>();
+	}
 
 	public Map<Integer, List<SortedTriggerEntry>> getAtomic() {
 		return atomic;
