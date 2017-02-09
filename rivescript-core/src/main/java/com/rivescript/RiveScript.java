@@ -84,9 +84,9 @@ import static com.rivescript.regexp.Regexp.RE_USER_VAR;
 import static com.rivescript.regexp.Regexp.RE_WEIGHT;
 import static com.rivescript.regexp.Regexp.RE_ZERO_WITH_STAR;
 import static com.rivescript.session.History.HISTORY_SIZE;
-import static com.rivescript.util.StringUtils.quoteMeta;
+import static com.rivescript.util.StringUtils.countWords;
+import static com.rivescript.util.StringUtils.quoteMetacharacters;
 import static com.rivescript.util.StringUtils.stripNasties;
-import static com.rivescript.util.StringUtils.wordCount;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -999,7 +999,7 @@ public class RiveScript {
 				// Start inspecting the trigger's contents.
 				if (pattern.contains("_")) {
 					// Alphabetic wildcard included.
-					int count = wordCount(pattern, false);
+					int count = countWords(pattern, false);
 					logger.debug("Has a _ wildcard with {} words", count);
 					if (count > 0) {
 						if (!track.get(inherits).getAlpha().containsKey(count)) {
@@ -1011,7 +1011,7 @@ public class RiveScript {
 					}
 				} else if (pattern.contains("#")) {
 					// Numeric wildcard included.
-					int count = wordCount(pattern, false);
+					int count = countWords(pattern, false);
 					logger.debug("Has a # wildcard with {} words", count);
 					if (count > 0) {
 						if (!track.get(inherits).getNumber().containsKey(count)) {
@@ -1023,7 +1023,7 @@ public class RiveScript {
 					}
 				} else if (pattern.contains("*")) {
 					// Wildcard included.
-					int count = wordCount(pattern, false);
+					int count = countWords(pattern, false);
 					logger.debug("Has a * wildcard with {} words", count);
 					if (count > 0) {
 						if (!track.get(inherits).getWild().containsKey(count)) {
@@ -1035,7 +1035,7 @@ public class RiveScript {
 					}
 				} else if (pattern.contains("[")) {
 					// Optionals included.
-					int count = wordCount(pattern, false);
+					int count = countWords(pattern, false);
 					logger.debug("Has optionals with {} words", count);
 					if (!track.get(inherits).getOption().containsKey(count)) {
 						track.get(inherits).getOption().put(count, new ArrayList<SortedTriggerEntry>());
@@ -1043,7 +1043,7 @@ public class RiveScript {
 					track.get(inherits).getOption().get(count).add(trigger);
 				} else {
 					// Totally atomic.
-					int count = wordCount(pattern, false);
+					int count = countWords(pattern, false);
 					logger.debug("Totally atomic trigger with {} words", count);
 					if (!track.get(inherits).getAtomic().containsKey(count)) {
 						track.get(inherits).getAtomic().put(count, new ArrayList<SortedTriggerEntry>());
@@ -1098,7 +1098,7 @@ public class RiveScript {
 
 		// Loop through each item.
 		for (String item : list) {
-			int count = StringUtils.wordCount(item, true);
+			int count = StringUtils.countWords(item, true);
 			if (!track.containsKey(count)) {
 				track.put(count, new ArrayList<String>());
 			}
@@ -2038,7 +2038,7 @@ public class RiveScript {
 
 		for (String pattern : sorted) {
 			String result = subs.get(pattern);
-			String qm = quoteMeta(pattern);
+			String qm = quoteMetacharacters(pattern);
 
 			// Make a placeholder.
 			ph.add(result);
@@ -2143,13 +2143,14 @@ public class RiveScript {
 
 			// If this optional had a star or anything in it, make it non-matching.
 			String pipes = StringUtils.join(opts.toArray(new String[0]), "|");
-			pipes.replaceAll(StringUtils.quoteMeta("(.+?)"), "(?:.+?)");
-			pipes.replaceAll(StringUtils.quoteMeta("(\\d+?)"), "(?:\\\\d+?)");
-			pipes.replaceAll(StringUtils.quoteMeta("(\\w+?)"), "(?:\\\\w+?)");
+			pipes.replaceAll(StringUtils.quoteMetacharacters("(.+?)"), "(?:.+?)");
+			pipes.replaceAll(StringUtils.quoteMetacharacters("(\\d+?)"), "(?:\\\\d+?)");
+			pipes.replaceAll(StringUtils.quoteMetacharacters("(\\w+?)"), "(?:\\\\w+?)");
 
 			// Put the new text in.
 			pipes = "(?:" + pipes + "|(?:\\s|\\b)+)";
-			pattern = pattern.replaceAll("\\s*\\[" + StringUtils.quoteMeta(matcher.group(1)) + "\\]\\s*", StringUtils.quoteMeta(pipes));
+			pattern = pattern.replaceAll("\\s*\\[" + StringUtils.quoteMetacharacters(matcher.group(1)) + "\\]\\s*",
+					StringUtils.quoteMetacharacters(pipes));
 		}
 
 		// _ wildcards can't match numbers!

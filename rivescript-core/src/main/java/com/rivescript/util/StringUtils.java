@@ -22,6 +22,8 @@
 
 package com.rivescript.util;
 
+import com.rivescript.regexp.Regexp;
+
 import java.util.regex.Pattern;
 
 import static com.rivescript.regexp.Regexp.RE_NASTIES;
@@ -35,10 +37,38 @@ import static com.rivescript.regexp.Regexp.RE_NASTIES;
 public class StringUtils {
 
 	/**
+	 * Counts the number of words in a {@link String}.
+	 *
+	 * @param str the string to count
+	 * @param all count all
+	 * @return the number of words
+	 */
+	public static int countWords(String str, boolean all) {
+		if (str == null || str.length() == 0) {
+			return 0;
+		}
+		String[] words;
+		if (all) {
+			words = str.split("\\s+"); // Splits at whitespaces.
+		} else {
+			words = str.split("[\\s\\*\\#\\_\\|]+");
+		}
+
+		int count = 0;
+		for (String word : words) {
+			if (word.length() > 0) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	/**
 	 * Joins a {@link String} array into a single {@link String}.
 	 *
 	 * @param array     the array to join
-	 * @param delimiter the delimiter character to use, {@code null} treated as {@code ""}
+	 * @param delimiter the delimiter character to use, {@code null} is treated as {@code ""}
 	 */
 	public static String join(String[] array, String delimiter) {
 		if (array == null) {
@@ -58,54 +88,27 @@ public class StringUtils {
 	}
 
 	/**
-	 * Strips special characters out of a string.
+	 * Escapes a {@link String} for use in a regular expression.
 	 *
-	 * @param str TODO
-	 * @return
+	 * @param str the string to escape
+	 * @return the escaped string
 	 */
-	public static String stripNasties(String str) {
-		return RE_NASTIES.matcher(str).replaceAll("");
-	}
-
-	/**
-	 * Counts the number of words in a {@link String}.
-	 *
-	 * @param str the string to count
-	 * @param all count all
-	 * @return the number of words
-	 */
-	public static int wordCount(String str, boolean all) {
-		if (str == null || str.length() == 0) {
-			return 0;
-		}
-		String[] words;
-		if (all) {
-			words = str.split("\\s+");
-		} else {
-			words = str.split("[\\s\\*\\#\\_\\|]+");
-		}
-
-		int count = 0;
-		for (String word : words) {
-			if (word.length() > 0) {
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	/**
-	 * TODO
-	 *
-	 * @param str
-	 * @return
-	 */
-	public static String quoteMeta(String str) {
+	public static String quoteMetacharacters(String str) {
 		String[] unsafe = "\\.+*?[^]$(){}=!<>|:".split("");
 		for (String c : unsafe) {
 			str = str.replaceAll(Pattern.quote(c), "\\\\\\" + c);
 		}
 		return str;
+	}
+
+	/**
+	 * Strips special characters out of a {@link String}.
+	 *
+	 * @param str the string to strip
+	 * @return the stripped string
+	 * @see Regexp#RE_NASTIES
+	 */
+	public static String stripNasties(String str) {
+		return RE_NASTIES.matcher(str).replaceAll("");
 	}
 }
