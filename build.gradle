@@ -167,7 +167,7 @@ project("rivescript-core") {
 	description = "RiveScript Core"
 
 	dependencies {
-		compile "org.json:json:${jsonVersion}"
+		compileOnly "org.json:json:${jsonVersion}"
 	}
 }
 
