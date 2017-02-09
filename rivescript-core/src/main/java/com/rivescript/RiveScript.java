@@ -486,7 +486,7 @@ public class RiveScript {
 	 * <p>
 	 * Throws a {@link DeepRecursionException} in case throw exceptions is enabled, otherwise logs a warning.
 	 *
-	 * @param depth the recursion depth counter
+	 * @param depth   the recursion depth counter
 	 * @param message the message to log
 	 * @return whether deep recursion is detected
 	 * @throws DeepRecursionException in case deep recursion is detected and throw exceptions is enabled
