@@ -481,6 +481,16 @@ public class RiveScript {
 		return person.get(name);
 	}
 
+	/**
+	 * Checks whether deep recursion is detected.
+	 * <p>
+	 * Throws a {@link DeepRecursionException} in case throw exceptions is enabled, otherwise logs a warning.
+	 *
+	 * @param depth the recursion depth counter
+	 * @param message the message to log
+	 * @return whether deep recursion is detected
+	 * @throws DeepRecursionException in case deep recursion is detected and throw exceptions is enabled
+	 */
 	private boolean checkDeepRecursion(int depth, String message) throws DeepRecursionException {
 		if (depth > this.depth) {
 			logger.warn(message);
@@ -829,8 +839,7 @@ public class RiveScript {
 	 */
 	private List<SortedTriggerEntry> getTopicTriggers(String topic, boolean thats, int depth, int inheritance, boolean inherited) {
 		// Break if we're in too deep.
-		if (depth > this.depth) {
-			logger.warn("Deep recursion while scanning topic inheritance!");
+		if (checkDeepRecursion(depth, "Deep recursion while scanning topic inheritance!")) {
 			return new ArrayList<>();
 		}
 
@@ -1287,7 +1296,7 @@ public class RiveScript {
 		}
 
 		// Avoid deep recursion.
-		if (step > this.depth) {
+		if (checkDeepRecursion(step, "Deep recursion while getting reply!")) {
 			return this.errorMessages.get("deepRecursion");
 		}
 
@@ -1563,8 +1572,7 @@ public class RiveScript {
 			int giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > this.depth) {
-					logger.warn("Infinite loop looking for topic tag!");
+				if (checkDeepRecursion(giveup, "Infinite loop looking for topic tag!")) {
 					break;
 				}
 				String name = matcher.group(1);
@@ -1577,8 +1585,7 @@ public class RiveScript {
 			giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > this.depth) {
-					logger.warn("Infinite loop looking for set tag!");
+				if (checkDeepRecursion(giveup, "Infinite loop looking for set tag!")) {
 					break;
 				}
 				String name = matcher.group(1);
@@ -1662,8 +1669,7 @@ public class RiveScript {
 		Matcher matcher = re.matcher(reply);
 		int giveup = 0;
 		while (matcher.find()) {
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop looking for arrays in reply!");
+			if (checkDeepRecursion(giveup, "Infinite loop looking for arrays in reply!")) {
 				break;
 			}
 
@@ -1719,8 +1725,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop looking for random tag!");
+			if (checkDeepRecursion(giveup, "Infinite loop looking for random tag!")) {
 				break;
 			}
 
@@ -1748,8 +1753,7 @@ public class RiveScript {
 			giveup = 0;
 			while (matcher.find()) {
 				giveup++;
-				if (giveup > this.depth) {
-					logger.warn("Infinite loop looking for {} tag!", format);
+				if (checkDeepRecursion(giveup, "Infinite loop looking for {} tag!")) {
 					break;
 				}
 
@@ -1890,8 +1894,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop looking for topic tag!");
+			if (checkDeepRecursion(giveup, "Infinite loop looking for topic tag!")) {
 				break;
 			}
 
@@ -1905,8 +1908,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop looking for redirect tag!");
+			if (checkDeepRecursion(giveup, "Infinite loop looking for redirect tag!")) {
 				break;
 			}
 
@@ -1923,8 +1925,7 @@ public class RiveScript {
 		giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop looking for call tag!");
+			if (checkDeepRecursion(giveup, "Infinite loop looking for call tag!")) {
 				break;
 			}
 
@@ -1994,8 +1995,7 @@ public class RiveScript {
 		int tries = 0;
 		while (message.contains("\\x00")) {
 			tries++;
-			if (tries > this.depth) {
-				logger.warn("Too many loops in substitution placeholders!");
+			if (checkDeepRecursion(tries, "Too many loops in substitution placeholders!")) {
 				break;
 			}
 
@@ -2021,8 +2021,7 @@ public class RiveScript {
 	 */
 	private List<String> getTopicTree(String topic, int depth) {
 		// Break if we're in too deep.
-		if (depth > this.depth) {
-			logger.warn("Deep recursion while scanning topic tree!");
+		if (checkDeepRecursion(depth, "Deep recursion while scanning topic tree!")) {
 			return new ArrayList<>();
 		}
 
@@ -2071,8 +2070,7 @@ public class RiveScript {
 		int giveup = 0;
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
-				logger.warn("Infinite loop when trying to process optionals in a trigger!");
+			if (checkDeepRecursion(giveup, "Infinite loop when trying to process optionals in a trigger!")) {
 				return "";
 			}
 
@@ -2105,7 +2103,7 @@ public class RiveScript {
 		matcher = RE_ARRAY.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
+			if (checkDeepRecursion(giveup, "Infinite loop looking when trying to process arrays in a trigger!")) {
 				break;
 			}
 
@@ -2122,7 +2120,7 @@ public class RiveScript {
 		matcher = RE_BOT_VAR.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
+			if (checkDeepRecursion(giveup, "Infinite loop looking when trying to process bot variables in a trigger!")) {
 				break;
 			}
 
@@ -2139,7 +2137,7 @@ public class RiveScript {
 		matcher = RE_USER_VAR.matcher(pattern);
 		while (matcher.find()) {
 			giveup++;
-			if (giveup > this.depth) {
+			if (checkDeepRecursion(giveup, "Infinite loop looking when trying to process user variables in a trigger!")) {
 				break;
 			}
 
@@ -2159,7 +2157,7 @@ public class RiveScript {
 
 		while (pattern.contains("<input") || pattern.contains("<reply")) {
 			giveup++;
-			if (giveup > this.depth) {
+			if (checkDeepRecursion(giveup, "Infinite loop looking when trying to process input and reply tags in a trigger!")) {
 				break;
 			}
 
