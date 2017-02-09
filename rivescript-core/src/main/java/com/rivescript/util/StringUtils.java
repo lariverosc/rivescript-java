@@ -22,7 +22,6 @@
 
 package com.rivescript.util;
 
-import java.util.Comparator;
 import java.util.regex.Pattern;
 
 import static com.rivescript.regexp.Regexp.RE_NASTIES;
@@ -99,25 +98,6 @@ public class StringUtils {
 	/**
 	 * TODO
 	 *
-	 * @return
-	 */
-	public static Comparator<String> byLengthReverse() {
-		return new Comparator<String>() {
-
-			@Override
-			public int compare(String o1, String o2) {
-				int result = Integer.compare(o2.length(), o1.length());
-				if (result == 0) {
-					result = o1.compareTo(o2);
-				}
-				return result;
-			}
-		};
-	}
-
-	/**
-	 * TODO
-	 *
 	 * @param str
 	 * @return
 	 */
@@ -127,35 +107,5 @@ public class StringUtils {
 			str = str.replaceAll(Pattern.quote(c), "\\\\\\" + c);
 		}
 		return str;
-	}
-
-	/**
-	 * Formats a {@link String}.
-	 *
-	 * @return the formatted string.
-	 */
-	public static String stringFormat(String format, String text) {
-		if (format.equals("uppercase")) {
-			return text.toUpperCase();
-		} else if (format.equals("lowercase")) {
-			return text.toLowerCase();
-		} else if (format.equals("sentence")) {
-			if (text.length() > 1) {
-				return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
-			}
-			return text.toUpperCase();
-		} else if (format.equals("formal")) {
-			String[] words = text.split(" ");
-			for (int i = 0; i < words.length; i++) {
-				String word = words[i];
-				if (word.length() > 1) {
-					words[i] = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
-				} else {
-					words[i] = word.toUpperCase();
-				}
-			}
-			return join(words, " ");
-		}
-		return text;
 	}
 }

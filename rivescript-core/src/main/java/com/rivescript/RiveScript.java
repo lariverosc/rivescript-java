@@ -58,6 +58,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,6 @@ import static com.rivescript.regexp.Regexp.RE_USER_VAR;
 import static com.rivescript.regexp.Regexp.RE_WEIGHT;
 import static com.rivescript.regexp.Regexp.RE_ZERO_WITH_STAR;
 import static com.rivescript.session.History.HISTORY_SIZE;
-import static com.rivescript.util.StringUtils.byLengthReverse;
 import static com.rivescript.util.StringUtils.quoteMeta;
 import static com.rivescript.util.StringUtils.stripNasties;
 import static com.rivescript.util.StringUtils.wordCount;
@@ -1207,6 +1207,26 @@ public class RiveScript {
 		return sorted;
 	}
 
+
+	/**
+	 * TODO
+	 *
+	 * @return
+	 */
+	private Comparator<String> byLengthReverse() {
+		return new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				int result = Integer.compare(o2.length(), o1.length());
+				if (result == 0) {
+					result = o1.compareTo(o2);
+				}
+				return result;
+			}
+		};
+	}
+
 	/*---------------------*/
 	/*-- Reply Methods   --*/
 	/*---------------------*/
@@ -1778,11 +1798,32 @@ public class RiveScript {
 				}
 
 				String content = matcher.group(1);
-				String replace;
+				String replace = null;
 				if (format.equals("person")) {
 					replace = substitute(content, this.person, this.sorted.getPerson());
 				} else {
-					replace = StringUtils.stringFormat(format, content);
+					if (format.equals("uppercase")) {
+						replace = content.toUpperCase();
+					} else if (format.equals("lowercase")) {
+						replace = content.toLowerCase();
+					} else if (format.equals("sentence")) {
+						if (content.length() > 1) {
+							replace = content.substring(0, 1).toUpperCase() + content.substring(1).toLowerCase();
+						} else {
+							replace = content.toUpperCase();
+						}
+					} else if (format.equals("formal")) {
+						String[] words = content.split(" ");
+						for (int i = 0; i < words.length; i++) {
+							String word = words[i];
+							if (word.length() > 1) {
+								words[i] = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+							} else {
+								words[i] = word.toUpperCase();
+							}
+						}
+						replace = StringUtils.join(words, " ");
+					}
 				}
 
 				reply = reply.replace(matcher.group(0), replace);
