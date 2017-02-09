@@ -794,13 +794,13 @@ public class RiveScript {
 			List<SortedTriggerEntry> allTriggers = getTopicTriggers(topic, false, 0, 0, false);
 
 			// Sort these triggers.
-			this.sorted.getTopics().put(topic, sortTriggerSet(allTriggers, true));
+			this.sorted.addTopic(topic, sortTriggerSet(allTriggers, true));
 
 			// Get all of the %Previous triggers for this topic.
 			List<SortedTriggerEntry> thatTriggers = getTopicTriggers(topic, true, 0, 0, false);
 
 			// And sort them, too.
-			this.sorted.getThats().put(topic, sortTriggerSet(thatTriggers, false));
+			this.sorted.addThats(topic, sortTriggerSet(thatTriggers, false));
 		}
 
 		// Sort the substitution lists.
@@ -1363,7 +1363,7 @@ public class RiveScript {
 			for (String top : allTopics) {
 				logger.debug("Checking topic {} for any %Previous's", top);
 
-				if (this.sorted.getThats().get(top).size() > 0) {
+				if (this.sorted.getThats(top).size() > 0) {
 					logger.debug("There's a %Previous in this topic!");
 
 					// Get the bot's last reply to the user.
@@ -1375,7 +1375,7 @@ public class RiveScript {
 					logger.debug("Bot's last reply: {}", lastReply);
 
 					// See if it's a match.
-					for (SortedTriggerEntry trigger : this.sorted.getThats().get(top)) {
+					for (SortedTriggerEntry trigger : this.sorted.getThats(top)) {
 						String pattern = trigger.getPointer().getPrevious();
 						String botside = triggerRegexp(username, pattern);
 						logger.debug("Try to match lastReply {} to {} ({})", lastReply, pattern, botside);
@@ -1433,7 +1433,7 @@ public class RiveScript {
 		// Search their topic for a match to their trigger.
 		if (!foundMatch) {
 			logger.debug("Searching their topic for a match...");
-			for (SortedTriggerEntry trigger : this.sorted.getTopics().get(topic)) {
+			for (SortedTriggerEntry trigger : this.sorted.getTopic(topic)) {
 				String pattern = trigger.getTrigger();
 				String regexp = triggerRegexp(username, pattern);
 				logger.debug("Try to match \"{}\" against {} ({})", message, pattern, regexp);
@@ -1749,8 +1749,8 @@ public class RiveScript {
 		History history = this.sessions.getHistory(username);
 		if (history != null) {
 			for (int i = 1; i <= HISTORY_SIZE; i++) {
-				reply = reply.replaceAll("<input" + i + ">", history.getInput().get(i - 1));
-				reply = reply.replaceAll("<reply" + i + ">", history.getReply().get(i - 1));
+				reply = reply.replaceAll("<input" + i + ">", history.getInput(i - 1));
+				reply = reply.replaceAll("<reply" + i + ">", history.getReply(i - 1));
 			}
 		}
 
@@ -2228,8 +2228,8 @@ public class RiveScript {
 				String replyPattern = "<reply" + i + ">";
 				History history = this.sessions.getHistory(username);
 				if (history == null) {
-					pattern = pattern.replace(inputPattern, history.getInput().get(i - 1));
-					pattern = pattern.replace(replyPattern, history.getReply().get(i - 1));
+					pattern = pattern.replace(inputPattern, history.getInput(i - 1));
+					pattern = pattern.replace(replyPattern, history.getReply(i - 1));
 				} else {
 					pattern = pattern.replace(inputPattern, "undefined");
 					pattern = pattern.replace(replyPattern, "undefined");

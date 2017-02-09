@@ -40,20 +40,28 @@ public class SortBuffer {
 	private List<String> sub = new ArrayList<>();
 	private List<String> person = new ArrayList<>();
 
+	public List<SortedTriggerEntry> getTopic(String name) {
+		return topics.get(name);
+	}
+
 	public Map<String, List<SortedTriggerEntry>> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(Map<String, List<SortedTriggerEntry>> topics) {
-		this.topics = topics;
+	public void addTopic(String name, List<SortedTriggerEntry> triggers) {
+		topics.put(name, triggers);
+	}
+
+	public List<SortedTriggerEntry> getThats(String name) {
+		return thats.get(name);
 	}
 
 	public Map<String, List<SortedTriggerEntry>> getThats() {
 		return thats;
 	}
 
-	public void setThats(Map<String, List<SortedTriggerEntry>> thats) {
-		this.thats = thats;
+	public void addThats(String name, List<SortedTriggerEntry> triggers) {
+		thats.put(name, triggers);
 	}
 
 	public List<String> getSub() {

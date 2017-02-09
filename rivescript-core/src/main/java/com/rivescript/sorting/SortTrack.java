@@ -48,63 +48,31 @@ public class SortTrack {
 		return atomic;
 	}
 
-	public void setAtomic(Map<Integer, List<SortedTriggerEntry>> atomic) {
-		this.atomic = atomic;
-	}
-
 	public Map<Integer, List<SortedTriggerEntry>> getOption() {
 		return option;
-	}
-
-	public void setOption(Map<Integer, List<SortedTriggerEntry>> option) {
-		this.option = option;
 	}
 
 	public Map<Integer, List<SortedTriggerEntry>> getAlpha() {
 		return alpha;
 	}
 
-	public void setAlpha(Map<Integer, List<SortedTriggerEntry>> alpha) {
-		this.alpha = alpha;
-	}
-
 	public Map<Integer, List<SortedTriggerEntry>> getNumber() {
 		return number;
-	}
-
-	public void setNumber(Map<Integer, List<SortedTriggerEntry>> number) {
-		this.number = number;
 	}
 
 	public Map<Integer, List<SortedTriggerEntry>> getWild() {
 		return wild;
 	}
 
-	public void setWild(Map<Integer, List<SortedTriggerEntry>> wild) {
-		this.wild = wild;
-	}
-
 	public List<SortedTriggerEntry> getPound() {
 		return pound;
-	}
-
-	public void setPound(List<SortedTriggerEntry> pound) {
-		this.pound = pound;
 	}
 
 	public List<SortedTriggerEntry> getUnder() {
 		return under;
 	}
 
-	public void setUnder(List<SortedTriggerEntry> under) {
-		this.under = under;
-	}
-
 	public List<SortedTriggerEntry> getStar() {
 		return star;
-	}
-
-	public void setStar(List<SortedTriggerEntry> star) {
-		this.star = star;
 	}
 }

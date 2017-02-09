@@ -54,14 +54,14 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	@Override
 	public void set(String username, String name, String value) {
 		UserData userData = init(username);
-		userData.getVariables().put(name, value);
+		userData.setVariable(name, value);
 	}
 
 	@Override
 	public void set(String username, Map<String, String> vars) {
 		UserData userData = init(username);
 		for (Map.Entry<String, String> var : vars.entrySet()) {
-			userData.getVariables().put(var.getKey(), var.getValue());
+			userData.setVariable(var.getKey(), var.getValue());
 		}
 	}
 
@@ -69,9 +69,9 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	public void addHistory(String username, String input, String reply) {
 		UserData userData = init(username);
 		Collections.rotate(userData.getHistory().getInput(), 1); // Rotate right.
-		userData.getHistory().getInput().add(0, input.trim());   // Now set the first item
+		userData.getHistory().addInputFirst(input.trim());       // Now set the first item
 		Collections.rotate(userData.getHistory().getReply(), 1); // Rotate right.
-		userData.getHistory().getReply().add(0, reply.trim());   // Now set the first item.
+		userData.getHistory().addReplyFirst(reply.trim());       // Now set the first item.
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 		if (!users.containsKey(username)) {
 			return null;
 		}
-		return users.get(username).getVariables().get(name);
+		return users.get(username).getVariable(name);
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	private UserData defaultSession() {
 		UserData userData = new UserData();
-		userData.getVariables().put("topic", "random");
+		userData.setVariable("topic", "random");
 		userData.setLastMatch("");
 		return userData;
 	}

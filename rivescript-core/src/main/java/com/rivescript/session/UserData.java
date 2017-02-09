@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO
+ * {@code UserData} is a container for user variables.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
@@ -42,12 +42,16 @@ public class UserData {
 		this.history = new History();
 	}
 
+	public String getVariable(String name) {
+		return variables.get(name);
+	}
+
 	public Map<String, String> getVariables() {
 		return variables;
 	}
 
-	public void setVariables(Map<String, String> variables) {
-		this.variables = variables;
+	public void setVariable(String name, String value) {
+		variables.put(name, value);
 	}
 
 	public String getLastMatch() {
@@ -60,9 +64,5 @@ public class UserData {
 
 	public History getHistory() {
 		return history;
-	}
-
-	public void setHistory(History history) {
-		this.history = history;
 	}
 }

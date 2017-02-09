@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO
+ * {@code History} keeps track of recent input and reply history.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
@@ -54,15 +54,23 @@ public class History {
 		return input;
 	}
 
-	public void setInput(List<String> input) {
-		this.input = input;
+	public String getInput(int index) {
+		return input.get(index);
+	}
+
+	public void addInputFirst(String input) {
+		this.input.add(0, input);
 	}
 
 	public List<String> getReply() {
 		return reply;
 	}
 
-	public void setReply(List<String> reply) {
-		this.reply = reply;
+	public String getReply(int index) {
+		return reply.get(index);
+	}
+
+	public void addReplyFirst(String reply) {
+		this.reply.add(0, reply);
 	}
 }
