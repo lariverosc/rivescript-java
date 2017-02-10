@@ -25,7 +25,7 @@ package com.rivescript.exception;
 import com.rivescript.RiveScriptException;
 
 /**
- * TODO
+ * Thrown to indicate the replies are not sorted.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk

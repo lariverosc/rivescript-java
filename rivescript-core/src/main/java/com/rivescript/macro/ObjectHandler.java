@@ -23,14 +23,29 @@
 package com.rivescript.macro;
 
 /**
- * TODO see ZzObjectHandler
+ * Interface for RiveScript object handlers.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
  */
 public interface ObjectHandler {
 
-	boolean load(String name, String[] code);
+	/**
+	 * Handler for when object code is read (loaded) by RiveScript.
+	 *
+	 * @param name the name of the object
+	 * @param code the source code inside the object
+	 */
+	void load(String name, String[] code);
 
+	/**
+	 * Handler for when a user invokes the object. Should return the {@link String} result from the object.
+	 * <p>
+	 * This code is executed when a {@code <call>} tag in a RiveScript reply wants to call your object macro.
+	 *
+	 * @param name   the name of the object being called
+	 * @param fields the argument list from the call tag
+	 * @return the result
+	 */
 	String call(String name, String[] fields);
 }

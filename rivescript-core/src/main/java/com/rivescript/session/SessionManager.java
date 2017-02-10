@@ -22,10 +22,19 @@
 
 package com.rivescript.session;
 
+import com.rivescript.RiveScript;
+
 import java.util.Map;
 
 /**
- * TODO
+ * Interface for RiveScript user user variables.
+ * <p>
+ * The session manager keeps track of getting and setting user variables, for example when the {@code <set>} or {@code <get>`} tags are used
+ * in RiveScript or when API functions like {@link RiveScript#setUservar(String, String, String)} are called.
+ * <p>
+ * By default RiveScript stores user sessions in memory and provides methods to export and import them (e.g. to persist them when the bot
+ * shuts down so they can be reloaded). If you'd prefer a more 'active' session storage, for example one that puts user variables into a
+ * database or cache, you can create your own session manager that implements this interface.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
@@ -85,6 +94,7 @@ public interface SessionManager {
 
 	/**
 	 * Returns all variables for a user.
+	 * // TODO rename method?
 	 *
 	 * @param username the username
 	 * @return the user data

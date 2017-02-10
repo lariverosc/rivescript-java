@@ -1209,9 +1209,10 @@ public class RiveScript {
 
 
 	/**
-	 * TODO
+	 * Returns a {@link Comparator<String>} to sort a list of {@link String}s by reverse length.
+	 * Strings with equal length will be sorted alphabetically (natural ordering).
 	 *
-	 * @return
+	 * @return the comparator
 	 */
 	private Comparator<String> byLengthReverse() {
 		return new Comparator<String>() {
@@ -2021,9 +2022,9 @@ public class RiveScript {
 	/**
 	 * Applies a substitution to an input message.
 	 *
-	 * @param message TODO
-	 * @param subs
-	 * @param sorted
+	 * @param message the input message
+	 * @param subs the substitution map
+	 * @param sorted the substitution list
 	 * @return the substituted message
 	 */
 	private String substitute(String message, Map<String, String> subs, List<String> sorted) {
@@ -2076,9 +2077,9 @@ public class RiveScript {
 	 * plus all the topics included or inherited by those topics, and so on).
 	 * The array includes the original topic, too.
 	 *
-	 * @param topic TODO
-	 * @param depth TODO
-	 * @return
+	 * @param topic the name of the topic
+	 * @param depth the recursion depth counter
+	 * @return the list of topic names
 	 */
 	private List<String> getTopicTree(String topic, int depth) {
 		// Break if we're in too deep.
@@ -2101,9 +2102,9 @@ public class RiveScript {
 	/**
 	 * Prepares a trigger pattern for the regular expression engine.
 	 *
-	 * @param username TODO
-	 * @param pattern
-	 * @return
+	 * @param username the username
+	 * @param pattern the pattern
+	 * @return the regular expression trigger pattern
 	 */
 	private String triggerRegexp(String username, String pattern) {
 		// If the trigger is simply '*' then the * needs to become (.*?) to match the blank string too.
@@ -2248,8 +2249,8 @@ public class RiveScript {
 	/**
 	 * Returns whether a trigger is atomic or not.
 	 *
-	 * @param pattern TODO
-	 * @return
+	 * @param pattern the pattern
+	 * @return whether the pattern is atmonic or not
 	 */
 	private boolean isAtomic(String pattern) {
 		// Atomic triggers don't contain any wildcards or parenthesis or anything of the sort.

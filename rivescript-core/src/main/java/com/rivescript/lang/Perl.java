@@ -45,44 +45,36 @@ import static java.util.Objects.requireNonNull;
  */
 public class Perl implements ObjectHandler {
 
-	private RiveScript parent; // Parent RS object
-	private String rsp4j; // Path to the Perl script
+	private RiveScript rs;                 // Parent RiveScript instance object
+	private String rsp4j;                  // Path to the Perl script
 	private HashMap<String, String> codes; // Object codes
 
 	/**
 	 * Creates a Perl {@link ObjectHandler}. Must take the path to the rsp4j script as its argument.
 	 *
-	 * @param rivescript The RiveScript instance, not null.
-	 * @param rsp4j      The path to the rsp4j script (either in .pl or .exe format), not null.
+	 * @param rs    the RiveScript instance, not null.
+	 * @param rsp4j the path to the rsp4j script (either in .pl or .exe format), not null.
 	 */
-	public Perl(RiveScript rivescript, String rsp4j) {
-		this.parent = requireNonNull(rivescript, "'rivescript' must not be null");
+	public Perl(RiveScript rs, String rsp4j) {
+		this.rs = requireNonNull(rs, "'rs' must not be null");
 		this.rsp4j = requireNonNull(rsp4j, "'rsp4j' must not be null");
 		this.codes = new HashMap<>();
 	}
 
 	/**
-	 * Handler for when object code is read (loaded) by RiveScript. Should return {@code true} for
-	 * success or {@code false} to indicate error.
-	 *
-	 * @param name The name of the object.
-	 * @param code The source code inside the object.
+	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean load(String name, String[] code) {
+	public void load(String name, String[] code) {
 		codes.put(name, StringUtils.join(code, "\n"));
-		return true;
 	}
 
 	/**
-	 * Handler for when a user invokes the object. Should return the text reply from the object.
-	 *
-	 * @param name   The name of the object being called.
-	 * @param fields The argument list from the call tag.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public String call(String name, String[] fields) {
-		String user = parent.currentUser();
+		String user = rs.currentUser();
 		// Prepare JSON data to send.
 		try {
 			JSONObject json = new JSONObject();
@@ -94,7 +86,7 @@ public class Perl implements ObjectHandler {
 
 			// Transcode the user's data into a JSON object.
 			JSONObject vars = new JSONObject();
-			Map<String, String> data = parent.getUservars(user).getVariables();
+			Map<String, String> data = rs.getUservars(user).getVariables();
 			Iterator it = data.keySet().iterator();
 			while (it.hasNext()) {
 				String key = it.next().toString();
@@ -145,7 +137,7 @@ public class Perl implements ObjectHandler {
 			String[] keys = reply.getNames(newVars);
 			for (int i = 0; i < keys.length; i++) {
 				String value = newVars.getString(keys[i]);
-				parent.setUservar(user, keys[i], value);
+				rs.setUservar(user, keys[i], value);
 			}
 
 			// OK. Get the reply.

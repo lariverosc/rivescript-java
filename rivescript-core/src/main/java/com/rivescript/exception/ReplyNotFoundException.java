@@ -25,7 +25,7 @@ package com.rivescript.exception;
 import com.rivescript.RiveScriptException;
 
 /**
- * TODO
+ * Thrown to indicate no reply was found.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk

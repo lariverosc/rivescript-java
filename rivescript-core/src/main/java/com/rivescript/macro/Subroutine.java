@@ -33,11 +33,11 @@ import com.rivescript.RiveScript;
 public interface Subroutine {
 
 	/**
-	 * TODO
+	 * The implemenatation of the Java object macro. Should return the {@link String} result from the object.
 	 *
-	 * @param rivescript
-	 * @param args
-	 * @return
+	 * @param rs   the reference to the parent RiveScript instance
+	 * @param args the argument list from the call tag
+	 * @return the result
 	 */
-	String call(RiveScript rivescript, String[] args);
+	String call(RiveScript rs, String[] args);
 }
