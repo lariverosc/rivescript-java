@@ -54,7 +54,7 @@ import static com.rivescript.cmd.Runner.Color.YELLOW;
  * <li>{@code --nostrict} Disable strict syntax checking
  * <li>{@code --utf8} Enable UTF-8 mode
  * <li>{@code --forcecase} Enable forcing triggers to lowercase
- * <li>{@code --depth=50} Override the recursion depth limit (default 50)
+ * <li>{@code --depth=50} Override the recursion depth limit (default {@code 50})
  * <li>{@code --nocolor} Disable ANSI colors
  * </ul>
  *
