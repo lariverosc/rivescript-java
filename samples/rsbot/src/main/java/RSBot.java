@@ -40,6 +40,10 @@ public class RSBot extends Runner {
 	}
 
 	public static void main(String[] args) {
+		if (args.length == 0) {
+			String path = RSBot.class.getClassLoader().getResource("rivescript").getFile();
+			args = new String[] { path };
+		}
 		new RSBot().run(args);
 	}
 }
