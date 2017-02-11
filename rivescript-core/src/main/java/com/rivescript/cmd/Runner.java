@@ -22,13 +22,185 @@
 
 package com.rivescript.cmd;
 
+import com.rivescript.Config;
+import com.rivescript.RiveScript;
+import com.rivescript.RiveScriptException;
+import com.rivescript.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import static com.rivescript.Config.DEFAULT_DEPTH;
+import static com.rivescript.cmd.Runner.Color.GREEN;
+import static com.rivescript.cmd.Runner.Color.RED;
+import static com.rivescript.cmd.Runner.Color.YELLOW;
+
 /**
- * TODO
+ * Stand-alone RiveScript Interpreter.
+ * <p>
+ * This is an example program included with the RiveScript Java library. It serves as a way to quickly demo and test a RiveScript bot.
+ * <p>
+ * Usage: {@code java com.rivescript.cmd.Runner [options] </path/to/documents>}
+ * <p>
+ * Options:
+ * <ul>
+ * <li>{@code --nostrict} Disable strict syntax checking
+ * <li>{@code --utf8} Enable UTF-8 mode
+ * <li>{@code --forcecase} Enable forcing triggers to lowercase
+ * <li>{@code --depth=50} Override the recursion depth limit (default 50)
+ * <li>{@code --nocolor} Disable ANSI colors
+ * </ul>
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
  */
 public class Runner {
 
-	// TODO
+	public static void main(String[] args) {
+
+		boolean strict = true;
+		boolean utf8 = false;
+		boolean forceCase = false;
+		int depth = DEFAULT_DEPTH;
+		boolean noColor = false;
+
+		// Collect command line arguments.
+		List<String> arguments = new ArrayList<>(Arrays.asList(args));
+		Iterator<String> i = arguments.iterator();
+		while (i.hasNext()) {
+			String argument = i.next();
+			if (argument.charAt(0) == '-') {
+				String flag = argument.replaceAll("^-*", "").trim();
+				if (flag.equals("version")) {
+					System.out.println("RiveScript-Java version " + RiveScript.getVersion());
+					System.exit(0);
+				} else if (flag.equals("nostrict")) {
+					strict = false;
+				} else if (flag.equals("utf8")) {
+					utf8 = true;
+				} else if (flag.equals("forcecase")) {
+					forceCase = true;
+				} else if (flag.startsWith("depth")) {
+					depth = Integer.parseInt(flag.split("=", 2)[1]);
+				} else if (flag.equals("nocolor")) {
+					noColor = true;
+				}
+				i.remove();
+			}
+		}
+
+		if (arguments.size() == 0) {
+			System.err.println("Usage: java com.rivescript.cmd.Runner [options] </path/to/documents>");
+			System.exit(0);
+		}
+
+		String root = arguments.get(0);
+
+		Config config = Config.newBuilder()
+				.throwExceptions(true)
+				.strict(strict)
+				.utf8(utf8)
+				.forceCase(forceCase)
+				.depth(depth)
+				.build();
+
+		// Initialize the bot.
+		RiveScript bot = new RiveScript(config);
+		init(bot);
+
+		// Load the target directory.
+		bot.loadDirectory(root);
+
+		bot.sortReplies();
+
+		System.out.println(""
+				+ "      .   .       \n"
+				+ "     .:...::      RiveScript Interpreter (Java)\n"
+				+ "    .::   ::.     Library Version: " + RiveScript.getVersion() + "\n"
+				+ " ..:;;. ' .;;:..  \n"
+				+ "    .  '''  .     Type '/quit' to quit.\n"
+				+ "     :;,:,;:      Type '/help' for more options.\n"
+				+ "     :     :      \n"
+				+ "\n"
+				+ "Using the RiveScript bot found in: " + root + "\n"
+				+ "Type a message to the bot and press Return to send it.");
+
+		// Enter the main loop.
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			print(YELLOW, noColor, "You>");
+			String text = "";
+			try {
+				text = stdin.readLine();
+			} catch (IOException e) {
+				print(RED, noColor, "Read error!");
+			}
+			text = text.trim();
+			if (text.length() == 0) {
+				continue;
+			}
+
+			if (text.startsWith("/help")) {
+				help();
+			} else if (text.startsWith("/quit")) {
+				System.exit(0);
+			} else if (text.startsWith("/dump t")) {
+				bot.dumpTopics();
+			} else if (text.startsWith("/dump s")) {
+				bot.dumpSorted();
+			} else {
+				try {
+					String reply = bot.reply("localuser", text);
+					print(GREEN, noColor, "RiveScript>", reply, "\n");
+				} catch (RiveScriptException e) {
+					print(RED, noColor, "Error>", e.getMessage(), "\n");
+				}
+			}
+		}
+	}
+
+	protected static void init(RiveScript rs) {
+	}
+
+	enum Color {
+
+		RED("1"),
+		YELLOW("3"),
+		GREEN("2");
+
+		private String code;
+
+		Color(String code) {
+			this.code = code;
+		}
+
+		public String getCode() {
+			return code;
+		}
+	}
+
+	private static void print(Color color, boolean noColor, String... text) {
+		if (noColor) {
+			System.out.print(StringUtils.join(text, " "));
+		} else {
+			System.out.print(String.format("\u001B[3%sm%s\u001B[0m %s", color.getCode(), text[0],
+					StringUtils.join(Arrays.copyOfRange(text, 1, text.length), " ")));
+		}
+	}
+
+	private static void help() {
+		System.out.println(""
+				+ "Supported commands:\n"
+				+ "- /help\n"
+				+ "    Show this text.\n"
+				+ "- /quit\n"
+				+ "    Exit the program.\n"
+				+ "- /dump <topics|sorted>\n"
+				+ "    For debugging purposes, dump the topic and sorted trigger trees.");
+	}
 }
