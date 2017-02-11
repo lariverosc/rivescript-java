@@ -69,6 +69,11 @@ public class Runner {
 	private int depth = DEFAULT_DEPTH;
 	private boolean noColor = false;
 
+	/**
+	 * Runs the RiveScript bot.
+	 *
+	 * @param args the arguments
+	 */
 	protected void run(String[] args) {
 
 		// Collect command line arguments.
@@ -166,9 +171,19 @@ public class Runner {
 		}
 	}
 
+	/**
+	 * Initializes the RiveScript instance.
+	 * <p>
+	 * Override this method to define additional language handlers or Java object macro's.
+	 *
+	 * @param rs the RiveScript instance
+	 */
 	protected void init(RiveScript rs) {
 	}
 
+	/**
+	 * The color names.
+	 */
 	protected enum Color {
 
 		RED("1"),
@@ -187,6 +202,12 @@ public class Runner {
 		}
 	}
 
+	/**
+	 * Prints colored text.
+	 *
+	 * @param color the color
+	 * @param text  the text
+	 */
 	protected void print(Color color, String... text) {
 		if (noColor) {
 			System.out.print(StringUtils.join(text, " "));
