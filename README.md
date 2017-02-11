@@ -61,7 +61,7 @@ These commands may be used at your input prompt in RSBot:
 To execute `RSBot` to begin chatting with the demo Eliza-based bot that
 tends to ship with RiveScript libraries run:
 
-    ./gradlew :rivescript-samples-rsbot:runApp --console plain
+    ./gradlew :rivescript-samples-rsbot:runBot --console plain
 
 ## Unit Testing
 

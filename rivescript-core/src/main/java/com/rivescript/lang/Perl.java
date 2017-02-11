@@ -25,9 +25,11 @@ package com.rivescript.lang;
 import com.rivescript.RiveScript;
 import com.rivescript.macro.ObjectHandler;
 import com.rivescript.util.StringUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -104,8 +106,7 @@ public class Perl implements ObjectHandler {
 			try {
 				Process p = Runtime.getRuntime().exec(this.rsp4j + " --java");
 				OutputStream stdIn = p.getOutputStream();
-				BufferedReader stdOut =
-						new BufferedReader(new InputStreamReader(p.getInputStream()));
+				BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 				// Send it the JSON-in.
 				stdIn.write(outgoing.getBytes());
@@ -119,7 +120,7 @@ public class Perl implements ObjectHandler {
 					result.add(line);
 				}
 				incoming = StringUtils.join(result.toArray(new String[0]), "\n");
-			} catch (java.io.IOException e) {
+			} catch (IOException e) {
 				System.err.println("IOException error in " + this.getClass().getCanonicalName() + ": " + e.getMessage());
 				return "[ERR: IOException: " + e.getMessage() + "]";
 			}
@@ -143,7 +144,7 @@ public class Perl implements ObjectHandler {
 			// OK. Get the reply.
 			return reply.getString("reply");
 
-		} catch (org.json.JSONException e) {
+		} catch (JSONException e) {
 			System.err.println("JSONException in " + this.getClass().getCanonicalName() + ": " + e.getMessage());
 			return "[ERR: JSONException: " + e.getMessage() + "]";
 		}

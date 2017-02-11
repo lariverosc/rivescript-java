@@ -90,13 +90,16 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	@Override
 	public UserData getAny(String username) {
 		// TODO
-		return null;
+		if (!users.containsKey(username)) {
+			return null;
+		}
+		return users.get(username);
 	}
 
 	@Override
 	public Map<String, UserData> getAll() {
 		// TODO
-		return null;
+		return users;
 	}
 
 	@Override

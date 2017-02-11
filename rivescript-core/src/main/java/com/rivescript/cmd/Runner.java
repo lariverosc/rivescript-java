@@ -45,7 +45,9 @@ import static com.rivescript.cmd.Runner.Color.YELLOW;
  * <p>
  * This is an example program included with the RiveScript Java library. It serves as a way to quickly demo and test a RiveScript bot.
  * <p>
- * Usage: {@code java com.rivescript.cmd.Runner [options] </path/to/documents>}
+ * Usage:
+ * <p>
+ * {@code java com.rivescript.cmd.Runner [options] </path/to/documents>}
  * <p>
  * Options:
  * <ul>
@@ -61,13 +63,13 @@ import static com.rivescript.cmd.Runner.Color.YELLOW;
  */
 public class Runner {
 
-	public static void main(String[] args) {
+	private boolean strict = true;
+	private boolean utf8 = false;
+	private boolean forceCase = false;
+	private int depth = DEFAULT_DEPTH;
+	private boolean noColor = false;
 
-		boolean strict = true;
-		boolean utf8 = false;
-		boolean forceCase = false;
-		int depth = DEFAULT_DEPTH;
-		boolean noColor = false;
+	protected void run(String[] args) {
 
 		// Collect command line arguments.
 		List<String> arguments = new ArrayList<>(Arrays.asList(args));
@@ -133,12 +135,12 @@ public class Runner {
 		// Enter the main loop.
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		while (true) {
-			print(YELLOW, noColor, "You>");
+			print(YELLOW, "You>");
 			String text = "";
 			try {
 				text = stdin.readLine();
 			} catch (IOException e) {
-				print(RED, noColor, "Read error!");
+				print(RED, "Read error!");
 			}
 			text = text.trim();
 			if (text.length() == 0) {
@@ -156,22 +158,23 @@ public class Runner {
 			} else {
 				try {
 					String reply = bot.reply("localuser", text);
-					print(GREEN, noColor, "RiveScript>", reply, "\n");
+					print(GREEN, "RiveScript>", reply, "\n");
 				} catch (RiveScriptException e) {
-					print(RED, noColor, "Error>", e.getMessage(), "\n");
+					print(RED, "Error>", e.getMessage(), "\n");
 				}
 			}
 		}
 	}
 
-	protected static void init(RiveScript rs) {
+	protected void init(RiveScript rs) {
 	}
 
-	enum Color {
+	protected enum Color {
 
 		RED("1"),
 		YELLOW("3"),
-		GREEN("2");
+		GREEN("2"),
+		CYAN("6");
 
 		private String code;
 
@@ -184,7 +187,7 @@ public class Runner {
 		}
 	}
 
-	private static void print(Color color, boolean noColor, String... text) {
+	protected void print(Color color, String... text) {
 		if (noColor) {
 			System.out.print(StringUtils.join(text, " "));
 		} else {
@@ -193,7 +196,7 @@ public class Runner {
 		}
 	}
 
-	private static void help() {
+	private void help() {
 		System.out.println(""
 				+ "Supported commands:\n"
 				+ "- /help\n"
@@ -202,5 +205,9 @@ public class Runner {
 				+ "    Exit the program.\n"
 				+ "- /dump <topics|sorted>\n"
 				+ "    For debugging purposes, dump the topic and sorted trigger trees.");
+	}
+
+	public static void main(String[] args) {
+		new Runner().run(args);
 	}
 }
