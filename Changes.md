@@ -6,11 +6,11 @@ This documents the history of significant changes to `rivescript-java`.
 
 This update focuses on new features and code reorganization.
 
-* **API Breaking Changes**
+* **API Breaking Changes:**
   * A
   * B
 
-* **Changes**
+* **Changes:**
   * C
   * D
 
