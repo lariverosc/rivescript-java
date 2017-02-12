@@ -9,7 +9,13 @@ The `rivescript-java` implementations has been aligned with the `rivescript-go`
 implementation.
 
 * **API Breaking Changes:**
-  * TODO
+  * Removed `RiveScript(boolean debug)` constructor in favour of 
+    `RiveScript(Config config)` constructor .
+  * The `RiveScript` instance has no notion of `debug` mode anymore.
+    Debug logging is now based on the SLF4J configuration.
+  * Replaced `com.rivescript.ObjectMacro` with `com.rivescript.macro.Subroutine`.
+  * Renamed `ObjectHandler` methods from `onLoad`, `onCall` to respectively 
+    `load` and `call`. Also the `setClass` method has been removed.
 
 * **Changes:**
   * Replace `System.out` logging by using the SLF4J API.

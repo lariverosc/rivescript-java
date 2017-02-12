@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TODO
+ * Implements the default in-memory session store for RiveScript, based on a {@link ConcurrentHashMap}.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk
@@ -68,9 +68,9 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	public void addHistory(String username, String input, String reply) {
 		UserData userData = init(username);
 		Collections.rotate(userData.getHistory().getInput(), 1); // Rotate right.
-		userData.getHistory().addInput(input.trim());       // Now set the first item
+		userData.getHistory().addInput(input.trim());            // Now set the first item
 		Collections.rotate(userData.getHistory().getReply(), 1); // Rotate right.
-		userData.getHistory().addReply(reply.trim());       // Now set the first item.
+		userData.getHistory().addReply(reply.trim());            // Now set the first item.
 	}
 
 	@Override
@@ -89,7 +89,6 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	@Override
 	public UserData get(String username) {
-		// TODO
 		if (!users.containsKey(username)) {
 			return null;
 		}
@@ -98,7 +97,6 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	@Override
 	public Map<String, UserData> getAll() {
-		// TODO
 		return users;
 	}
 
