@@ -21,14 +21,14 @@
  */
 
 import com.rivescript.RiveScript;
-import com.rivescript.cmd.Runner;
+import com.rivescript.cmd.Shell;
 import com.rivescript.lang.Perl;
 import java.io.File;
 
 /**
  * @author Noah Petherbridge
  */
-public class RSBot extends Runner {
+public class RSBot extends Shell {
 
 	@Override
 	protected void init(RiveScript bot) {

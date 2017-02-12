@@ -36,9 +36,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.rivescript.Config.DEFAULT_DEPTH;
-import static com.rivescript.cmd.Runner.Color.GREEN;
-import static com.rivescript.cmd.Runner.Color.RED;
-import static com.rivescript.cmd.Runner.Color.YELLOW;
+import static com.rivescript.cmd.Shell.Color.GREEN;
+import static com.rivescript.cmd.Shell.Color.RED;
+import static com.rivescript.cmd.Shell.Color.YELLOW;
 
 /**
  * Stand-alone RiveScript Interpreter.
@@ -47,7 +47,7 @@ import static com.rivescript.cmd.Runner.Color.YELLOW;
  * <p>
  * Usage:
  * <p>
- * {@code java com.rivescript.cmd.Runner [options] </path/to/documents>}
+ * {@code java com.rivescript.cmd.Shell [options] </path/to/documents>}
  * <p>
  * Options:
  * <ul>
@@ -61,7 +61,7 @@ import static com.rivescript.cmd.Runner.Color.YELLOW;
  * @author Noah Petherbridge
  * @author Marcel Overdijk
  */
-public class Runner {
+public class Shell {
 
 	private boolean strict = true;
 	private boolean utf8 = false;
@@ -102,7 +102,7 @@ public class Runner {
 		}
 
 		if (arguments.size() == 0) {
-			System.err.println("Usage: java com.rivescript.cmd.Runner [options] </path/to/documents>");
+			System.err.println("Usage: java com.rivescript.cmd.Shell [options] </path/to/documents>");
 			System.exit(0);
 		}
 
@@ -229,6 +229,6 @@ public class Runner {
 	}
 
 	public static void main(String[] args) {
-		new Runner().run(args);
+		new Shell().run(args);
 	}
 }

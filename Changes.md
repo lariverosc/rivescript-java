@@ -4,16 +4,38 @@ This documents the history of significant changes to `rivescript-java`.
 
 ## v0.8.0 - TBD, 2017
 
-This update focuses on new features and code reorganization.
+This update focuses on new features and huge code refactoring / reorganization.
+The `rivescript-java` implementations has been aligned with the `rivescript-go`
+implementation.
 
 * **API Breaking Changes:**
-  * A
-  * B
+  * TODO
 
 * **Changes:**
-  * C
-  * D
-
+  * Replace `System.out` logging by using the SLF4J API.
+  * Add Unicode support (#30, #31).
+  * Add new forceCase config option, which will force-lowercase your triggers
+    during parse time, enabling authors to use uppercase letters in triggers 
+    without it being a syntax error. Do note however that Unicode case folding 
+    can become an issue with certain symbols.
+  * Add customizable error messages config option.
+  * Add throw exceptions config option, which will make the bot throw (runtime)
+    exceptions (e.g. `DeepRecursionException`, `ReplyNotFoundException`)  
+    in case of an error instead of just replying with an error message. 
+    When enabled, developers should catch these exceptions and take the 
+    appropriate actions.
+  * The `RiveScript` constructor now accepts a `Config` object to configure
+    the RiveScript instance. Also a developer `Config.Builder` is available.  
+  * Add support for pluggable session stores for user variables. The default
+    one still keeps user variables in memory, but you can specify your own
+    implementation instead (#33).
+  * Add RiveScript shell to quickly demo and test a RiveScript bot.
+    See `com.rivescript.cmd.Shell`.
+  * Separated the `Parser` which can now be used independently.
+    The parser returns a Abstract Syntax Tree (AST) identical to the 
+    `rivescript-go` parser. It enables third party developers to write 
+    applications that simply parse RiveScript code and getting an AST from it.
+  * Fix for sorting %Previous triggers (#9).
 
 ## v0.7.2 - January 17, 2017
 
