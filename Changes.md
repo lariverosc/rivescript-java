@@ -35,6 +35,8 @@ implementation.
     The parser returns a Abstract Syntax Tree (AST) identical to the 
     `rivescript-go` parser. It enables third party developers to write 
     applications that simply parse RiveScript code and getting an AST from it.
+  * Add option to load RiveScript source code from a `java.io.File` or 
+    `java.nio.file.Path`.
   * Fix for sorting %Previous triggers (#9).
 
 ## v0.7.2 - January 17, 2017
