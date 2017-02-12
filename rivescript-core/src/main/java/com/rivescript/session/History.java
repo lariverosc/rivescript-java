@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code History} keeps track of recent input and reply history.
+ * Container to keep track of recent input and reply history.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk

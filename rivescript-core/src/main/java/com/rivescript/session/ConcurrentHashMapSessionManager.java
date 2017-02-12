@@ -88,7 +88,7 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 	}
 
 	@Override
-	public UserData getAny(String username) {
+	public UserData get(String username) {
 		// TODO
 		if (!users.containsKey(username)) {
 			return null;

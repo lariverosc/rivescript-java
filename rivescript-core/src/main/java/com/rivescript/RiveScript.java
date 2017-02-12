@@ -2314,7 +2314,7 @@ public class RiveScript {
 	 * @return the variables
 	 */
 	public UserData getUservars(String username) {
-		return sessions.getAny(username);
+		return sessions.get(username);
 	}
 
 	/**

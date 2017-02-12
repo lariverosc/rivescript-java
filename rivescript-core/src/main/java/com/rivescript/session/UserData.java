@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@code UserData} is a container for user variables.
+ * Container for user variables.
  *
  * @author Noah Petherbridge
  * @author Marcel Overdijk

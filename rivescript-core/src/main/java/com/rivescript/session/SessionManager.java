@@ -94,12 +94,11 @@ public interface SessionManager {
 
 	/**
 	 * Returns all variables for a user.
-	 * // TODO rename method?
 	 *
 	 * @param username the username
 	 * @return the user data
 	 */
-	UserData getAny(String username);
+	UserData get(String username);
 
 	/**
 	 * Returns all variables about all users.

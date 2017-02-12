@@ -1,11 +1,30 @@
-# Revision History for RiveScript-Java
+# Change History
 
-* 0.7.2  January 17 2017
+This documents the history of significant changes to `rivescript-java`.
+
+## v0.8.0 - TBD, 2017
+
+This update focuses on new features and code reorganization.
+
+* **API Breaking Changes**
+  * A
+  * B
+
+* **Changes**
+  * C
+  * D
+
+
+## v0.7.2 - January 17, 2017
+
+* **Changes:**
   * Fix to make the `RiveScript` thread safe using a a `ThreadLocal` to store
     the current user.  (#18).
   * Add support for escaping `_` (underscores) in triggers.
 
-* 0.7.1  January 9 2017
+## v0.7.1 - January 9, 2017
+
+* **Changes:**
   * Fix for arrays in replies (e.g. `(@greek)`) not being converted to
     randomized sets (bug #26).
   * Fix trigger regexp processing so that if a `{weight}` tag contains a
@@ -19,11 +38,15 @@
   * Fix for moving the no-{inherits} triggers to the bottom of the stack
     when sorting the triggers (#8).
 
-* 0.7.0  December 22 2016
+## v0.7.0 - December 22, 2016
+
+* **Changes:**
   * Refactored project setup to allow separate module.
   * Switched to Gradle as build tool.
 
-* 0.6.0  June 28 2016
+## v0.6.0 - June 28, 2016
+
+* **Changes:**
   * Switched to semantic versioning; `com.rivescript.RiveScript.VERSION` is now
     a string `"0.6.0"` instead of a floating point number.
   * Add support for Java object macros (compile-time) via the new API
@@ -52,5 +75,6 @@
       topic inherited other topics, but didn't include other topics. The code
       was checking for inheritance but looping over includes.
 
-* 0.03  Nov 26 2014
-  * Initial official beta release.
+## v0.03-beta - Nov 26, 2014
+
+* Initial official beta release.
