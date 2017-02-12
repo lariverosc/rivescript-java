@@ -488,12 +488,12 @@ public class RiveScript {
 	/**
 	 * Checks whether deep recursion is detected.
 	 * <p>
-	 * Throws a {@link DeepRecursionException} in case throw exceptions is enabled, otherwise logs a warning.
+	 * Throws a {@link DeepRecursionException} in case exception throwing is enabled, otherwise logs a warning.
 	 *
 	 * @param depth   the recursion depth counter
 	 * @param message the message to log
 	 * @return whether deep recursion is detected
-	 * @throws DeepRecursionException in case deep recursion is detected and throw exceptions is enabled
+	 * @throws DeepRecursionException in case deep recursion is detected and exception throwing is enabled
 	 */
 	private boolean checkDeepRecursion(int depth, String message) throws DeepRecursionException {
 		if (depth > this.depth) {
@@ -674,8 +674,6 @@ public class RiveScript {
 	 * @throws ParserException in case of a parsing error
 	 */
 	private void parse(String filename, String[] code) throws ParserException {
-		logger.debug("Parsing code...");
-
 		// Get the abstract syntax tree of this file.
 		Root ast = this.parser.parse(filename, code);
 
@@ -1234,12 +1232,16 @@ public class RiveScript {
 
 	/**
 	 * Returns a reply from the bot for a user's message.
+	 * <p>
+	 * In case of an exception and exception throwing is enabled a {@link RiveScriptException} is thrown.
+	 * Check the subclasses to see which types exceptions can be thrown.
 	 *
 	 * @param username the username
 	 * @param message  the user's message
 	 * @return the reply
+	 * @throws RiveScriptException in case of an exception and exception throwing is enabled
 	 */
-	public String reply(String username, String message) {
+	public String reply(String username, String message) throws RiveScriptException {
 		logger.debug("Asked to reply to [{}] {}", username, message);
 
 		long startTime = System.currentTimeMillis();
