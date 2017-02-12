@@ -13,7 +13,7 @@ implementation.
     `RiveScript(Config config)` constructor .
   * The `RiveScript` instance has no notion of `debug` mode anymore.
     Debug logging is now based on the SLF4J configuration.
-  * Replaced `com.rivescript.ObjectMacro` with `com.rivescript.macro.Subroutine`.
+  * Refactored `com.rivescript.ObjectMacro` to `com.rivescript.macro.Subroutine`.
   * Renamed `ObjectHandler` methods from `onLoad`, `onCall` to respectively 
     `load` and `call`. Also the `setClass` method has been removed.
 

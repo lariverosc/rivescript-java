@@ -608,7 +608,7 @@ public class RiveScript {
 
 		// No results?
 		if (files.length == 0) {
-			logger.info("No files found in directory: {}", directory);
+			logger.warn("No files found in directory: {}", directory);
 		}
 
 		// Parse each file.
@@ -1275,9 +1275,9 @@ public class RiveScript {
 			// Save their message history.
 			this.sessions.addHistory(username, message, reply);
 
-			if (logger.isTraceEnabled()) {
+			if (logger.isDebugEnabled()) {
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				logger.trace("Replied to [{}] in {} ms", username, elapsedTime);
+				logger.debug("Replied [{}] to [{}] in {} ms", reply, username, elapsedTime);
 			}
 
 			return reply;

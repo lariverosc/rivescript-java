@@ -98,7 +98,7 @@ public class Parser {
 	 */
 	public Root parse(String filename, String[] code) throws ParserException {
 
-		logger.info("Parsing {}", filename);
+		logger.debug("Parsing {}", filename);
 
 		if (logger.isTraceEnabled()) {
 			for (String line : code) {
@@ -530,9 +530,9 @@ public class Parser {
 			}
 		}
 
-		if (logger.isInfoEnabled()) {
+		if (logger.isDebugEnabled()) {
 			long elapsedTime = System.currentTimeMillis() - startTime;
-			logger.info("Parsing {} completed in {} ms", filename, elapsedTime);
+			logger.debug("Parsing {} completed in {} ms", filename, elapsedTime);
 		}
 
 		return ast;
