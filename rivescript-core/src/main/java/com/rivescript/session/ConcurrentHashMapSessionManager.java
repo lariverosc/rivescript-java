@@ -22,9 +22,12 @@
 
 package com.rivescript.session;
 
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import static com.rivescript.session.ThawAction.*;
+import static com.rivescript.session.History.HISTORY_SIZE;
 
 /**
  * Implements the default in-memory session store for RiveScript, based on a {@link ConcurrentHashMap}.
@@ -130,16 +133,57 @@ public class ConcurrentHashMapSessionManager implements SessionManager {
 
 	@Override
 	public void freeze(String username) {
-
-		// TODO
+		if (users.containsKey(username)) {
+			UserData data = users.get(username);
+			frozen.put(username, cloneUser(data));
+		}
 	}
 
 	@Override
 	public void thaw(String username, ThawAction action) {
-
-		// TODO
+		if (frozen.containsKey(username)) {
+			UserData frozen = this.frozen.get(username);
+			if (action == THAW) {
+				users.put(username, cloneUser(frozen));
+				this.frozen.remove(username);
+			} else if (action == DISCARD) {
+				this.frozen.remove(username);
+			} else if (action == KEEP) {
+				users.put(username, cloneUser(frozen));
+			}
+		}
 	}
 
+	/**
+	 * Makes a safe clone of {@link UserData}.
+	 *
+	 * @param data the data to clone
+	 * @return the cloned data
+	 */
+	private UserData cloneUser(UserData data) {
+		UserData clone = defaultSession();
+
+		// Copy user variables.
+		for (Map.Entry<String, String> entry : data.getVariables().entrySet()) {
+			clone.setVariable(entry.getKey(), entry.getValue());
+		}
+
+		// Copy history.
+		for (int i = 0; i < HISTORY_SIZE; i++) {
+			clone.getHistory().getInput().set(i, data.getHistory().getInput(i));
+			clone.getHistory().getReply().set(i, data.getHistory().getReply(i));
+		}
+
+		return clone;
+	}
+
+	/**
+	 * Initializes the default session variables for a user.
+	 * <p>
+	 * This mostly just means the topic is set to "random".
+	 *
+	 * @return
+	 */
 	private UserData defaultSession() {
 		UserData userData = new UserData();
 		userData.setVariable("topic", "random");
